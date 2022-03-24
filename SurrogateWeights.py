@@ -28,7 +28,7 @@ class SurrogateWeights:
         n = len(self.criteria_rank)
         weights = []
         for i in range(1, n+1):
-            weights.append(round(2*(n+1-i)/n*(n+1), self.decimal_place))
+            weights.append(round(2*(n+1-i)/(n*(n+1)), self.decimal_place))
         return weights
 
     def reciprocalOfRanks(self):
