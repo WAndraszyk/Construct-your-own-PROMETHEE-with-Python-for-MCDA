@@ -26,7 +26,7 @@ class PrometheePreference:
             return 1
 
     def __uShapeCriterion(self, d, q):
-        if d >= q:
+        if d <= q:
             return 0
         else:
             return 1
