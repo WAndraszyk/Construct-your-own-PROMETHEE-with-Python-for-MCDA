@@ -15,9 +15,9 @@ class PrometheePreference:
         self.alternatives_performances = alternatives_performances
         self.weights = weights
         self.decimal_place = decimal_place
-        self.generalized_criterion = generalized_criterion
+        self.generalized_criterion = '_PrometheePreference__' + generalized_criterion + 'Criterion'
 
-        ### GENERALIZED_CRITERIONS
+        # GENERALIZED_CRITERIONS
 
     def __usualCriterion(self, d):
         if d <= 0:
@@ -83,22 +83,25 @@ class PrometheePreference:
             for i in range(len(self.alternatives_performances)):
                 alternativeIndices = []
                 for j in range(len(self.alternatives_performances)):
-                    alternativeIndices.append(method(deviations[k][i][j]))  # q,p,s?
+                    alternativeIndices.append(method(self, deviations[k][i][j]))  # q,p,s?
                 criterionIndices.append(alternativeIndices)
             ppIndices.append(criterionIndices)
         return ppIndices
 
     def computePreferenceIndices(self):
         """
-        Wstępnie zaimplementowana metoda która sztywno uzywa usualCriterion, docelowo metoda na podstawie zmiennej generalised criterion (param2).
+        .
         :return: OUT1, OUT2
         """
-        partialPref = self.__partialPreference(self.__usualCriterion)
-        aggregatedPI = []
+        partialPref = self.__partialPreference(getattr(PrometheePreference, self.generalized_criterion))
+        preferences =[]
         for i in range(len(self.alternatives_performances)):
+            aggregatedPI = []
             for j in range(len(self.alternatives_performances)):
                 Pi_A_B = 0
                 for k in range(len(self.criteria)):
                     Pi_A_B += partialPref[k][i][j] * self.weights[k]
                 aggregatedPI.append(Pi_A_B)
-        return aggregatedPI, partialPref
+            preferences.append(aggregatedPI)
+
+        return preferences, partialPref

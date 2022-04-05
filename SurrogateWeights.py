@@ -2,9 +2,20 @@ class SurrogateWeights:
     """This class computes weights of criteria. It requires the user to specify the
     criteria ranking. In this ranking each criterion is associated with a unique position.
     The ranking should list the criteria from the most to least important."""
-    def __init__(self, criteria_rank, decimal_place=3):
+
+    def __init__(self, criteria_rank, criteria, decimal_place=3):
+        self.criteria = criteria
         self.decimal_place = decimal_place
         self.criteria_rank = criteria_rank
+
+    def __weightOrder(self, weights):
+        weightsOut = []
+        for num_a, crit in enumerate(self.criteria):
+            for num_b, critOrderd in enumerate(self.criteria_rank):
+                if crit == critOrderd:
+                    weightsOut.append(weights[num_b])
+                    break
+        return weightsOut
 
     def equalWeights(self):
         """
@@ -15,9 +26,10 @@ class SurrogateWeights:
         n = len(self.criteria_rank)
         weights = []
         wi = round(1 / n, self.decimal_place)
-        for i in range(1, n+1):
+        for i in range(1, n + 1):
             weights.append(wi)
-        return weights
+        weightsOrdered = self.__weightOrder(weights)
+        return weightsOrdered
 
     def rankSum(self):
         """
@@ -27,9 +39,10 @@ class SurrogateWeights:
         """
         n = len(self.criteria_rank)
         weights = []
-        for i in range(1, n+1):
-            weights.append(round(2*(n+1-i)/(n*(n+1)), self.decimal_place))
-        return weights
+        for i in range(1, n + 1):
+            weights.append(round(2 * (n + 1 - i) / (n * (n + 1)), self.decimal_place))
+        weightsOrdered = self.__weightOrder(weights)
+        return weightsOrdered
 
     def reciprocalOfRanks(self):
         """
@@ -41,11 +54,12 @@ class SurrogateWeights:
         n = len(self.criteria_rank)
         weights = []
         sigma = 0
-        for j in range(1, n+1):
-            sigma += 1/j
-        for i in range(1, n+1):
-            weights.append(round((1/i)/sigma, self.decimal_place))
-        return weights
+        for j in range(1, n + 1):
+            sigma += 1 / j
+        for i in range(1, n + 1):
+            weights.append(round((1 / i) / sigma, self.decimal_place))
+        weightsOrdered = self.__weightOrder(weights)
+        return weightsOrdered
 
     def rankOrderCentroid(self):
         """
@@ -59,8 +73,8 @@ class SurrogateWeights:
         sigma = 0
         for j in range(1, n + 1):
             sigma += 1 / j
-        wi = round((1/n)*sigma, self.decimal_place)
+        wi = round((1 / n) * sigma, self.decimal_place)
         for i in range(1, n + 1):
             weights.append(wi)
-        return weights
-
+        weightsOrdered = self.__weightOrder(weights)
+        return weightsOrdered
