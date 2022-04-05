@@ -1,10 +1,12 @@
 import numpy as np
 
+
 class PrometheeOutrankingFlows:
     """
     This class computes positive and negative outranking flows
     based on preferences.
     """
+
     def __init__(self, alternatives, preferences):
         """
         :param alternatives: List of alternatives names (strings only)
@@ -25,7 +27,7 @@ class PrometheeOutrankingFlows:
 
         axis = 1 if positive else 0
         aggregtedPIes = np.sum(self.preferences, axis=axis)
-        flows = aggregtedPIes/(n-1)
+        flows = aggregtedPIes / (n - 1)
 
         return flows
         # return np.sum(self.preferences, axis=1 if positive else 0)/(len(self.alternatives)-1)
@@ -37,6 +39,3 @@ class PrometheeOutrankingFlows:
                  OUT2: negative outranking flow
         """
         return self.__calculate_flow(), self.__calculate_flow(positive=False)
-
-
-

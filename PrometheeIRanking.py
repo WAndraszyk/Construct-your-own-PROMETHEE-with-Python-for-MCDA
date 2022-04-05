@@ -18,6 +18,7 @@ class PrometheeIRanking:
         Calculate outranking pairs - 1st alternative in pair is weak-preferenced over 2nd alternative in pair.
         :return: List of outranking pairs
         """
+        # po co ten or tutaj? Nie mozna dac >= ?
         pairs = []
         for num_a, alternative_a in enumerate(self.alternatives):
             for num_b, alternative_b in enumerate(self.alternatives):
