@@ -8,7 +8,7 @@ class PrometheePreference:
         :param alternatives_performances: 2D list of alternatives' value at every criterion
         :param weights: list of weights
         :param generalized_criterion: method used for computing partial preference indices
-        :param decimal_place:
+        :param decimal_place: with this you can choose the decimal_place of the output numbers
         """
         self.alternatives = alternatives
         self.criteria = criteria
@@ -17,21 +17,39 @@ class PrometheePreference:
         self.decimal_place = decimal_place
         self.generalized_criterion = '_PrometheePreference__' + generalized_criterion + 'Criterion'
 
-        # GENERALIZED_CRITERIONS
+        # GENERALIZED_CRITERIONS:
 
     def __usualCriterion(self, d):
+        """
+        Returns 0 if difference is less or equal to 0, if not it returns 1.
+
+        :param d: difference between two alternatives on a specified criterion
+        """
         if d <= 0:
             return 0
         else:
             return 1
 
     def __uShapeCriterion(self, d, q):
+        """
+        Returns 0 if difference is less or equal to q, if not it returns 1.
+
+        :param d: difference between two alternatives on a specified criterion
+        :param q: threshold of indifference
+        """
         if d <= q:
             return 0
         else:
             return 1
 
     def __vShapeCriterion(self, d, p):
+        """
+        Returns 0 if difference is less or equal to p, 1 if it is greater then p.
+        Else it calculates the number between 0 and 1 based on the difference.
+
+        :param d: difference between two alternatives on a specified criterion
+        :param p: threshold of strict prefference
+        """
         if d <= 0:
             return 0
         elif d <= p:
@@ -40,6 +58,15 @@ class PrometheePreference:
             return 1
 
     def __levelCriterion(self, d, p, q):
+        """
+        Returns: 0 for d<=q
+                 0.5 for q<d<=p
+                 1 for d>p
+
+        :param d: difference between two alternatives on a specified criterion
+        :param p: threshold of strict prefference
+        :param q: threshold of indifference
+        """
         if d <= q:
             return 0
         elif d <= p:
@@ -48,6 +75,14 @@ class PrometheePreference:
             return 1
 
     def __vShapeIndifferenceCriterion(self, d, p, q):
+        """
+        Returns 0 if difference is less or equal to q, 1 if it is greater then p.
+        Else it calculates the number between 0 and 1 based on the difference.
+
+        :param d: difference between two alternatives on a specified criterion
+        :param p: threshold of strict prefference
+        :param q: threshold of indifference
+        """
         if d <= q:
             return 0
         elif d <= p:
@@ -56,6 +91,12 @@ class PrometheePreference:
             return 1
 
     def __gaussianCriterion(self, d, s):
+        """
+        Calculates preference based on nonlinear gaussian function.
+
+        :param s: intermediate value between q and p. Defines the inflection point of the preference function.
+        :param d: difference between two alternatives on a specified criterion
+        """
         e = 2.718281828459045
         if d <= 0:
             return 0
@@ -63,6 +104,11 @@ class PrometheePreference:
             return 1 - e ** (-((d ** 2) / (2 * s ** 2)))
 
     def __deviations(self):
+        """
+        Compares alternatives on criteria.
+
+        :return: 3D matrix of deviations in evaluations on criteria
+        """
         deviations = []
         for k in range(len(self.criteria)):
             comparisons = []
@@ -76,6 +122,16 @@ class PrometheePreference:
         return deviations
 
     def __partialPreference(self, method, q=0.25, p=0.75, s=0.5, ):
+        """
+        Calculates partial preference of every alternative over others at every criterion
+        based on deviations using a method chosen by user.
+
+        :param method: method used for computing partial preference indices
+        :param q: threshold of indifference
+        :param p: threshold of strict prefference
+        :param s: intermediate value between q and p. Defines the inflection point of the preference function.
+        :return: partial preference indices
+        """
         deviations = self.__deviations()
         ppIndices = []
         for k in range(len(self.criteria)):
@@ -90,8 +146,10 @@ class PrometheePreference:
 
     def computePreferenceIndices(self):
         """
-        .
-        :return: OUT1, OUT2
+        Calculates preference of every alternative over others based on partial preferences
+
+        :return: preferences
+        :return: partial preferences
         """
         partialPref = self.__partialPreference(getattr(PrometheePreference, self.generalized_criterion))
         preferences =[]
@@ -105,3 +163,4 @@ class PrometheePreference:
             preferences.append(aggregatedPI)
 
         return preferences, partialPref
+
