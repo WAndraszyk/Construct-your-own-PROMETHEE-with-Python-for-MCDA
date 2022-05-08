@@ -1,9 +1,6 @@
 from enum import Enum
 
 
-# TODO: categories profiles, profiles performance table, criteria
-
-
 class PreferenceFunction(Enum):
     """Enumeration of the preference functions."""
 
