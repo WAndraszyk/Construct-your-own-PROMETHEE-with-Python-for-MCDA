@@ -1,34 +1,66 @@
+from enum import Enum
+
+
+# TODO: categories profiles, profiles performance table, criteria
+
+
+class PreferenceFunction(Enum):
+    """Enumeration of the preference functions."""
+
+    USUAL = 1
+    U_SHAPE = 2
+    V_SHAPE = 3
+    LEVEL = 4
+    V_SHAPE_INDIFFERENCE = 5
+    GAUSSIAN = 6
+
+
 class PrometheePreference:
-    def __init__(self, alternatives, criteria, alternatives_performances, weights, generalized_criterion="usual",
+    def __init__(self, alternatives, criteria, alternatives_performances, weights,
+                 p_list, q_list, s_list, generalized_criteria, directions,
                  decimal_place=3):
         """
         Nie uwzględniono boundary profiles oraz characteristic profiles.
-        :param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
+        @param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
         :param criteria: list of criteria
         :param alternatives_performances: 2D list of alternatives' value at every criterion
         :param weights: list of weights
         :param generalized_criterion: method used for computing partial preference indices
         :param decimal_place: with this you can choose the decimal_place of the output numbers
+        :param p_list: list of preference threshold for each criteria
+        :param q_list: list of indifference threshold for each criteria
+        :param s_list: list of standard deviation for each criteria
+        :param generalized_criteria: list of preference functions
+        :param directions: directions of preference of criteria
+
+
         """
         self.alternatives = alternatives
         self.criteria = criteria
-        self.alternatives_performances = alternatives_performances
+        self.alternatives_performances = self.directed_alternatives_performances(alternatives_performances, directions)
         self.weights = weights
         self.decimal_place = decimal_place
-        self.generalized_criterion = '_PrometheePreference__' + generalized_criterion + 'Criterion'
+        self.generalized_criteria = generalized_criteria
+        self.p_list = p_list
+        self.q_list = q_list
+        self.s_list = s_list
 
-        # GENERALIZED_CRITERIONS:
+    def directed_alternatives_performances(self, alternatives_performances, directions):
+        for i in range(len(directions)):
+            if directions[i] == 0:
+                for j in range(len(alternatives_performances)):
+                    alternatives_performances[j][i] = -alternatives_performances[j][i]
 
+        return alternatives_performances
+
+    # GENERALIZED_CRITERIA:
     def __usualCriterion(self, d):
         """
         Returns 0 if difference is less or equal to 0, if not it returns 1.
 
         :param d: difference between two alternatives on a specified criterion
         """
-        if d <= 0:
-            return 0
-        else:
-            return 1
+        return 1 if d > 0 else 0
 
     def __uShapeCriterion(self, d, q):
         """
@@ -121,25 +153,55 @@ class PrometheePreference:
             deviations.append(comparisons)
         return deviations
 
-    def __partialPreference(self, method, q=0.25, p=0.75, s=0.5, ):
+    def __partialPreference(self):
         """
         Calculates partial preference of every alternative over others at every criterion
         based on deviations using a method chosen by user.
-
-        :param method: method used for computing partial preference indices
-        :param q: threshold of indifference
-        :param p: threshold of strict prefference
-        :param s: intermediate value between q and p. Defines the inflection point of the preference function.
         :return: partial preference indices
         """
         deviations = self.__deviations()
         ppIndices = []
         for k in range(len(self.criteria)):
+            method = self.generalized_criteria[k]
+            q = self.q_list[k]
+            p = self.p_list[k]
+            s = self.s_list[k]
             criterionIndices = []
             for i in range(len(self.alternatives_performances)):
                 alternativeIndices = []
                 for j in range(len(self.alternatives_performances)):
-                    alternativeIndices.append(method(self, deviations[k][i][j]))  # q,p,s?
+                    if method is PreferenceFunction.USUAL:
+                        alternativeIndices.append(self.__usualCriterion(deviations[k][i][j]))
+                    elif method is PreferenceFunction.U_SHAPE:
+                        alternativeIndices.append(self.__uShapeCriterion(deviations[k][i][j], q))
+                    elif method is PreferenceFunction.V_SHAPE:
+                        alternativeIndices.append(self.__vShapeCriterion(deviations[k][i][j], p))
+                    elif method is PreferenceFunction.LEVEL:
+                        if q > p:
+                            raise ValueError(
+                                "incorrect threshold : q "
+                                + str(q)
+                                + " greater than p "
+                                + str(p)
+                            )
+                        alternativeIndices.append(self.__levelCriterion(deviations[k][i][j], p, q))
+                    elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
+                        if q > p:
+                            raise ValueError(
+                                "incorrect threshold : q "
+                                + str(q)
+                                + " greater than p "
+                                + str(p)
+                            )
+                        alternativeIndices.append(self.__vShapeIndifferenceCriterion(deviations[k][i][j], p, q))
+                    elif method is PreferenceFunction.GAUSSIAN:
+                        alternativeIndices.append(self.__gaussianCriterion(deviations[k][i][j], s))
+                    else:
+                        raise ValueError(
+                            "pref_func "
+                            + str(method)
+                            + " is not known."
+                        )
                 criterionIndices.append(alternativeIndices)
             ppIndices.append(criterionIndices)
         return ppIndices
@@ -151,8 +213,8 @@ class PrometheePreference:
         :return: preferences
         :return: partial preferences
         """
-        partialPref = self.__partialPreference(getattr(PrometheePreference, self.generalized_criterion))
-        preferences =[]
+        partialPref = self.__partialPreference()
+        preferences = []
         for i in range(len(self.alternatives_performances)):
             aggregatedPI = []
             for j in range(len(self.alternatives_performances)):
@@ -163,4 +225,3 @@ class PrometheePreference:
             preferences.append(aggregatedPI)
 
         return preferences, partialPref
-

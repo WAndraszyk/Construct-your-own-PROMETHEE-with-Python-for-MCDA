@@ -1,7 +1,7 @@
-import PrometheePreference as PP
-import SurrogateWeights as SW
-import PrometheeOutrankingFlows as POF
-import PrometheeIRanking as PI_Rank
+from PrometheePreference import (PrometheePreference, PreferenceFunction)
+from SurrogateWeights import SurrogateWeights
+from PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from PrometheeIRanking import PrometheeIRanking
 
 warianty = ['Pierwszy', 'Drugi', 'Trzeci']
 kryteria = ['G1', 'G2']
@@ -9,13 +9,19 @@ ap = [[10, 12],
       [11, 13],
       [12, 14]]
 rankingKryteriow = ['G2', 'G1']
-
-weights = SW.SurrogateWeights(rankingKryteriow, kryteria).rankSum()
-print("wagi : " ,weights)
-aggregatedPI, partialPref = PP.PrometheePreference(warianty,kryteria,ap,weights).computePreferenceIndices()
+directions = [0, 1]
+generalized_criteria = [PreferenceFunction.U_SHAPE, PreferenceFunction.V_SHAPE]
+p_param = [4, 0.5]
+q_param = [0.4, 5]
+s_param = [3, 3]
+weights = SurrogateWeights(rankingKryteriow, kryteria).rankSum()
+print("wagi : ", weights)
+aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
+                                                p_param, q_param, s_param, generalized_criteria,
+                                                directions).computePreferenceIndices()
 print("partial pref", partialPref)
 print("preferencje : ", aggregatedPI)
 
-positiveFlow, negativeFlow = POF.PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
-pairs = PI_Rank.PrometheeIRanking(warianty,positiveFlow, negativeFlow).calculate_ranking()
+positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
+pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
 print(pairs)
