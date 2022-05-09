@@ -1,7 +1,7 @@
-from PrometheePreference import (PrometheePreference, PreferenceFunction)
-from SurrogateWeights import SurrogateWeights
-from PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from PrometheeIRanking import PrometheeIRanking
+from ModularParts.PrometheePreference import (PrometheePreference, PreferenceFunction)
+from ModularParts.SurrogateWeights import SurrogateWeights
+from ModularParts.PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.PrometheeIRanking import PrometheeIRanking
 
 warianty = ['Pierwszy', 'Drugi', 'Trzeci']
 kryteria = ['G1', 'G2']
@@ -14,6 +14,7 @@ generalized_criteria = [PreferenceFunction.U_SHAPE, PreferenceFunction.V_SHAPE]
 p_param = [4, 0.5]
 q_param = [0.4, 5]
 s_param = [3, 3]
+
 weights = SurrogateWeights(rankingKryteriow, kryteria).rankSum()
 print("wagi : ", weights)
 aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
