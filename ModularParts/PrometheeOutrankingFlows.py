@@ -1,5 +1,6 @@
 import numpy as np
-
+from core.aliases import NumericValue
+from typing import List
 
 class PrometheeOutrankingFlows:
     """
@@ -7,7 +8,7 @@ class PrometheeOutrankingFlows:
     based on preferences.
     """
 
-    def __init__(self, alternatives, preferences):
+    def __init__(self, alternatives: List[str], preferences: List[List[NumericValue]]):
         """
         :param alternatives: List of alternatives names (strings only)
         :param preferences: 2D array of aggregated preferences
@@ -15,7 +16,7 @@ class PrometheeOutrankingFlows:
         self.alternatives = alternatives
         self.preferences = preferences
 
-    def __calculate_flow(self, positive=True):
+    def __calculate_flow(self, positive=True) -> List[NumericValue]:
         """
         Calculate positive or negative outranking flow.
 

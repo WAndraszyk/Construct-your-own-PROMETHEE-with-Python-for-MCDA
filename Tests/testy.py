@@ -17,6 +17,7 @@ s_param = [3, 3]
 
 weights = SurrogateWeights(rankingKryteriow, kryteria).rankSum()
 print("wagi : ", weights)
+print(generalized_criteria)
 aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
                                                 p_param, q_param, s_param, generalized_criteria,
                                                 directions).computePreferenceIndices()
@@ -24,5 +25,7 @@ print("partial pref", partialPref)
 print("preferencje : ", aggregatedPI)
 
 positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
+print(positiveFlow, negativeFlow )
+
 pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
 print(pairs)

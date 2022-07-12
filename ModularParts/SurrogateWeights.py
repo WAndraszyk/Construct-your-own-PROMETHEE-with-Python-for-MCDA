@@ -1,14 +1,21 @@
+from core.aliases import NumericValue
+from typing import List
+
+
 class SurrogateWeights:
     """This class computes weights of criteria. It requires the user to specify the
     criteria ranking. In this ranking each criterion is associated with a unique position.
     The ranking should list the criteria from the most to least important."""
 
-    def __init__(self, criteria_rank, criteria, decimal_place=3):
+    def __init__(self, criteria_rank,
+                 criteria: List[NumericValue],
+                 decimal_place: NumericValue = 3):
         self.criteria = criteria
         self.decimal_place = decimal_place
         self.criteria_rank = criteria_rank
 
-    def __weightOrder(self, weights):
+    def __weightOrder(self,
+                      weights: List[NumericValue]) -> List[NumericValue]:
         weightsOut = []
         for num_a, crit in enumerate(self.criteria):
             for num_b, critOrderd in enumerate(self.criteria_rank):
@@ -17,7 +24,7 @@ class SurrogateWeights:
                     break
         return weightsOut
 
-    def equalWeights(self):
+    def equalWeights(self) -> List[NumericValue] :
         """
         In this method all weights are computed with the same value and sum up to 1.
 
@@ -31,7 +38,7 @@ class SurrogateWeights:
         weightsOrdered = self.__weightOrder(weights)
         return weightsOrdered
 
-    def rankSum(self):
+    def rankSum(self) -> List[NumericValue]:
         """
         In this method the more important the criterion is, the higher its weight.
 
@@ -44,7 +51,7 @@ class SurrogateWeights:
         weightsOrdered = self.__weightOrder(weights)
         return weightsOrdered
 
-    def reciprocalOfRanks(self):
+    def reciprocalOfRanks(self)-> List[NumericValue]:
         """
         This method computes weights by dividing each reciprocal of rank by the sum of these
         reciprocals for all criteria.
@@ -61,7 +68,7 @@ class SurrogateWeights:
         weightsOrdered = self.__weightOrder(weights)
         return weightsOrdered
 
-    def rankOrderCentroid(self):
+    def rankOrderCentroid(self) -> List[NumericValue]:
         """
         The weights in this method reflect the centroid of the simplex defined by ranking of
         the criteria.

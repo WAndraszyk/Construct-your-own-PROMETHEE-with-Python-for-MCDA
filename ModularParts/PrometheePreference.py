@@ -1,4 +1,6 @@
 from enum import Enum
+from core.aliases import NumericValue
+from typing import List
 
 
 class PreferenceFunction(Enum):
@@ -13,9 +15,17 @@ class PreferenceFunction(Enum):
 
 
 class PrometheePreference:
-    def __init__(self, alternatives, criteria, alternatives_performances, weights,
-                 p_list, q_list, s_list, generalized_criteria, directions,
-                 decimal_place=3):
+    def __init__(self,
+                 alternatives,
+                 criteria,
+                 alternatives_performances: List[List[NumericValue]],
+                 weights: List[NumericValue],
+                 p_list: List[NumericValue],
+                 q_list: List[NumericValue],
+                 s_list: List[NumericValue],
+                 generalized_criteria,
+                 directions: List[NumericValue],
+                 decimal_place: NumericValue = 3):
         """
         Nie uwzględniono boundary profiles oraz characteristic profiles.
         @param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
@@ -42,7 +52,9 @@ class PrometheePreference:
         self.q_list = q_list
         self.s_list = s_list
 
-    def directed_alternatives_performances(self, alternatives_performances, directions):
+    def directed_alternatives_performances(self,
+                                           alternatives_performances: List[List[NumericValue]],
+                                           directions: List[NumericValue]) -> List[List[NumericValue]]:
         for i in range(len(directions)):
             if directions[i] == 0:
                 for j in range(len(alternatives_performances)):
@@ -51,7 +63,7 @@ class PrometheePreference:
         return alternatives_performances
 
     # GENERALIZED_CRITERIA:
-    def __usualCriterion(self, d):
+    def __usualCriterion(self, d: NumericValue):
         """
         Returns 0 if difference is less or equal to 0, if not it returns 1.
 
@@ -59,7 +71,7 @@ class PrometheePreference:
         """
         return 1 if d > 0 else 0
 
-    def __uShapeCriterion(self, d, q):
+    def __uShapeCriterion(self, d: NumericValue, q: NumericValue):
         """
         Returns 0 if difference is less or equal to q, if not it returns 1.
 
@@ -71,7 +83,7 @@ class PrometheePreference:
         else:
             return 1
 
-    def __vShapeCriterion(self, d, p):
+    def __vShapeCriterion(self, d: NumericValue, p: NumericValue):
         """
         Returns 0 if difference is less or equal to p, 1 if it is greater then p.
         Else it calculates the number between 0 and 1 based on the difference.
@@ -86,7 +98,7 @@ class PrometheePreference:
         else:
             return 1
 
-    def __levelCriterion(self, d, p, q):
+    def __levelCriterion(self, d: NumericValue, p: NumericValue, q: NumericValue):
         """
         Returns: 0 for d<=q
                  0.5 for q<d<=p
@@ -103,7 +115,7 @@ class PrometheePreference:
         else:
             return 1
 
-    def __vShapeIndifferenceCriterion(self, d, p, q):
+    def __vShapeIndifferenceCriterion(self, d: NumericValue, p: NumericValue, q: NumericValue):
         """
         Returns 0 if difference is less or equal to q, 1 if it is greater then p.
         Else it calculates the number between 0 and 1 based on the difference.
@@ -119,7 +131,7 @@ class PrometheePreference:
         else:
             return 1
 
-    def __gaussianCriterion(self, d, s):
+    def __gaussianCriterion(self, d: NumericValue, s: NumericValue):
         """
         Calculates preference based on nonlinear gaussian function.
 
@@ -132,7 +144,7 @@ class PrometheePreference:
         else:
             return 1 - e ** (-((d ** 2) / (2 * s ** 2)))
 
-    def __deviations(self):
+    def __deviations(self) ->  List[List[List[NumericValue]]]:
         """
         Compares alternatives on criteria.
 
@@ -150,7 +162,7 @@ class PrometheePreference:
             deviations.append(comparisons)
         return deviations
 
-    def __partialPreference(self):
+    def __partialPreference(self) ->  List[List[List[NumericValue]]]:
         """
         Calculates partial preference of every alternative over others at every criterion
         based on deviations using a method chosen by user.
