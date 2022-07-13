@@ -1,11 +1,27 @@
-from typing import Callable, Union
+from typing import Callable, List, NamedTuple, Union
 
-from pandas import DataFrame
+NumericValue = Union[int, float]
+Value = Union[NumericValue, str]
+Id = str
+Name = str
+Active = bool
+Real = bool
 
-NumericValue = float
-Value = Union[float, str]
+Alternative = Id
+Criterion = Id
+Category = Id
 
-PerformanceTable = DataFrame
+PerformanceTable = List[List[Value]]
+NumericPerformanceTable = List[List[NumericValue]]
 
 Function = Callable[[Value], Value]
 NumericFunction = Callable[[NumericValue], NumericValue]
+
+
+class CategoriesInterval(NamedTuple):
+    lower_bound: Category
+    upper_bound: Category
+
+
+Assignment = Union[Category, List[Category], CategoriesInterval]
+

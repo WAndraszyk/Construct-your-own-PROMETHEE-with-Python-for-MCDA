@@ -1,26 +1,35 @@
-"""
-.. deprecated:: 0.3.4
-    The whole module is deprecated. Class :class:`RelationType` and type alias
-    `Relation` should be imported from :mod:`mcda.core.relations` instead.
-"""
-from typing import List
-
-from deprecated.sphinx import deprecated
-
-import mcda.core.relations as relations
+from enum import Enum, auto
+from typing import List, Tuple
 
 from .aliases import NumericValue
 
-Relation = relations.Relation
 
-RelationType = relations.RelationType
+class RelationType(Enum):
+    """Enumeration of MCDA relation types."""
+
+    PREFERENCE = auto()
+    INDIFFERENCE = auto()
+    INCOMPARABLE = auto()
+
+    @classmethod
+    def has_value(cls, x: "RelationType") -> bool:
+        """Check if value is in enumeration.
+
+        :param x:
+        :return:
+        """
+        return x in cls
+
+    @classmethod
+    def content_message(cls) -> str:
+        """Return list of items and their values.
+
+        :return:
+        """
+        s = ", ".join(f"{item}: {item.value}" for item in cls)
+        return "RelationType only has following values " + s
 
 
-@deprecated(
-    reason="Since pandas package is used, its basic functions should be used "
-    "instead. In this case: :meth:`pandas.Series.sort_values`",
-    version="0.3.4",
-)
 def rank_values(
     values: List[NumericValue], reverse: bool = False
 ) -> List[int]:
@@ -41,11 +50,6 @@ def rank_values(
     return [order.index(i) for i, _ in enumerate(values)]
 
 
-@deprecated(
-    reason="Since pandas package is used, its basic functions should be used "
-    "instead. In this case: :meth:`pandas.Series.sort_values`",
-    version="0.3.4",
-)
 def sort_elements_by_values(
     values: List[NumericValue], *elements: List, reverse: bool = False
 ):
@@ -64,3 +68,6 @@ def sort_elements_by_values(
     for i in range(len(elements)):
         for j, v in enumerate([a for _, a in sorted(zip(ranks, elements[i]))]):
             elements[i][j] = v
+
+
+Relation = Tuple[int, int, RelationType]

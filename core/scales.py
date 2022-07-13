@@ -17,7 +17,7 @@ def numeric_value(value: Union[NumericValue, FuzzyNumber]) -> NumericValue:
     :param value:
     :return:
     """
-    return value.centre_of_gravity if isinstance(value, FuzzyNumber) else value
+    return value.average() if isinstance(value, FuzzyNumber) else value
 
 
 class PreferenceDirection(Enum):
@@ -186,7 +186,7 @@ class QuantitativeScale(Scale, Interval):
             List[Value], np.linspace(self.dmin, self.dmax, nb).tolist()
         )
 
-    def _normalize_value(self, x: NumericValue) -> NumericValue:
+    def normalize_value(self, x: Value) -> NumericValue:
         """Normalize numeric value.
 
         :param x:
@@ -200,7 +200,7 @@ class QuantitativeScale(Scale, Interval):
             return 1 - Interval.normalize(self, x)
         return Interval.normalize(self, x)
 
-    def _denormalize_value(self, x: NumericValue) -> NumericValue:
+    def denormalize_value(self, x: NumericValue) -> Value:
         """Denormalize normalized numeric value.
 
         :param x:
@@ -211,8 +211,8 @@ class QuantitativeScale(Scale, Interval):
             normalized value must always be bigger.
         """
         if self.preference_direction == PreferenceDirection.MIN:
-            return cast(NumericValue, Interval.denormalize(self, 1 - x))
-        return cast(NumericValue, Interval.denormalize(self, x))
+            return Interval.denormalize(self, 1 - x)
+        return Interval.denormalize(self, x)
 
     def transform_to(self, x: Value, target_scale: Scale = None) -> Value:
         """Transform value from this scale to target scale.
@@ -236,10 +236,10 @@ class QuantitativeScale(Scale, Interval):
         _x = cast(NumericValue, x)
         if isinstance(target_scale, QualitativeScale):
             return target_scale.label_from_value(
-                target_scale._denormalize_value(self._normalize_value(_x))
+                target_scale.denormalize_value(self.normalize_value(_x))
             )
         if isinstance(target_scale, QuantitativeScale):
-            return target_scale._denormalize_value(self._normalize_value(_x))
+            return target_scale.denormalize_value(self.normalize_value(_x))
         raise TypeError("cannot transform from quantitative to nominal scale")
 
     def normalize(self, x: Value) -> NumericValue:
@@ -262,20 +262,6 @@ class QuantitativeScale(Scale, Interval):
         """
         return Scale.denormalize(self, x)
 
-    def is_better(self, x: Value, y: Value) -> bool:
-        """Check if x is better than y according to this scale.
-
-        :param x:
-        :param y:
-        :return:
-        """
-        _x, _y = cast(NumericValue, x), cast(NumericValue, y)
-        return (
-            _x > _y
-            if self.preference_direction == PreferenceDirection.MAX
-            else _x < _y
-        )
-
 
 _NORMALIZED_SCALE = QuantitativeScale(0, 1)
 
@@ -290,12 +276,9 @@ class QualitativeScale(QuantitativeScale, NominalScale):
     :param labels:
     :param values:
     :param preference_direction: scale preference direction
-    :param dmin: min boundary of scale (inferred from `values` if not set)
-    :param dmax: max boundary of scale (inferred from `values` if not set)
     :raises ValueError:
         * if number of `labels` and `values` differs
         * if `preference_direction` is unknown
-        * if at least one value is outside the bounds
     :raises TypeError:
         * if `values` contains non-numeric values
 
@@ -315,8 +298,6 @@ class QualitativeScale(QuantitativeScale, NominalScale):
         labels: List[Value],
         values: List[NumericValue],
         preference_direction: PreferenceDirection = PreferenceDirection.MAX,
-        dmin: NumericValue = None,
-        dmax: NumericValue = None,
     ):
         """Constructor method"""
         if len(labels) != len(values):
@@ -336,24 +317,16 @@ class QualitativeScale(QuantitativeScale, NominalScale):
                     "QualitativeScale must have numeric values."
                     f"Got: {type(value)}"
                 )
-        dmin = min(values) if dmin is None else dmin
-        dmax = max(values) if dmax is None else dmax
-        for value in values:
-            if value < dmin or value > dmax:
-                raise ValueError(
-                    f"value '{value}' is outside the defined bounds "
-                    f"[{dmin}, {dmax}]"
-                )
         self.values = values
         QuantitativeScale.__init__(
             self,
-            dmin,
-            dmax,
+            min(self.values),
+            max(self.values),
             preference_direction,
         )
         self.__quantitative = QuantitativeScale(
-            dmin,
-            dmax,
+            min(self.values),
+            max(self.values),
             preference_direction,
         )
 
@@ -402,9 +375,7 @@ class QualitativeScale(QuantitativeScale, NominalScale):
             return target_scale.labels[target_scale.labels.index(x)]
         if isinstance(target_scale, QuantitativeScale):
             value = self.values[self.labels.index(x)]
-            return target_scale._denormalize_value(
-                self._normalize_value(value)
-            )
+            return target_scale.denormalize_value(self.normalize_value(value))
         raise TypeError(
             f"unrecognized scale type for scale: {target_scale}"
         )  # pragma: nocover
@@ -421,17 +392,6 @@ class QualitativeScale(QuantitativeScale, NominalScale):
         _x = cast(NumericValue, x)
         return self.labels[self.values.index(_x)]
 
-    def is_better(self, x: Value, y: Value) -> bool:
-        """Check if x is better than y according to this scale.
-
-        :param x:
-        :param y:
-        :return:
-        """
-        return self.quantitative.is_better(
-            self.transform_to(x), self.transform_to(y)
-        )
-
 
 class FuzzyScale(QualitativeScale):
     """This class implements a MCDA fuzzy qualitative scale.
@@ -439,12 +399,9 @@ class FuzzyScale(QualitativeScale):
     :param labels:
     :param fuzzy:
     :param preference_direction: scale preference direction
-    :param dmin: min boundary of scale (inferred from `values` if not set)
-    :param dmax: max boundary of scale (inferred from `values` if not set)
     :raises ValueError:
         * if number of `labels` and `fuzzy` differs
         * if `preference_direction` is unknown
-        * if at least one fuzzy number is outside the bounds
     :raises TypeError:
         * if `fuzzy` contains non-fuzzy numbers
     """
@@ -454,109 +411,14 @@ class FuzzyScale(QualitativeScale):
         labels: List[Value],
         fuzzy: List[FuzzyNumber],
         preference_direction: PreferenceDirection = PreferenceDirection.MAX,
-        dmin: NumericValue = None,
-        dmax: NumericValue = None,
     ):
         values = []
         for fz in fuzzy:
             if type(fz) is not FuzzyNumber:
                 raise TypeError("fuzzy scales can only contains fuzzy numbers")
-        dmin = min(fz.abscissa[0] for fz in fuzzy) if dmin is None else dmin
-        dmax = max(fz.abscissa[-1] for fz in fuzzy) if dmax is None else dmax
-        for fz in fuzzy:
-            if fz.abscissa[0] < dmin or fz.abscissa[-1] > dmax:
-                raise ValueError(
-                    "fuzzy number sets must be within the defined bounds "
-                    f"[{dmin}, {dmax}]"
-                )
-            values.append(fz.centre_of_gravity)
-        QualitativeScale.__init__(
-            self, labels, values, preference_direction, dmin, dmax
-        )
+            values.append(fz.average())
+        QualitativeScale.__init__(self, labels, values, preference_direction)
         self.fuzzy = fuzzy
-
-    def defuzzify(self, method: str = "centre_of_gravity"):
-        """Defuzzify all fuzzy numbers using given method.
-
-        :param method:
-            method used to defuzzify
-            (from :class:`mcda.core.functions.FuzzyNumber` numeric methods)
-        """
-        for i, fz in enumerate(self.fuzzy):
-            self.values[i] = getattr(fz, method)
-
-    def is_fuzzy_partition(self) -> bool:
-        """Test whether the scale define a fuzzy partition.
-
-        :return:
-        """
-        indexes = sorted(range(len(self.labels)), key=lambda i: self.values[i])
-        fuzzy_sets = [self.fuzzy[i] for i in indexes]
-        for i in range(len(fuzzy_sets) - 1):
-            for j in range(2):
-                if (
-                    fuzzy_sets[i].abscissa[j + 2]
-                    != fuzzy_sets[i + 1].abscissa[j]
-                ):
-                    return False
-        return True
-
-    def similarity(
-        self, fuzzy1: FuzzyNumber, fuzzy2: FuzzyNumber
-    ) -> NumericValue:
-        """Returns similarity between both fuzzy numbers w.r.t this scale.
-
-        :param fuzzy1:
-        :param fuzzy2:
-        :return:
-
-        .. note:: implementation based on :cite:p:`isern2010ulowa`
-        """
-        a = [self.quantitative.normalize(v) for v in fuzzy1.abscissa]
-        b = [self.quantitative.normalize(v) for v in fuzzy2.abscissa]
-        res = [2 - abs(aa - bb) for aa, bb in zip(a, b)]
-        prod = 1.0
-        for r in res:
-            prod *= r
-        return prod ** (1 / 4) - 1
-
-    def fuzziness(self, fuzzy: FuzzyNumber) -> NumericValue:
-        """Returns the fuzziness of given fuzzy number w.r.t this scale.
-
-        :param fuzzy:
-        :return:
-        """
-        return self.quantitative.normalize(
-            (
-                fuzzy.abscissa[1]
-                + fuzzy.abscissa[3]
-                - fuzzy.abscissa[0]
-                - fuzzy.abscissa[2]
-            )
-            / 2
-        )
-
-    def specificity(self, fuzzy: FuzzyNumber) -> NumericValue:
-        """Returns the specificity of given fuzzy number w.r.t this scale.
-
-        :param fuzzy:
-        :return:
-        """
-        return 1 - self.quantitative.normalize(fuzzy.area)
-
-    def ordinal_distance(self, a: Value, b: Value) -> NumericValue:
-        """Returns the ordinal distance between the labels
-        (sorted by defuzzified values).
-
-        :param a:
-        :param b:
-        :return:
-        :raises ValueError: if `a` or `b` is not inside the scale
-        """
-        if a not in self or b not in self:
-            raise ValueError("both labels must be inside the fuzzy scale")
-        labels = sorted(self.labels, key=lambda v: self.transform_to(v))
-        return abs(labels.index(a) - labels.index(b))
 
 
 class ScaledFunction:
@@ -597,25 +459,3 @@ class ScaledFunction:
         if x not in self.scale_input:
             raise ValueError(f"input is outside its scale: {x}")
         return self.function(x)
-
-
-def is_better(x: Value, y: Value, scale: QuantitativeScale) -> bool:
-    """Check if x is better than y according to this scale
-
-    :param x:
-    :param y:
-    :param scale:
-    :return:
-    """
-    return scale.is_better(x, y)
-
-
-def is_better_or_equal(x: Value, y: Value, scale: QuantitativeScale) -> bool:
-    """Check if x is better or equal to y according to this scale
-
-    :param x:
-    :param y:
-    :param scale:
-    :return:
-    """
-    return x == y or is_better(x, y, scale)

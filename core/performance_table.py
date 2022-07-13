@@ -7,23 +7,24 @@ __all__ = [
     "apply_criteria_functions",
     "apply_criteria_weights",
     "get_alternative_values",
-    "get_alternative_values_at",
     "get_criterion_values",
-    "get_criterion_values_at",
+    "in_scales_alternatives",
     "is_numeric",
     "is_within_criteria_scales",
     "normalize",
     "sum_table",
     "transform",
-    "within_criteria_scales",
 ]
 
-from typing import Dict, Union, cast
+from typing import Iterable, List, Optional, Union, cast
 
-from pandas import Series
-from pandas.api.types import is_numeric_dtype  # type: ignore
-
-from .aliases import Function, NumericValue, PerformanceTable
+from .aliases import (
+    Function,
+    NumericPerformanceTable,
+    NumericValue,
+    PerformanceTable,
+    Value,
+)
 from .scales import Scale
 
 
@@ -34,47 +35,48 @@ def is_numeric(performance_table: PerformanceTable) -> bool:
     :return:
     :rtype: bool
     """
-    for col in performance_table.columns:
-        if not is_numeric_dtype(performance_table[col]):
-            return False
+    for row in performance_table:
+        for cell in row:
+            if type(cell) not in [int, float]:
+                return False
     return True
 
 
 def apply_criteria_functions(
-    performance_table: PerformanceTable, functions: Dict[str, Function]
+    performance_table: PerformanceTable, functions: List[Function]
 ) -> PerformanceTable:
     """Apply criteria functions to performance table and return result.
 
     :param performance_table:
-    :param functions: functions identified by their criterion
+    :param functions: list of functions in same criteria order than table
     :return:
     """
-    return cast(
-        PerformanceTable,
-        performance_table.apply(lambda col: col.apply(functions[col.name])),
-    )
+    return [
+        [f(perf) for f, perf in zip(functions, aPerf)]
+        for aPerf in performance_table
+    ]
 
 
 def apply_criteria_weights(
-    performance_table: PerformanceTable,
-    criteria_weights: Dict[str, NumericValue],
-) -> PerformanceTable:
-    """Apply criteria weights to a performance table and return result.
+    performance_table: NumericPerformanceTable,
+    criteria_weights: List[NumericValue],
+) -> NumericPerformanceTable:
+    """Apply criteria weights to a numeric performance table and return result.
 
     :param performance_table:
-    :param criteria_weights: weights identified by their criterion
+    :param criteria_weights: criteria weights in same criteria order than table
     :return:
     """
-    return cast(
-        PerformanceTable,
-        performance_table.apply(lambda col: criteria_weights[col.name] * col),
-    )
+    return [
+        [w * perf for w, perf in zip(criteria_weights, aPerf)]
+        for aPerf in performance_table
+    ]
 
 
 def transform(
     performance_table: PerformanceTable,
-    in_scales: Dict[str, Scale],
-    out_scales: Dict[str, Scale],
+    in_scales: List[Scale],
+    out_scales: List[Optional[Scale]] = None,
 ) -> PerformanceTable:
     """Transform performances table between scales.
 
@@ -83,72 +85,91 @@ def transform(
     :param out_scales: target criteria scales
     :return: transformed performance table
     """
-    functions = {
-        criterion: (
-            cast(
-                Function,
-                lambda x, c=criterion: in_scales[c].transform_to(
-                    x, out_scales[c]
-                ),
-            )
-        )  # https://bugs.python.org/issue13652
-        for criterion in in_scales.keys()
-    }
-    return apply_criteria_functions(performance_table, functions)
+    out_scales = (
+        [None for _ in range(len(in_scales))]
+        if out_scales is None
+        else out_scales
+    )
+    return [
+        [
+            in_scale.transform_to(perf, out_scale)
+            for perf, in_scale, out_scale in zip(aPerf, in_scales, out_scales)
+        ]
+        for aPerf in performance_table
+    ]
+
+
+def subtable(
+    performance_table: PerformanceTable,
+    alternatives: Iterable[int] = None,
+    criteria: Iterable[int] = None,
+) -> PerformanceTable:
+    """Return performance subtable.
+
+    Subtable contains only performances for input alternatives and criteria.
+
+    :param performance_table:
+    :param alternatives:
+    :param criteria:
+    :return:
+    """
+    alternatives = (
+        range(len(performance_table)) if alternatives is None else alternatives
+    )
+    criteria = (
+        range(len(performance_table[0])) if criteria is None else criteria
+    )
+    return [[performance_table[i][j] for j in criteria] for i in alternatives]
+
+
+def get_performances(
+    performance_table: PerformanceTable, index: int, axis: int = 0
+) -> List[Value]:
+    """Get performance row or column.
+
+    Behaviour depends on `axis` value:
+
+    * ``0``: returns performances on row `index`
+    * ``1``: returns performances on column `index`
+
+    :param performance_table:
+    :param index: row/column index
+    :param axis: determines dimension to return
+    :return:
+    """
+    if axis == 0:
+        return performance_table[index]
+    return [perf[index] for perf in performance_table]
 
 
 def get_alternative_values(
-    performance_table: PerformanceTable, alternative: str
-) -> Series:
-    """Get performances associated to an alternative.
-
-    :param performance_table:
-    :param alternative: alternative label
-    :return:
-    """
-    return performance_table.loc[alternative]
-
-
-def get_criterion_values(
-    performance_table: PerformanceTable, criterion: str
-) -> Series:
-    """Get performances associated to a criterion.
-
-    :param performance_table:
-    :param criterion: criterion label
-    :return:
-    """
-    return performance_table[criterion]
-
-
-def get_alternative_values_at(
     performance_table: PerformanceTable, index: int
-) -> Series:
-    """Get performances associated to an alternative index.
+) -> List[Value]:
+    """Get performances associated to an alternative.
 
     :param performance_table:
     :param index: alternative index
     :return:
     """
-    return performance_table.iloc[index]
+    return get_performances(performance_table, index, axis=0)
 
 
-def get_criterion_values_at(
+def get_criterion_values(
     performance_table: PerformanceTable, index: int
-) -> Series:
-    """Get performances associated to a criterion index.
+) -> List[Value]:
+    """Get performances associated to a criterion.
 
     :param performance_table:
     :param index: criterion index
     :return:
     """
-    return performance_table.iloc[:, index]
+    return get_performances(performance_table, index, axis=1)
 
 
 def normalize_without_scales(
     performance_table: PerformanceTable, axis: int = 0
-) -> PerformanceTable:
-    """Normalize performance table along given axis (min-max normalization).
+) -> NumericPerformanceTable:
+    """Normalize performance table along given axis.
 
     `axis` parameter changes what is returned:
 
@@ -158,20 +179,38 @@ def normalize_without_scales(
     :param performance_table:
     :param axis:
     :return:
-    :raise TypeError: if performance table is not numeric
+    :raise ValueError: if `performance_table` is not numeric
     """
-    return cast(
-        PerformanceTable,
-        performance_table.apply(
-            lambda x: (x - x.min()) / (x.max() - x.min()),
-            axis=axis,  # type: ignore
-        ),
-    )
+    if not is_numeric(performance_table):
+        raise ValueError("Only numeric performance tables can be normalized")
+    _performance_table = cast(NumericPerformanceTable, performance_table)
+    if axis == 0:
+        values = [
+            [_performance_table[i][j] for i in range(len(_performance_table))]
+            for j in range(len(_performance_table[0]))
+        ]
+        min_values = [min(v) for v in values]
+        max_values = [max(v) for v in values]
+        return [
+            [
+                (_performance_table[i][j] - minv) / (maxv - minv)
+                for j, minv, maxv in zip(
+                    range(len(min_values)), min_values, max_values
+                )
+            ]
+            for i in range(len(_performance_table))
+        ]
+    min_values = [min(v) for v in _performance_table]
+    max_values = [max(v) for v in _performance_table]
+    return [
+        [(p - minv) / (maxv - minv) for p in perf]
+        for perf, minv, maxv in zip(_performance_table, min_values, max_values)
+    ]
 
 
 def normalize(
-    performance_table: PerformanceTable, scales: Dict[str, Scale] = None
-) -> PerformanceTable:
+    performance_table: PerformanceTable, scales: List[Scale] = None
+) -> NumericPerformanceTable:
     """Normalize performance table using criteria scales.
 
     :param performance_table:
@@ -180,43 +219,14 @@ def normalize(
     """
     if scales is None:
         return normalize_without_scales(performance_table)
-    # return transform(
-    #    performance_table,
-    #    scales,
-    #    {criterion: get_normalized_scale() for criterion in scales.keys()},
-    # )
-    return apply_criteria_functions(
-        performance_table,
-        {
-            criterion: cast(
-                Function, lambda x, c=criterion: scales[c].normalize(x)
-            )
-            for criterion in scales.keys()
-        },
-    )
-
-
-def within_criteria_scales(
-    performance_table: PerformanceTable, scales: Dict[str, Scale]
-) -> PerformanceTable:
-    """Return a table indicating which performances are within their respective
-    criterion scale.
-
-    :param performance_table:
-    :param scales:
-    :return:
-    """
-    return apply_criteria_functions(
-        performance_table,
-        {
-            criterion: cast(Function, lambda x, c=criterion: x in scales[c])
-            for criterion in scales.keys()
-        },
-    )
+    return [
+        [scale.normalize(perf) for perf, scale in zip(aPerf, scales)]
+        for aPerf in performance_table
+    ]
 
 
 def is_within_criteria_scales(
-    performance_table: PerformanceTable, scales: Dict[str, Scale]
+    performance_table: PerformanceTable, scales: List[Scale]
 ) -> bool:
     """Check whether all cells are within their respective criteria scales.
 
@@ -224,12 +234,39 @@ def is_within_criteria_scales(
     :param scales:
     :return:
     """
-    return within_criteria_scales(performance_table, scales).all(None)
+    for j, s in enumerate(scales):
+        for aPerf in performance_table:
+            if not aPerf[j] in s:
+                return False
+    return True
+
+
+def in_scales_alternatives(
+    performance_table: PerformanceTable, scales: List[Scale]
+) -> List[int]:
+    """Check which alternatives have performances inside their criteria scales.
+
+    :param performance_table:
+    :param scales:
+    :return: list of filtered alternatives indexes
+
+    .. todo:: think of a better name
+    """
+    res = []
+    for i, aPerf in enumerate(performance_table):
+        is_in = True
+        for scale, perf in zip(scales, aPerf):
+            if perf not in scale:
+                is_in = False
+                break
+        if is_in:
+            res.append(i)
+    return res
 
 
 def sum_table(
     performance_table: PerformanceTable, axis: int = None
-) -> Union[Series, NumericValue]:
+) -> Union[List[NumericValue], NumericValue]:
     """Sum performances.
 
     Behaviour depends on `axis` value:
@@ -241,9 +278,16 @@ def sum_table(
     :param performance_table:
     :param axis: axis on which the sum is made
     :return:
-
-    .. note:: Non-numeric values are simply ignored as well as non-numeric sums
     """
-    if axis is not None:
-        return performance_table.sum(axis=axis, numeric_only=True)
-    return performance_table.sum(numeric_only=True).sum()
+    if not is_numeric(performance_table):
+        raise ValueError("Can only sum numeric performance table")
+    _performance_table = cast(NumericPerformanceTable, performance_table)
+    if axis == 1:
+        return [sum(aPerf) for aPerf in _performance_table]
+    elif axis == 0:
+        return [
+            sum([aPerf[j] for aPerf in _performance_table])
+            for j in range(len(_performance_table[0]))
+        ]
+    else:
+        return sum([sum(aPerf) for aPerf in _performance_table])

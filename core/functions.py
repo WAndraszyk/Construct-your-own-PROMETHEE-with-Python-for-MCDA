@@ -1,5 +1,5 @@
 import math
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional, cast
 
 from .aliases import NumericFunction, NumericValue, Value
 
@@ -41,7 +41,9 @@ class Interval:
     :param dmax: max boundary of interval
     :param min_in: is min boundary inside interval or not
     :param max_in: is max boundary inside interval or not
-    :raises ValueError: if `dmin` bigger than `dmax`
+    :raises ValueError: if `dmin` bigger than or equal to `dmax`
+
+    .. note :: Empty or simplex intervals are forbidden by construction
     """
 
     def __init__(
@@ -52,21 +54,15 @@ class Interval:
         max_in: bool = True,
     ):
         """Constructor method"""
-        if dmin > dmax:
+        if dmin >= dmax:
             raise ValueError(
-                f"Interval min value '{dmin}' bigger than max value '{dmax}'"
+                f"Interval min value '{dmin}' bigger than or "
+                f"equal to max value '{dmax}'"
             )
         self.dmin = dmin
         self.dmax = dmax
         self.min_in = min_in
         self.max_in = max_in
-
-    def is_empty(self) -> bool:
-        """Check if interval is empty.
-
-        :return: ``True`` if interval is empty, ``False`` otherwise.
-        """
-        return self.dmin == self.dmax and (not self.min_in or not self.max_in)
 
     def __contains__(self, x: NumericValue) -> bool:
         """Check whether value is inside interval or not.
@@ -83,8 +79,6 @@ class Interval:
         :return:
         :rtype: bool
         """
-        if self.is_empty():
-            return False
         if self.dmin < x < self.dmax:
             return True
         if self.min_in and x == self.dmin:
@@ -132,7 +126,7 @@ class Interval:
         )
         return Interval(dmin, dmax, min_in, max_in)
 
-    def intersect(self, other: "Interval") -> "Interval":
+    def intersect(self, other: "Interval") -> Optional["Interval"]:
         """Compute intersection between two intervals.
 
         :param other:
@@ -148,11 +142,13 @@ class Interval:
         max_in = (self.max_in if dmax == self.dmax else True) and (
             other.max_in if dmax == other.dmax else True
         )
-        if dmin > dmax:
-            return Interval(0, 0, False, False)
-        return Interval(dmin, dmax, min_in, max_in)
+        try:
+            res = Interval(dmin, dmax, min_in, max_in)
+            return res
+        except ValueError:
+            return None
 
-    def union(self, other: "Interval") -> "Interval":
+    def union(self, other: "Interval") -> Optional["Interval"]:
         """Compute union of two intervals.
 
         :param other:
@@ -160,8 +156,19 @@ class Interval:
 
         .. note :: Returns ``None`` if intervals don't coïncide
         """
-        if self.intersect(other).is_empty():
-            return Interval(0, 0, False, False)
+        dmin = max((self.dmin, other.dmin))
+        dmax = min((self.dmax, other.dmax))
+        min_in = (self.min_in if dmin == self.dmin else True) and (
+            other.min_in if dmin == other.dmin else True
+        )
+        max_in = (self.max_in if dmax == self.dmax else True) and (
+            other.max_in if dmax == other.dmax else True
+        )
+        if dmin > dmax:
+            return None
+        if dmin == dmax:
+            if not min_in or not max_in:
+                return None
         return self.join(other)
 
     def continuous(self, other: "Interval") -> bool:
@@ -317,65 +324,30 @@ class PieceWiseFunction:
 
 
 class FuzzyNumber(PieceWiseFunction):
-    """This class implements a trapezoidal fuzzy number.
+    """This class implements a fuzzy number.
 
-    A fuzzy number is described by its 4 abscissa in increasing order.
-    Its ordinates are fixed at ``[0, 1, 1, 0]``.
-
-    Triangular fuzzy number can be represented by having two consecutive
-    abscissa equals.
-
-    :param abscissa: list of abscissa defining a trapezoidal fuzzy number
+    :param intervals: functions definition intervals
+    :param functions:
+    :param segments: list of segments defining piecewise linear functions
     :raises ValueError:
-        * if abscissa has not exactly 4 values
-        * if abscissa are not in increasing order
+        * if number of intervals and functions are different
+        * if number of intervals and functions is zero
+        * if functions are discontinuous
     """
 
     def __init__(
         self,
-        abscissa: List[NumericValue],
+        intervals: List[Interval] = None,
+        functions: List[NumericFunction] = None,
+        segments: List[List[List]] = None,
     ):
         """Constructor method"""
-        if len(abscissa) != 4:
-            raise ValueError("FuzzyNumber must have 4 abscissa")
-        self.abscissa = abscissa
-        self.ordinates = [0, 1, 1, 0]
-        segments = []
-        for x1, x2, y1, y2 in zip(
-            self.abscissa[:-1],
-            self.abscissa[1:],
-            self.ordinates[:-1],
-            self.ordinates[1:],
-        ):
-            if x1 > x2:
-                raise ValueError(
-                    "FuzzyNumber abscissa must be in increasing order"
-                )
-            if x1 < x2:
-                segments.append([[x1, y1], [x2, y2]])
-        if len(segments) == 0:
-            PieceWiseFunction.__init__(
-                self,
-                [Interval(self.abscissa[0], self.abscissa[0])],
-                [lambda x: 1],
-            )
-        else:
-            PieceWiseFunction.__init__(self, segments=segments)
+        PieceWiseFunction.__init__(self, intervals, functions, segments)
+        if len(self.functions) == 0:
+            raise ValueError("FuzzyNumber must have at least one function")
+        if not self.continuous():
+            raise ValueError("FuzzyNumber functions must be continuous")
 
-    def apply(self, x: NumericValue) -> NumericValue:
-        """Apply function to single value.
-
-        :param x:
-        :return:
-
-        .. note:: returns ``0`` if value is not in the fuzzy set
-        """
-        for interval, f in zip(self.intervals, self.functions):
-            if x in interval:
-                return f(x)
-        return 0
-
-    @property
     def average(self) -> NumericValue:
         """Computes the average of all intervals boundaries.
 
@@ -385,41 +357,3 @@ class FuzzyNumber(PieceWiseFunction):
         for interval in self.intervals:
             res += interval.dmax
         return res / (len(self.functions) + 1)
-
-    @property
-    def centre_of_gravity(self) -> NumericValue:
-        """Computes the centre of gravity of this fuzzy set (COG).
-
-        :return: the x value of COG
-        """
-        if self.abscissa[0] == self.abscissa[3]:
-            y = 0.5
-        else:
-            y = (1 / 6) * (
-                (self.abscissa[2] - self.abscissa[1])
-                / (self.abscissa[3] - self.abscissa[0])
-                + 2
-            )
-        return (
-            y * (self.abscissa[2] + self.abscissa[1])
-            + (self.abscissa[3] + self.abscissa[0]) * (1 - y)
-        ) / 2
-
-    @property
-    def centre_of_maximum(self) -> NumericValue:
-        """Returns the centre of maximum of this fuzzy set (COM).
-
-        :return:
-        """
-        return (self.abscissa[2] + self.abscissa[1]) / 2
-
-    @property
-    def area(self) -> NumericValue:
-        """Returns the area under the fuzzy number curve.
-
-        :return:
-        """
-        return (
-            (self.abscissa[3] - self.abscissa[0])
-            + (self.abscissa[2] - self.abscissa[1])
-        ) / 2
