@@ -1,9 +1,13 @@
+from core.aliases import NumericValue
+from typing import List
+
+
 class PrometheeIRanking:
     """
     This class compute PrometheeIRanking based on positive and negative flows.
     Implemented method is generalized to relation of the weak preference.
     """
-    def __init__(self, alternatives, positive_flow, negative_flow):
+    def __init__(self, alternatives: List[str], positive_flow: List[NumericValue], negative_flow: List[NumericValue]):
         """
         :param alternatives: List of alternatives names (strings only)
         :param positive_flow: List of positive flow values
@@ -13,7 +17,7 @@ class PrometheeIRanking:
         self.positive_flow = positive_flow
         self.negative_flow = negative_flow
 
-    def calculate_ranking(self):
+    def calculate_ranking(self) -> List[List[str]]:
         """
         Calculate outranking pairs - 1st alternative in pair is weak-preferenced over 2nd alternative in pair.
         :return: List of outranking pairs
