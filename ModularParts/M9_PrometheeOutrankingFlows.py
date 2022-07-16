@@ -49,7 +49,6 @@ class PrometheeOutrankingFlows:
             flows = aggregatedPIes / (n - 1)
 
         return flows
-        # return np.sum(self.preferences, axis=1 if positive else 0)/(len(self.alternatives)-1)
 
     def calculate_flows(self, category_profiles: bool = False) -> Tuple[List[NumericValue], List[NumericValue]]:
         """
@@ -62,4 +61,4 @@ class PrometheeOutrankingFlows:
                 OUT2: negative outranking flow
         """
         return self.__calculate_flow(category_profiles=category_profiles), \
-               self.__calculate_flow(positive=False, category_profiles=category_profiles)
+            self.__calculate_flow(positive=False, category_profiles=category_profiles)

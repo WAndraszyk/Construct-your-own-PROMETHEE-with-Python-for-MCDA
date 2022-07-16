@@ -1,7 +1,7 @@
-from ModularParts.PrometheePreference import (PrometheePreference, PreferenceFunction)
-from ModularParts.SurrogateWeights import SurrogateWeights
-from ModularParts.PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.PrometheeIRanking import PrometheeIRanking
+from ModularParts.M3_PrometheePreference import (PrometheePreference, PreferenceFunction)
+from ModularParts.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
 
 warianty = ['Pierwszy', 'Drugi', 'Trzeci']
 kryteria = ['G1', 'G2']
