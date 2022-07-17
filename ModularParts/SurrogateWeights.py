@@ -8,7 +8,7 @@ class SurrogateWeights:
     The ranking should list the criteria from the most to least important."""
 
     def __init__(self, criteria_rank,
-                 criteria: List[NumericValue],
+                 criteria: List[str],
                  decimal_place: NumericValue = 3):
         self.criteria = criteria
         self.decimal_place = decimal_place

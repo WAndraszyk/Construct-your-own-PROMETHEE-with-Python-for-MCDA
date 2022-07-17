@@ -2,6 +2,7 @@ from enum import Enum
 from core.aliases import NumericValue
 from typing import List
 import core.generalized_criteria as gc
+import core.preference_commons as pc
 
 
 class PreferenceFunction(Enum):
@@ -29,39 +30,27 @@ class PrometheePreference:
                  decimal_place: NumericValue = 3):
         """
         Nie uwzględniono boundary profiles oraz characteristic profiles.
-        @param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
+
+        :param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
         :param criteria: list of criteria
         :param alternatives_performances: 2D list of alternatives' value at every criterion
         :param weights: list of weights
-        :param generalized_criterion: method used for computing partial preference indices
-        :param decimal_place: with this you can choose the decimal_place of the output numbers
         :param p_list: list of preference threshold for each criteria
         :param q_list: list of indifference threshold for each criteria
         :param s_list: list of standard deviation for each criteria
         :param generalized_criteria: list of preference functions
         :param directions: directions of preference of criteria
-
-
+        :param decimal_place: with this you can choose the decimal_place of the output numbers
         """
         self.alternatives = alternatives
         self.criteria = criteria
-        self.alternatives_performances = self.directed_alternatives_performances(alternatives_performances, directions)
+        self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
         self.weights = weights
         self.decimal_place = decimal_place
         self.generalized_criteria = generalized_criteria
         self.p_list = p_list
         self.q_list = q_list
         self.s_list = s_list
-
-    def directed_alternatives_performances(self,
-                                           alternatives_performances: List[List[NumericValue]],
-                                           directions: List[NumericValue]) -> List[List[NumericValue]]:
-        for i in range(len(directions)):
-            if directions[i] == 0:
-                for j in range(len(alternatives_performances)):
-                    alternatives_performances[j][i] = -alternatives_performances[j][i]
-
-        return alternatives_performances
 
     def __deviations(self) -> List[List[List[NumericValue]]]:
         """
@@ -103,7 +92,7 @@ class PrometheePreference:
                     elif method is PreferenceFunction.U_SHAPE:
                         alternativeIndices.append(gc.uShapeCriterion(deviations[k][i][j], q))
                     elif method is PreferenceFunction.V_SHAPE:
-                        alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p))
+                        alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p, self.decimal_place))
                     elif method is PreferenceFunction.LEVEL:
                         if q > p:
                             raise ValueError(
@@ -121,7 +110,8 @@ class PrometheePreference:
                                 + " greater than p "
                                 + str(p)
                             )
-                        alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j], p, q))
+                        alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j],
+                                                                                 p, q, self.decimal_place))
                     elif method is PreferenceFunction.GAUSSIAN:
                         alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
                     else:
