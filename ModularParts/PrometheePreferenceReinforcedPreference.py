@@ -14,7 +14,7 @@ class PreferenceFunction(Enum):
     GAUSSIAN = 6
 
 
-class PrometheePreference:
+class PrometheePreferenceReinforcedPreference:
     def __init__(self,
                  alternatives,
                  criteria,
@@ -22,7 +22,6 @@ class PrometheePreference:
                  weights: List[NumericValue],
                  p_list: List[NumericValue],
                  q_list: List[NumericValue],
-                 s_list: List[NumericValue],
                  generalized_criteria,
                  directions: List[NumericValue],
                  decimal_place: NumericValue = 3):
@@ -92,7 +91,6 @@ class PrometheePreference:
             method = self.generalized_criteria[k]
             q = self.q_list[k]
             p = self.p_list[k]
-            s = self.s_list[k]
             criterionIndices = []
             for i in range(len(self.alternatives_performances)):
                 alternativeIndices = []
@@ -121,8 +119,6 @@ class PrometheePreference:
                                 + str(p)
                             )
                         alternativeIndices.append(self.__vShapeIndifferenceCriterion(deviations[k][i][j], p, q))
-                    elif method is PreferenceFunction.GAUSSIAN:
-                        alternativeIndices.append(self.__gaussianCriterion(deviations[k][i][j], s))
                     else:
                         raise ValueError(
                             "pref_func "
