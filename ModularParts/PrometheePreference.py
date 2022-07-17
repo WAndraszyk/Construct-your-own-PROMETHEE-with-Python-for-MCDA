@@ -1,6 +1,7 @@
 from enum import Enum
 from core.aliases import NumericValue
 from typing import List
+import core.generalized_criteria as gc
 
 
 class PreferenceFunction(Enum):
@@ -98,11 +99,11 @@ class PrometheePreference:
                 alternativeIndices = []
                 for j in range(len(self.alternatives_performances)):
                     if method is PreferenceFunction.USUAL:
-                        alternativeIndices.append(self.__usualCriterion(deviations[k][i][j]))
+                        alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
                     elif method is PreferenceFunction.U_SHAPE:
-                        alternativeIndices.append(self.__uShapeCriterion(deviations[k][i][j], q))
+                        alternativeIndices.append(gc.uShapeCriterion(deviations[k][i][j], q))
                     elif method is PreferenceFunction.V_SHAPE:
-                        alternativeIndices.append(self.__vShapeCriterion(deviations[k][i][j], p))
+                        alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p))
                     elif method is PreferenceFunction.LEVEL:
                         if q > p:
                             raise ValueError(
@@ -111,7 +112,7 @@ class PrometheePreference:
                                 + " greater than p "
                                 + str(p)
                             )
-                        alternativeIndices.append(self.__levelCriterion(deviations[k][i][j], p, q))
+                        alternativeIndices.append(gc.levelCriterion(deviations[k][i][j], p, q))
                     elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
                         if q > p:
                             raise ValueError(
@@ -120,9 +121,9 @@ class PrometheePreference:
                                 + " greater than p "
                                 + str(p)
                             )
-                        alternativeIndices.append(self.__vShapeIndifferenceCriterion(deviations[k][i][j], p, q))
+                        alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j], p, q))
                     elif method is PreferenceFunction.GAUSSIAN:
-                        alternativeIndices.append(self.__gaussianCriterion(deviations[k][i][j], s))
+                        alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
                     else:
                         raise ValueError(
                             "pref_func "

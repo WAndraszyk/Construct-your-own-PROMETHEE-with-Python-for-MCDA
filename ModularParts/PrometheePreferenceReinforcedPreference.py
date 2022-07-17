@@ -1,6 +1,7 @@
 from enum import Enum
 from core.aliases import NumericValue
 from typing import List
+import core.generalized_criteria as gc
 
 
 class PreferenceFunction(Enum):
@@ -49,7 +50,6 @@ class PrometheePreferenceReinforcedPreference:
         self.generalized_criteria = generalized_criteria
         self.p_list = p_list
         self.q_list = q_list
-        self.s_list = s_list
 
     def directed_alternatives_performances(self,
                                            alternatives_performances: List[List[NumericValue]],
@@ -96,11 +96,11 @@ class PrometheePreferenceReinforcedPreference:
                 alternativeIndices = []
                 for j in range(len(self.alternatives_performances)):
                     if method is PreferenceFunction.USUAL:
-                        alternativeIndices.append(self.__usualCriterion(deviations[k][i][j]))
+                        alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
                     elif method is PreferenceFunction.U_SHAPE:
-                        alternativeIndices.append(self.__uShapeCriterion(deviations[k][i][j], q))
+                        alternativeIndices.append(gc.uShapeCriterion(deviations[k][i][j], q))
                     elif method is PreferenceFunction.V_SHAPE:
-                        alternativeIndices.append(self.__vShapeCriterion(deviations[k][i][j], p))
+                        alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p))
                     elif method is PreferenceFunction.LEVEL:
                         if q > p:
                             raise ValueError(
@@ -109,7 +109,7 @@ class PrometheePreferenceReinforcedPreference:
                                 + " greater than p "
                                 + str(p)
                             )
-                        alternativeIndices.append(self.__levelCriterion(deviations[k][i][j], p, q))
+                        alternativeIndices.append(gc.levelCriterion(deviations[k][i][j], p, q))
                     elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
                         if q > p:
                             raise ValueError(
@@ -118,7 +118,7 @@ class PrometheePreferenceReinforcedPreference:
                                 + " greater than p "
                                 + str(p)
                             )
-                        alternativeIndices.append(self.__vShapeIndifferenceCriterion(deviations[k][i][j], p, q))
+                        alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j], p, q))
                     else:
                         raise ValueError(
                             "pref_func "
