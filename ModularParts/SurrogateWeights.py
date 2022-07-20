@@ -8,7 +8,7 @@ class SurrogateWeights:
     The ranking should list the criteria from the most to least important."""
 
     def __init__(self, criteria_rank,
-                 criteria: List[NumericValue],
+                 criteria: List[str],
                  decimal_place: NumericValue = 3):
         self.criteria = criteria
         self.decimal_place = decimal_place
@@ -24,7 +24,7 @@ class SurrogateWeights:
                     break
         return weightsOut
 
-    def equalWeights(self) -> List[NumericValue] :
+    def equalWeights(self) -> List[NumericValue]:
         """
         In this method all weights are computed with the same value and sum up to 1.
 
@@ -51,7 +51,7 @@ class SurrogateWeights:
         weightsOrdered = self.__weightOrder(weights)
         return weightsOrdered
 
-    def reciprocalOfRanks(self)-> List[NumericValue]:
+    def reciprocalOfRanks(self) -> List[NumericValue]:
         """
         This method computes weights by dividing each reciprocal of rank by the sum of these
         reciprocals for all criteria.
