@@ -12,10 +12,10 @@ class PrometheeOutrankingFlows:
     def __init__(self, alternatives: List[str], preferences: List[List[NumericValue]],
                  category_profiles: Tuple[List[List[NumericValue]], List[List[NumericValue]]] = None):
         """
-        :param alternatives: List of alternatives names (strings only)
-        :param preferences: 2D array of aggregated preferences (profile over profile )
+        :param alternatives: List of alternatives names (strings only).
+        :param preferences: 2D array of aggregated preferences (profile over profile ).
         :param category_profiles: 2-element tuple of 2D arrays of aggregated preferences (profile over category
-                                  and category over profile)
+                                  and category over profile).
         """
         self.category_profiles = category_profiles
         self.alternatives = alternatives
@@ -25,12 +25,11 @@ class PrometheeOutrankingFlows:
         """
         Calculate positive or negative outranking flow.
 
-
-        :param positive: if True function returns positive outranking flow
-                         else returns negative outranking flow
-        :param category_profiles: if True calculate flows for comparison between profiles and categories,
+        :param positive: If True function returns positive outranking flow
+                         else returns negative outranking flow.
+        :param category_profiles: If True calculate flows for comparison between profiles and categories,
                                   else calculate flows for comparison between profiles.
-        :return: List of outranking flow's values
+        :return: List of outranking flow's values.
         """
         if category_profiles:
             if positive:
@@ -57,8 +56,8 @@ class PrometheeOutrankingFlows:
         :param category_profiles: if True calculate flows for comparison between profiles and categories,
                                   else calculate flows for comparison between profiles.
         :return:
-                OUT1: positive outranking flow
-                OUT2: negative outranking flow
+                OUT1: positive outranking flow.
+                OUT2: negative outranking flow.
         """
         return self.__calculate_flow(category_profiles=category_profiles), \
             self.__calculate_flow(positive=False, category_profiles=category_profiles)

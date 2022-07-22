@@ -31,7 +31,7 @@ class NetFlowScore:
         Calculates scores for passed preferences.
 
         :param preferences: 2D List of aggregated preferences between alternatives.
-        :return: List of Net Flow Scores for passed preferences
+        :return: List of Net Flow Scores for passed preferences.
         """
 
         if self.function is ScoringFunction.MAX:
@@ -73,7 +73,7 @@ class NetFlowScore:
 
         :param avoid_same_scores: If True and calculate_scores returns some equal scores calculate once more scores for
                                   alternatives which get the same score.
-        :return: List of Net Flow Scores for all preferences
+        :return: List of Net Flow Scores for all preferences.
         """
         if avoid_same_scores:
             scores = self.__calculate_score(self.preferences)
