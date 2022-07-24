@@ -52,31 +52,13 @@ class PrometheePreference:
         self.q_list = q_list
         self.s_list = s_list
 
-    def __deviations(self) -> List[List[List[NumericValue]]]:
-        """
-        Compares alternatives on criteria.
-
-        :return: 3D matrix of deviations in evaluations on criteria
-        """
-        deviations = []
-        for k in range(len(self.criteria)):
-            comparisons = []
-            for i in range(len(self.alternatives_performances)):
-                comparison_direct = []
-                for j in range(len(self.alternatives_performances)):
-                    comparison_direct.append(
-                        self.alternatives_performances[i][k] - self.alternatives_performances[j][k])
-                comparisons.append(comparison_direct)
-            deviations.append(comparisons)
-        return deviations
-
     def __partialPreference(self) -> List[List[List[NumericValue]]]:
         """
         Calculates partial preference of every alternative over others at every criterion
         based on deviations using a method chosen by user.
         :return: partial preference indices
         """
-        deviations = self.__deviations()
+        deviations = pc.deviations(self.criteria, self.alternatives_performances)
         ppIndices = []
         for k in range(len(self.criteria)):
             method = self.generalized_criteria[k]
