@@ -3,7 +3,7 @@ from ModularParts.PrometheePreferenceReinforcedPreference \
 from ModularParts.SurrogateWeights import SurrogateWeights
 from ModularParts.PrometheeOutrankingFlows import PrometheeOutrankingFlows
 from ModularParts.PrometheeIRanking import PrometheeIRanking
-
+from ModularParts.PrometheeIIFlow import PrometheeIIFlow
 warianty = ['Pierwszy', 'Drugi', 'Trzeci']
 kryteria = ['G1', 'G2']
 ap = [[10, 12],
@@ -32,5 +32,7 @@ print("preferencje : ", aggregatedPI)
 positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
 print(positiveFlow, negativeFlow)
 
+new_flow = PrometheeIIFlow(warianty, positiveFlow, negativeFlow).calculate_PrometheeIIFlow()
+print('II flow', new_flow)
 pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
 print(pairs)

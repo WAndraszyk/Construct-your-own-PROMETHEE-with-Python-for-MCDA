@@ -7,6 +7,7 @@ class PrometheeIRanking:
     This class compute PrometheeIRanking based on positive and negative flows.
     Implemented method is generalized to relation of the weak preference.
     """
+
     def __init__(self, alternatives: List[str], positive_flow: List[NumericValue], negative_flow: List[NumericValue]):
         """
         :param alternatives: List of alternatives names (strings only)
@@ -34,4 +35,3 @@ class PrometheeIRanking:
                     pairs.append([alternative_a, alternative_b])
 
         return pairs
-
