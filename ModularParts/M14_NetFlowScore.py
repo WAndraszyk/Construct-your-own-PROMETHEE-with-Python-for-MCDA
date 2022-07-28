@@ -1,33 +1,10 @@
 import numpy as np
 from core.aliases import NumericValue
-from typing import List
-from enum import Enum
-
-
-class ScoringFunction(Enum):
-    """Enumeration of the scoring functions."""
-
-    MAX = 1
-    MIN = 2
-    SUM = 3
-
-
-class ScoringFunctionDirection(Enum):
-    """
-    Enumeration of the scoring function directions.
-
-    IN_FAVOR: ScoringFunction(R(a,b))
-    AGAINST: -ScoringFunction(R(b,a))
-    DIFFERENCE: ScoringFunction(R(a,b) - R(b,a))
-    """
-
-    IN_FAVOR = 1
-    AGAINST = 2
-    DIFFERENCE = 3
+from typing import List, Union
+from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
 
 
 #  NOTATKI:
-#  Preferencja sama do siebie niech będzie None
 #  Bez category_profiles?
 
 
@@ -50,12 +27,12 @@ class NetFlowScore:
         self.function = function
         self.direction = direction
 
-    def __calculate_score(self, preferences):
+    def __calculate_score(self, preferences: np.ndarray) -> np.ndarray:
         """
         Calculates scores for passed preferences.
 
         :param preferences: 2D List of aggregated preferences between alternatives.
-        :return: List of Net Flow Scores for passed preferences
+        :return: List of Net Flow Scores for passed preferences.
         """
 
         if self.function is ScoringFunction.MAX:
@@ -79,7 +56,7 @@ class NetFlowScore:
         return scores
 
     @staticmethod
-    def __find_duplicates_values(array):
+    def __find_duplicates_values(array: Union[List, np.ndarray]) -> set:
         seen = set()
         duplicated_values = set()
 
@@ -91,13 +68,13 @@ class NetFlowScore:
 
         return duplicated_values
 
-    def calculate_net_flows_score(self, avoid_same_scores=False):
+    def calculate_net_flows_score(self, avoid_same_scores: bool = False) -> np.ndarray:
         """
         Calculates scores for all preferences.
 
         :param avoid_same_scores: If True and calculate_scores returns some equal scores calculate once more scores for
                                   alternatives which get the same score.
-        :return: List of Net Flow Scores for all preferences
+        :return: List of Net Flow Scores for all preferences.
         """
         if avoid_same_scores:
             scores = self.__calculate_score(self.preferences)
