@@ -9,10 +9,10 @@ class PrometheeGroupRanking:
     Allows many Decision Makers to get influence on final flows.
     """
 
-    def __init__(self, alternatives: List[str], flows: List[NumericValue], weightsDMs: List[NumericValue]):
+    def __init__(self, alternatives: List[str], flows: List[List[NumericValue]], weightsDMs: List[NumericValue]):
         """
         :param alternatives: List of alternatives names
-        :param flows: List of flows (one per alternative)
+        :param flows: List of Lists of flows (one list with flows per DM)
         :param weightsDMs: List of weights of every Decision Maker. The greater the weight
          the greater the influence of DM on the output flow.
         """
@@ -25,8 +25,7 @@ class PrometheeGroupRanking:
         Calculates weighted flows by multiplying flows by each DM weight.
         :return: ndarray(2 dim) of weighted flows
         """
-        return np.array([weight * self.flows for weight in self.weightsDMs])
-        # return [[weight * flow_value for flow_value in flow] for weight, flow in zip(self.weightsDMs, self.flows)]
+        return np.multiply(self.weightsDMs, self.flows.T).T
 
     def calculate_group_ranking(self) -> Tuple[np.ndarray, np.ndarray]:
         """
