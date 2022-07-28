@@ -21,9 +21,9 @@ Wykonane moduły:
 - M11 :heavy_check_mark:
 - M12
 - M13
-- M14
-- M15
-- M16
+- M14 :heavy_check_mark:
+- M15 :heavy_check_mark:
+- M16 :heavy_check_mark:
 - M17
 - M18
 - M19
