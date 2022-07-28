@@ -78,15 +78,17 @@ class SurrogateWeights:
 
         sum_of_weights = np.sum(not_normalized_weights)
 
-        not_normalized_weights = not_normalized_weights * 100 * 10 ** self.decimal_place
+        precise_rounding_factor = 10 ** self.decimal_place  # It allows for more precise rounding
+
+        not_normalized_weights = not_normalized_weights * 100 * precise_rounding_factor
 
         for not_normalized_weight in not_normalized_weights[:len(not_normalized_weights) // 2]:
             normalized_weights.append(round(ceil(not_normalized_weight / sum_of_weights) /
-                                            10 ** self.decimal_place, self.decimal_place))
+                                            precise_rounding_factor, self.decimal_place))
 
         for not_normalized_weight in not_normalized_weights[len(not_normalized_weights) // 2:]:
             normalized_weights.append(round(floor(not_normalized_weight / sum_of_weights) /
-                                            10 ** self.decimal_place, self.decimal_place))
+                                            precise_rounding_factor, self.decimal_place))
 
         return normalized_weights
 
