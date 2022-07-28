@@ -1,7 +1,8 @@
 import numpy as np
 from core.aliases import NumericValue
-from typing import List
+from typing import List, Union
 from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
+
 
 #  NOTATKI:
 #  Bez category_profiles?
@@ -26,7 +27,7 @@ class NetFlowScore:
         self.function = function
         self.direction = direction
 
-    def __calculate_score(self, preferences):
+    def __calculate_score(self, preferences: np.ndarray) -> np.ndarray:
         """
         Calculates scores for passed preferences.
 
@@ -55,7 +56,7 @@ class NetFlowScore:
         return scores
 
     @staticmethod
-    def __find_duplicates_values(array):
+    def __find_duplicates_values(array: Union[List, np.ndarray]) -> set:
         seen = set()
         duplicated_values = set()
 
@@ -67,7 +68,7 @@ class NetFlowScore:
 
         return duplicated_values
 
-    def calculate_net_flows_score(self, avoid_same_scores=False):
+    def calculate_net_flows_score(self, avoid_same_scores: bool = False) -> np.ndarray:
         """
         Calculates scores for all preferences.
 
