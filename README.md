@@ -9,9 +9,9 @@ Założenia implementacyjne:
 
 Wykonane moduły:
 - M1  :heavy_check_mark:
-- M2
-- M3  :heavy_check_mark:
-- M4
+- M2  :heavy_check_mark:
+- M3  :heavy_check_mark: (bez opt)
+- M4  :heavy_check_mark: (bez opt)
 - M5
 - M6
 - M7
