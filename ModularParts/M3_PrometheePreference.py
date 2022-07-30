@@ -27,6 +27,9 @@ class PrometheePreference:
                  s_list: List[NumericValue],
                  generalized_criteria,
                  directions: List[NumericValue],
+                 categories_profiles: List[str] = None,
+                 profile_performance_table: List[List[NumericValue]] = None,
+
                  decimal_place: NumericValue = 3):
         """
         Nie uwzględniono boundary profiles oraz characteristic profiles.
@@ -41,7 +44,10 @@ class PrometheePreference:
         :param generalized_criteria: list of preference functions
         :param directions: directions of preference of criteria
         :param decimal_place: with this you can choose the decimal_place of the output numbers
+        :param categories_profiles: list of proviles (names, strings)
+        :param profile_performance_table: 2D list of profiles performance (value) at every criterion
         """
+
         self.alternatives = alternatives
         self.criteria = criteria
         self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
@@ -51,14 +57,14 @@ class PrometheePreference:
         self.p_list = p_list
         self.q_list = q_list
         self.s_list = s_list
+        self.categories_profiles = categories_profiles
+        if profile_performance_table is not None:
+            self.profile_performance_table = pc.directed_alternatives_performances(profile_performance_table,
+                                                                                   directions)
+        else:
+            self.profile_performance_table = profile_performance_table
 
-    def __partialPreference(self) -> List[List[List[NumericValue]]]:
-        """
-        Calculates partial preference of every alternative over others at every criterion
-        based on deviations using a method chosen by user.
-        :return: partial preference indices
-        """
-        deviations = pc.deviations(self.criteria, self.alternatives_performances)
+    def __pp_deep(self, deviations, i_iter, j_iter):
         ppIndices = []
         for k in range(len(self.criteria)):
             method = self.generalized_criteria[k]
@@ -66,9 +72,9 @@ class PrometheePreference:
             p = self.p_list[k]
             s = self.s_list[k]
             criterionIndices = []
-            for i in range(len(self.alternatives_performances)):
+            for i in range(len(i_iter)):
                 alternativeIndices = []
-                for j in range(len(self.alternatives_performances)):
+                for j in range(len(j_iter)):
                     if method is PreferenceFunction.USUAL:
                         alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
                     elif method is PreferenceFunction.U_SHAPE:
@@ -106,6 +112,20 @@ class PrometheePreference:
             ppIndices.append(criterionIndices)
         return ppIndices
 
+    def __partialPreference(self) -> List[List[List[NumericValue]]]:
+        """
+        Calculates partial preference of every alternative over other alternatives
+        or profiles at every criterion based on deviations using a method chosen by user.
+        :return: partial preference indices
+        """
+        deviations = pc.deviations(self.criteria, self.alternatives_performances, self.profile_performance_table)
+        if self.categories_profiles is None:
+            ppIndices = self.__pp_deep(deviations, self.alternatives_performances, self.alternatives_performances)
+        else:
+            ppIndices = [self.__pp_deep(deviations[0], self.alternatives_performances, self.profile_performance_table),
+                         self.__pp_deep(deviations[1], self.profile_performance_table, self.alternatives_performances)]
+        return ppIndices
+
     def computePreferenceIndices(self):
         """
         Calculates preference of every alternative over others based on partial preferences
@@ -114,14 +134,24 @@ class PrometheePreference:
         :return: partial preferences
         """
         partialPref = self.__partialPreference()
+        if self.categories_profiles is None:
+            return self.__preferences(partialPref, self.alternatives_performances), partialPref
+        else:
+            return (self.__preferences(partialPref[0], self.alternatives_performances, self.profile_performance_table),
+                    self.__preferences(partialPref[1], self.profile_performance_table,
+                                       self.alternatives_performances)), partialPref
+
+    def __preferences(self, partialPref, i_iter, j_iter=None):
+        if j_iter is None:
+            j_iter = i_iter
         preferences = []
-        for i in range(len(self.alternatives_performances)):
+        for i in range(len(i_iter)):
             aggregatedPI = []
-            for j in range(len(self.alternatives_performances)):
+            for j in range(len(j_iter)):
                 Pi_A_B = 0
                 for k in range(len(self.criteria)):
                     Pi_A_B += partialPref[k][i][j] * self.weights[k]
                 aggregatedPI.append(Pi_A_B)
             preferences.append(aggregatedPI)
 
-        return preferences, partialPref
+        return preferences
