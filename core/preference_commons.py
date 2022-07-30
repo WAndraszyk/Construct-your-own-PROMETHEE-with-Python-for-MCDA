@@ -21,20 +21,36 @@ def directed_alternatives_performances(alternatives_performances: List[List[Nume
     return alternatives_performances
 
 
-def deviations(criteria, alternatives_performances) -> List[List[List[NumericValue]]]:
+def deviations(criteria, alternatives_performances, profile_performance_table=None) -> List[List[List[NumericValue]]]:
     """
     Compares alternatives on criteria.
 
     :return: 3D matrix of deviations in evaluations on criteria
     """
-    deviations_list = []
-    for k in range(len(criteria)):
-        comparisons = []
-        for i in range(len(alternatives_performances)):
+
+    def dev_calc(i_iter, j_iter, k):
+        for i in range(len(i_iter)):
             comparison_direct = []
-            for j in range(len(alternatives_performances)):
-                comparison_direct.append(
-                    alternatives_performances[i][k] - alternatives_performances[j][k])
+            for j in range(len(j_iter)):
+                comparison_direct.append(i_iter[i][k] - j_iter[j][k])
             comparisons.append(comparison_direct)
-        deviations_list.append(comparisons)
+        return comparisons
+
+    deviations_list = []
+    if profile_performance_table is None:
+        for k in range(len(criteria)):
+            comparisons = []
+            deviations_list.append(dev_calc(alternatives_performances, alternatives_performances, k))
+    else:
+        deviations_part = []
+        for k in range(len(criteria)):
+            comparisons = []
+            deviations_part.append(dev_calc(alternatives_performances, profile_performance_table, k))
+        deviations_list.append(deviations_part)
+        deviations_part = []
+        for k in range(len(criteria)):
+            comparisons = []
+            deviations_part.append(dev_calc(profile_performance_table, alternatives_performances, k))
+        deviations_list.append(deviations_part)
+
     return deviations_list
