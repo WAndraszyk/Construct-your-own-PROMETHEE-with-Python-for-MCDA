@@ -31,7 +31,7 @@ aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
 print("partial pref", partialPref)
 print("preferencje : ", aggregatedPI)
 
-positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows(True)
+positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
 print(positiveFlow, negativeFlow)
 
 pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
@@ -55,7 +55,7 @@ aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
 print("partial pref", partialPref)
 print("preferencje : ", aggregatedPI)
 
-positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
+positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows(True)
 print(positiveFlow, negativeFlow)
 
 pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
