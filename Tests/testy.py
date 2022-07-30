@@ -1,7 +1,7 @@
 from ModularParts.M3_PrometheePreference import (PrometheePreference, PreferenceFunction)
-from ModularParts.SurrogateWeights import SurrogateWeights
-from ModularParts.PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.PrometheeIRanking import PrometheeIRanking
+from ModularParts.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
 
 
 kryteria = ['G1', 'G2']
@@ -23,19 +23,19 @@ ap = [[10, 12],  # a1
       [12, 14]]  # a3
 
 # TEST M3 SAME WARIANTY
-# print("--------Test modułu M3 dla samych wariantów----------")
-#
-# aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
-#                                                 p_param, q_param, s_param, generalized_criteria,
-#                                                 directions).computePreferenceIndices()
-# print("partial pref", partialPref)
-# print("preferencje : ", aggregatedPI)
-#
-# positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
-# print(positiveFlow, negativeFlow)
-#
-# pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
-# print(pairs)
+print("--------Test modułu M3 dla samych wariantów----------")
+
+aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
+                                                p_param, q_param, s_param, generalized_criteria,
+                                                directions).computePreferenceIndices()
+print("partial pref", partialPref)
+print("preferencje : ", aggregatedPI)
+
+positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows(True)
+print(positiveFlow, negativeFlow)
+
+pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
+print(pairs)
 
 # TEST M3 PROFILE
 print("--------Test modułu M3 dla wariantów i profili----------")
