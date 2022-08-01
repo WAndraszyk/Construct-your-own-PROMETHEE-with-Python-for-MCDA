@@ -2,6 +2,7 @@ from ModularParts.M3_PrometheePreference import (PrometheePreference, Preference
 from ModularParts.M1_SurrogateWeights import SurrogateWeights
 from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
 from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
+from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
 
 
 kryteria = ['G1', 'G2']
@@ -14,7 +15,7 @@ s_param = [3, 3]
 
 weights = SurrogateWeights(rankingKryteriow, kryteria).rankSum()
 print("wagi : ", weights)
-print(generalized_criteria)
+print("generalized criteria: ", generalized_criteria)
 
 warianty = ['a1', 'a2', 'a3']
 #      G1   G2
@@ -32,31 +33,34 @@ print("partial pref", partialPref)
 print("preferencje : ", aggregatedPI)
 
 positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
-print(positiveFlow, negativeFlow)
+print("positive flow: ", positiveFlow, "negative flow: ", negativeFlow)
 
 pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
-print(pairs)
+print("Ranking M11_PrometheeIRanking:", pairs)
+intervals, pairs = PrometheeIIIFlow(warianty, positiveFlow, negativeFlow, aggregatedPI).calculate_ranking(0.2)
+print("Intervals:", intervals)
+print("Ranking M13_PrometheeIIIFlow:", pairs)
 
 # TEST M3 PROFILE
-print("--------Test modułu M3 dla wariantów i profili----------")
-#      G1   G2
-ap = [[10, 12],  # a1
-      [11, 13],  # a2
-      [12, 14]]  # a3
-
-profile = ['b1', 'b2']
-#      G1  G2
-pp = [[11, 11],  # b1
-      [14, 13]]  # b2
-
-aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
-                                                p_param, q_param, s_param, generalized_criteria,
-                                                directions, profile, pp).computePreferenceIndices()
-print("partial pref", partialPref)
-print("preferencje : ", aggregatedPI)
-
-positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows(True)
-print(positiveFlow, negativeFlow)
-
-pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
-print(pairs)
+# print("--------Test modułu M3 dla wariantów i profili----------")
+# #      G1   G2
+# ap = [[10, 12],  # a1
+#       [11, 13],  # a2
+#       [12, 14]]  # a3
+#
+# profile = ['b1', 'b2']
+# #      G1  G2
+# pp = [[11, 11],  # b1
+#       [14, 13]]  # b2
+#
+# aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
+#                                                 p_param, q_param, s_param, generalized_criteria,
+#                                                 directions, profile, pp).computePreferenceIndices()
+# print("partial pref", partialPref)
+# print("preferencje : ", aggregatedPI)
+#
+# positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows(True)
+# print("positive flow: ", positiveFlow, "negative flow: ", negativeFlow)
+#
+# pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
+# print(pairs)
