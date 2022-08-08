@@ -29,11 +29,8 @@ class PrometheePreference:
                  directions: List[NumericValue],
                  categories_profiles: List[str] = None,
                  profile_performance_table: List[List[NumericValue]] = None,
-
                  decimal_place: NumericValue = 3):
         """
-        Nie uwzględniono boundary profiles oraz characteristic profiles.
-
         :param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
         :param criteria: list of criteria
         :param alternatives_performances: 2D list of alternatives' value at every criterion
@@ -44,7 +41,7 @@ class PrometheePreference:
         :param generalized_criteria: list of preference functions
         :param directions: directions of preference of criteria
         :param decimal_place: with this you can choose the decimal_place of the output numbers
-        :param categories_profiles: list of proviles (names, strings)
+        :param categories_profiles: list of profiles (names, strings)
         :param profile_performance_table: 2D list of profiles performance (value) at every criterion
         """
 
@@ -128,7 +125,8 @@ class PrometheePreference:
 
     def computePreferenceIndices(self):
         """
-        Calculates preference of every alternative over others based on partial preferences
+        Calculates preference of every alternative over other alternatives
+        or profiles based on partial preferences
 
         :return: preferences
         :return: partial preferences
