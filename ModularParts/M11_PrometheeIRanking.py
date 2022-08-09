@@ -33,6 +33,8 @@ class PrometheeIRanking:
         pairs = []
         for num_a, alternative_a in enumerate(self.alternatives):
             for num_b, alternative_b in enumerate(self.alternatives):
+                if alternative_a == alternative_b:
+                    continue
                 if weak_preference:
                     if self.positive_flow[num_a] >= self.positive_flow[num_b] \
                             and self.negative_flow[num_a] <= self.negative_flow[num_b]:
