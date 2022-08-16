@@ -51,18 +51,20 @@ class FlowSortI:
         self.positive_flows = positive_flows
         self.comparison_with_profiles = comparison_with_profiles
 
-    @staticmethod
-    def append_to_classification(classification: Dict, positive_flow_class: str,
-                                 negative_flow_class: str, positive_flow_class_id: int, negative_flow_class_id: int,
-                                 alternative_name: str):
+    def __append_to_classification(self, classification: Dict, positive_flow_category: str, negative_flow_category: str,
+                                   alternative_name: str) -> None:
 
-        if positive_flow_class != negative_flow_class:
-            if positive_flow_class_id > negative_flow_class_id:
-                classification[alternative_name].append([negative_flow_class, positive_flow_class])
-            else:
-                classification[alternative_name].append([positive_flow_class, negative_flow_class])
-        else:
-            classification[alternative_name].append([positive_flow_class])
+        positive_category_index = self.categories.index(positive_flow_category)
+        negative_category_index = self.categories.index(negative_flow_category)
+
+        if positive_category_index > negative_category_index:
+            for category in self.categories[negative_category_index:positive_category_index]:
+                classification[category].append(alternative_name)
+        elif positive_category_index < negative_category_index:
+            for category in self.categories[positive_category_index:negative_category_index]:
+                classification[category].append(alternative_name)
+        else:  # positive_category_index = negative_category_index i.e. precise assignment to a specific category
+            classification[self.categories[positive_category_index]].append(alternative_name)
 
     def __check_dominance_condition(self):
         """
@@ -83,25 +85,25 @@ class FlowSortI:
 
         :return: Dictionary with alternatives classification
         """
-        classification = {alternatives: [] for alternatives in self.alternatives}
-        positive_flow_class = ""
-        negative_flow_class = ""
-        positive_flow_class_id = -1
-        negative_flow_class_id = -1
+        classification = {category: [] for category in self.categories}
         for alternative_name, alternative_positive_flow, alternative_negative_flow in zip(
                 self.alternatives, self.positive_flows[0], self.negative_flows[0]):
+            positive_flow_category = str
+            negative_flow_category = str
+            calc_positive_flow_category = True
+            calc_negative_flow_category = True
             for i, profile_i in enumerate(self.profiles_performances[:-1]):
-                if positive_flow_class == "":
+                if calc_positive_flow_category:
                     if self.positive_flows[1][i] < alternative_positive_flow <= self.positive_flows[1][i + 1]:
-                        positive_flow_class = self.categories[i]
-                        positive_flow_class_id = i
-                if negative_flow_class == "":
+                        positive_flow_category = self.categories[i]
+                        calc_positive_flow_category = False
+                if calc_negative_flow_category:
                     if self.negative_flows[1][i] >= alternative_negative_flow > self.negative_flows[1][i + 1]:
-                        negative_flow_class = self.categories[i]
-                        negative_flow_class_id = i
-                if positive_flow_class != "" and negative_flow_class != "":
-                    FlowSortI.append_to_classification(classification, positive_flow_class, negative_flow_class,
-                                                       positive_flow_class_id, negative_flow_class_id, alternative_name)
+                        negative_flow_category = self.categories[i]
+                        calc_negative_flow_category = False
+                if not calc_positive_flow_category and not calc_negative_flow_category:
+                    self.__append_to_classification(classification, positive_flow_category, negative_flow_category,
+                                                    alternative_name)
                     break
         return classification
 
@@ -112,43 +114,43 @@ class FlowSortI:
 
         :return: Dictionary with alternatives classification
         """
-        classification = {alternatives: [] for alternatives in self.alternatives}
-        positive_flow_class = ""
-        negative_flow_class = ""
-        positive_flow_class_id = -1
-        negative_flow_class_id = -1
+        classification = {category: [] for category in self.categories}
         for alternative_name, alternative_positive_flow, alternative_negative_flow in zip(
                 self.alternatives, self.positive_flows[0], self.negative_flows[0]):
+            positive_flow_category = str
+            negative_flow_category = str
+            calc_positive_flow_category = True
+            calc_negative_flow_category = True
             for i, profile_i in enumerate(self.profiles_performances):
-                if positive_flow_class == "":
+                if calc_positive_flow_category:
                     if i == 0:
                         if alternative_positive_flow <= self.positive_flows[1][i]:
-                            positive_flow_class = self.categories[i]
-                            positive_flow_class_id = i
+                            positive_flow_category = self.categories[i]
+                            calc_positive_flow_category = False
                     elif i == len(self.category_profiles) - 1:
                         if alternative_positive_flow > self.positive_flows[1][i - 1]:
-                            positive_flow_class = self.categories[i]
-                            positive_flow_class_id = i
+                            positive_flow_category = self.categories[i]
+                            calc_positive_flow_category = False
                     else:
                         if self.positive_flows[1][i - 1] < alternative_positive_flow <= self.positive_flows[1][i]:
-                            positive_flow_class = self.categories[i]
-                            positive_flow_class_id = i
-                if negative_flow_class == "":
+                            positive_flow_category = self.categories[i]
+                            calc_positive_flow_category = False
+                if calc_negative_flow_category:
                     if i == 0:
                         if alternative_negative_flow > self.negative_flows[1][i]:
-                            negative_flow_class = self.categories[i]
-                            negative_flow_class_id = i
+                            negative_flow_category = self.categories[i]
+                            calc_negative_flow_category = False
                     elif i == len(self.category_profiles) - 1:
                         if alternative_negative_flow <= self.negative_flows[1][i - 1]:
-                            negative_flow_class = self.categories[i]
-                            negative_flow_class_id = i
+                            negative_flow_category = self.categories[i]
+                            calc_negative_flow_category = False
                     else:
                         if self.negative_flows[1][i - 1] >= alternative_negative_flow > self.negative_flows[1][i]:
-                            negative_flow_class = self.categories[i]
-                            negative_flow_class_id = i
-                if positive_flow_class != "" and negative_flow_class != "":
-                    FlowSortI.append_to_classification(classification, positive_flow_class, negative_flow_class,
-                                                       positive_flow_class_id, negative_flow_class_id, alternative_name)
+                            negative_flow_category = self.categories[i]
+                            calc_negative_flow_category = False
+                if not calc_positive_flow_category and not calc_negative_flow_category:
+                    self.__append_to_classification(classification, positive_flow_category, negative_flow_category,
+                                                    alternative_name)
                     break
         return classification
 
@@ -159,46 +161,46 @@ class FlowSortI:
 
         :return: Dictionary with alternatives classification
         """
-        classification = {alternatives: [] for alternatives in self.alternatives}
-        positive_flow_class = ""
-        negative_flow_class = ""
-        positive_flow_class_id = -1
-        negative_flow_class_id = -1
+        classification = {category: [] for category in self.categories}
         for alternative_name, alternative_positive_flow, alternative_negative_flow in zip(
                 self.alternatives, self.positive_flows[0], self.negative_flows[0]):
+            positive_flow_category = str
+            negative_flow_category = str
+            calc_positive_flow_category = True
+            calc_negative_flow_category = True
             for i, profile_i in enumerate(self.profiles_performances):
-                if positive_flow_class == "":
+                if calc_positive_flow_category:
                     if i == 0:
                         if alternative_positive_flow <= (self.positive_flows[1][i] + self.positive_flows[1][i + 1]) / 2:
-                            positive_flow_class = self.categories[i]
-                            positive_flow_class_id = i
+                            positive_flow_category = self.categories[i]
+                            calc_positive_flow_category = False
                     elif i == len(self.category_profiles) - 1:
                         if (self.positive_flows[1][i - 1] + self.positive_flows[1][i]) / 2 < alternative_positive_flow:
-                            positive_flow_class = self.categories[i]
-                            positive_flow_class_id = i
+                            positive_flow_category = self.categories[i]
+                            calc_positive_flow_category = False
                     else:
                         if (self.positive_flows[1][i - 1] + self.positive_flows[1][i]) / 2 < alternative_positive_flow \
                                 <= (self.positive_flows[1][i] + self.positive_flows[1][i + 1]) / 2:
-                            positive_flow_class = self.categories[i]
-                            positive_flow_class_id = i
-                if negative_flow_class == "":
+                            positive_flow_category = self.categories[i]
+                            calc_positive_flow_category = False
+                if calc_negative_flow_category:
                     if i == 0:
                         if alternative_negative_flow > (self.negative_flows[1][i] + self.negative_flows[1][i + 1]) / 2:
-                            negative_flow_class = self.categories[i]
-                            negative_flow_class_id = i
+                            negative_flow_category = self.categories[i]
+                            calc_negative_flow_category = False
                     elif i == len(self.category_profiles) - 1:
                         if (self.negative_flows[1][i - 1] + self.negative_flows[1][i]) / 2 >= alternative_negative_flow:
-                            negative_flow_class = self.categories[i]
-                            negative_flow_class_id = i
+                            negative_flow_category = self.categories[i]
+                            calc_negative_flow_category = False
                     else:
                         if (self.negative_flows[1][i - 1] + self.negative_flows[1][i]) / 2 \
                                 >= alternative_negative_flow \
                                 > (self.negative_flows[1][i] + self.negative_flows[1][i + 1]) / 2:
-                            negative_flow_class = self.categories[i]
-                            negative_flow_class_id = i
-                if positive_flow_class != "" and negative_flow_class != "":
-                    FlowSortI.append_to_classification(classification, positive_flow_class, negative_flow_class,
-                                                       positive_flow_class_id, negative_flow_class_id, alternative_name)
+                            negative_flow_category = self.categories[i]
+                            calc_negative_flow_category = False
+                if not calc_positive_flow_category and not calc_negative_flow_category:
+                    self.__append_to_classification(classification, positive_flow_category, negative_flow_category,
+                                                    alternative_name)
                     break
         return classification
 

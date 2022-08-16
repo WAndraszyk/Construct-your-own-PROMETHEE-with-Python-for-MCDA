@@ -1,6 +1,6 @@
-import numpy as np
 from core.aliases import NumericValue
 from typing import List, Tuple, Dict
+
 
 class PrometheeTri:
     """
@@ -134,11 +134,3 @@ class PrometheeTri:
         profiles_criteria_net_flows, alternatives_criteria_net_flows = self.__calculate_criteria_net_flows()
         deviations = self.__calculate_deviations(profiles_criteria_net_flows, alternatives_criteria_net_flows)
         return self.__assign_alternatives_to_classes_with_minimal_deviation(deviations)
-
-
-
-
-
-
-
-

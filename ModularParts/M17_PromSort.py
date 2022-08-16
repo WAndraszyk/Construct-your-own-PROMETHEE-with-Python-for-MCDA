@@ -14,7 +14,7 @@ class PromSort:
                  category_profiles: List[str],
                  profiles_performances: List[List[NumericValue]],
                  criteria: Tuple[List[NumericValue], List[NumericValue]],
-                 # in pdf: description, importance etc, in code: thresholds and preference directions (0 or 1)
+                 # in pdf: description, importance etc. in code: thresholds and preference directions (0 or 1)
                  negative_flows: Tuple[List[NumericValue], List[NumericValue]],
                  positive_flows: Tuple[List[NumericValue], List[NumericValue]],
                  cut_point: NumericValue,  # <-1, 1>, used in second phase
@@ -65,7 +65,7 @@ class PromSort:
                                      positive_flow_b: NumericValue, negative_flow_b: NumericValue) -> chr:
         """
         This function declare 3 types of outranking relation between alternative
-        and profile or profile and alternative (preference - 'P', indifference - 'I', incomparability - '?')
+        and profile or profile and alternative (preference - 'P', indifference - 'I', incomparable - '?')
 
         :param positive_flow_a: positive flow of first profile/alternative
         :param negative_flow_a: negative flow of first profile/alternative
@@ -110,10 +110,10 @@ class PromSort:
         - if alternative is preferred to all boundary profiles then assign alternative to the best category
         - calculate outranking relations of each boundary profile to alternative, if all boundary profiles are
         preferred to alternative then assign alternative to the worst category
-        - if first incomparability or indifference appeared to the worse profile than first preference then assign
+        - if first incomparable or indifference appeared to the worse profile than first preference then assign
         alternative to first preference index + 1 category
-        - else mark alternative as 'not_classified'. This alternative will be assigned to first incomparability
-        or indifference index or first incomparability or indifference +1 category
+        - else mark alternative as 'not_classified'. This alternative will be assigned to first incomparable
+        or indifference index or first incomparable or indifference +1 category
 
         :return: Dictionary with classifications and List of Tuples of alternative, worse and better class to
         which can be alternative assigned in final assignments step

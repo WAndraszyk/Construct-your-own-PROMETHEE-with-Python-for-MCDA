@@ -13,7 +13,7 @@ class CompareProfiles(Enum):
     LIMITING_PROFILES = 3
 
 
-class FlowSortI:
+class FlowSortII:
     """
     This module computes the assignments of given alternatives to categories using FlowSort procedure based on
     Promethee II flows.
