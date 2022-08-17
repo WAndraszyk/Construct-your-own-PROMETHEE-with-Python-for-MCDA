@@ -50,6 +50,7 @@ class FlowSortI:
         self.negative_flows = negative_flows
         self.positive_flows = positive_flows
         self.comparison_with_profiles = comparison_with_profiles
+        self.__check_dominance_condition()
 
     def __append_to_classification(self, classification: Dict, positive_flow_category: str, negative_flow_category: str,
                                    alternative_name: str) -> None:
@@ -210,8 +211,6 @@ class FlowSortI:
 
         :return: Dictionary with alternatives assigned to proper classes
         """
-        self.__check_dominance_condition()
-
         if self.comparison_with_profiles == CompareProfiles.LIMITING_PROFILES:
             return self.__limiting_profiles_sorting()
         elif self.comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:

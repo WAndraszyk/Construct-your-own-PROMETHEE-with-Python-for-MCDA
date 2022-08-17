@@ -46,6 +46,7 @@ class FlowSortII:
         self.criteria = criteria
         self.flows = flows
         self.comparison_with_profiles = comparison_with_profiles
+        self.__check_dominance_condition()
 
     def __check_dominance_condition(self):
         """
@@ -125,8 +126,6 @@ class FlowSortII:
 
         :return: Dictionary with alternatives assigned to proper classes
         """
-        self.__check_dominance_condition()
-
         if self.comparison_with_profiles == CompareProfiles.LIMITING_PROFILES:
             return self.__limiting_profiles_sorting()
         elif self.comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
