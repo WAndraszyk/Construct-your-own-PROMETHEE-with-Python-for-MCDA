@@ -13,7 +13,7 @@ Wykonane moduły:
 - M3  :heavy_check_mark:
 - M4  :heavy_check_mark:
 - M5
-- M6
+- M6  :heavy_check_mark:
 - M7
 - M8
 - M9  :heavy_check_mark:
