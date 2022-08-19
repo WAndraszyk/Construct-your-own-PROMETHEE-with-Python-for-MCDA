@@ -102,7 +102,7 @@ class PromSort:
                                                       alternative_positive_flow, alternative_negative_flow))
         return set(outranking_relations) == {"P"}
 
-    def __calculate_first_step_assignments(self) -> Tuple[Dict[str][List[str]],
+    def __calculate_first_step_assignments(self) -> Tuple[Dict[str, List[str]],
                                                           List[Tuple[str, Tuple[str, str]]]]:
         """
         Calculates first step of assignments alternatives to categories.
@@ -147,8 +147,8 @@ class PromSort:
 
         return classification, not_classified
 
-    def __calculate_final_assignments(self, classification: Dict[str][List[str]],
-                                      not_classified: List[Tuple[str, Tuple[str, str]]]) -> Dict[str][List[str]]:
+    def __calculate_final_assignments(self, classification: Dict[str, List[str]],
+                                      not_classified: List[Tuple[str, Tuple[str, str]]]) -> Dict[str, List[str]]:
         """
         Used assigned categories to assign the unassigned ones. Based on positive and negative distance,
         that is calculated for each alternative, basing on calculated in first step categories (s and s+1).
@@ -162,9 +162,9 @@ class PromSort:
         :return: Dictionary with final alternatives classification
         """
 
-        new_classification = classification
+        new_classification = classification.copy()
 
-        for alternative, worse_category, better_category in not_classified:
+        for alternative, (worse_category, better_category) in not_classified:
             alternative_index = self.alternatives.index(alternative)
             worse_category_alternatives = classification[worse_category]
             better_category_alternatives = classification[better_category]
@@ -207,14 +207,19 @@ class PromSort:
 
         return new_classification
 
-    def calculate_sorted_alternatives(self) -> Tuple[Dict[str][List[str]], Dict[str][List[str]]]:
+    def calculate_sorted_alternatives(self) -> Tuple[Dict[str, List[str]], Dict[str, List[str]]]:
         """
         Sort alternatives to proper categories.
 
-        :return: Dictionary with final alternatives classification
-        and Dictionary with classifications from first step assignments.
+        :return: Dictionary with first step assignment classification
+        and Dictionary with final step assignment classification.
         """
         first_step_assignments, not_classified = self.__calculate_first_step_assignments()
         final_step_assignments = self.__calculate_final_assignments(first_step_assignments, not_classified)
 
-        return first_step_assignments, final_step_assignments
+        first_step_full_assignments = first_step_assignments
+        for alternative_name, (worse_category, better_category) in not_classified:
+            first_step_full_assignments[worse_category].append(alternative_name)
+            first_step_full_assignments[better_category].append(alternative_name)
+
+        return first_step_full_assignments, final_step_assignments
