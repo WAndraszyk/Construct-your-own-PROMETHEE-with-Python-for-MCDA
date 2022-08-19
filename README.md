@@ -11,7 +11,7 @@ Wykonane moduły:
 - M1  :heavy_check_mark:
 - M2  :heavy_check_mark:
 - M3  :heavy_check_mark:
-- M4  :heavy_check_mark: (bez opt)
+- M4  :heavy_check_mark:
 - M5
 - M6
 - M7
@@ -20,7 +20,7 @@ Wykonane moduły:
 - M10
 - M11 :heavy_check_mark:
 - M12
-- M13
+- M13 :heavy_check_mark:
 - M14 :heavy_check_mark:
 - M15 :heavy_check_mark:
 - M16 :heavy_check_mark:
