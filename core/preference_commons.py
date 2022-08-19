@@ -1,3 +1,4 @@
+import copy
 from typing import List
 
 from core.aliases import NumericValue
@@ -13,12 +14,13 @@ def directed_alternatives_performances(alternatives_performances: List[List[Nume
     :param directions: directions of preference of criteria
     :return: 2D list of alternatives' value at every criterion
     """
+    copy_alternatives_performances = copy.deepcopy(alternatives_performances)
     for i in range(len(directions)):
         if directions[i] == 0:
             for j in range(len(alternatives_performances)):
-                alternatives_performances[j][i] = -alternatives_performances[j][i]
+                copy_alternatives_performances[j][i] = -alternatives_performances[j][i]
 
-    return alternatives_performances
+    return copy_alternatives_performances
 
 
 def deviations(criteria, alternatives_performances, profile_performance_table=None) -> List[List[List[NumericValue]]]:

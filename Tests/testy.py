@@ -3,6 +3,7 @@ from ModularParts.M1_SurrogateWeights import SurrogateWeights
 from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
 from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
 from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
+from ModularParts.M6_PrometheeDiscordance import PrometheeDiscordance
 
 
 kryteria = ['G1', 'G2']
@@ -29,8 +30,12 @@ print("--------Test modułu M3 dla samych wariantów----------")
 aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
                                                 p_param, q_param, s_param, generalized_criteria,
                                                 directions).computePreferenceIndices()
-print("partial pref", partialPref)
-print("preferencje : ", aggregatedPI)
+print("partial preferences", partialPref)
+print("preferences : ", aggregatedPI)
+
+discordance, partial_discordance = PrometheeDiscordance(2, partialPref).calculate_discordance(1.5)
+print("partial discordance: ", partial_discordance)
+print("discordance: ", discordance)
 
 positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
 print("positive flow: ", positiveFlow, "negative flow: ", negativeFlow)
@@ -56,12 +61,12 @@ pp = [[11, 11],  # b1
 aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
                                                 p_param, q_param, s_param, generalized_criteria,
                                                 directions, profile, pp).computePreferenceIndices()
-print("partial pref", partialPref)
-print("preferencje : ", aggregatedPI)
+print("partial preferences", partialPref)
+print("preferences: ", aggregatedPI)
+
+discordance, partial_discordance = PrometheeDiscordance(2, partialPref, True).calculate_discordance(1.25)
+print("partial discordance: ", partial_discordance)
+print("discordance: ", discordance)
 
 positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
 print(positiveFlow, negativeFlow)
-
-# RANKINGS ARE NOT SUPPOSED TO ACCEPT category_profiles AND CANNOT BUILD RANKINGS WITH category_profiles
-# pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
-# print(pairs)
