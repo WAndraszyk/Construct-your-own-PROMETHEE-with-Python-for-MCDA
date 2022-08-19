@@ -24,12 +24,12 @@ Wykonane moduły:
 - M14 :heavy_check_mark:
 - M15 :heavy_check_mark:
 - M16 :heavy_check_mark:
-- M17
-- M18
-- M19
-- M20
-- M21
-- M22
+- M17 :heavy_check_mark:
+- M18 :heavy_check_mark:
+- M19 :heavy_check_mark:
+- M20 :heavy_check_mark:
+- M21 :heavy_check_mark:
+- M22 :heavy_check_mark:
 - M23
 - M24
 - M25

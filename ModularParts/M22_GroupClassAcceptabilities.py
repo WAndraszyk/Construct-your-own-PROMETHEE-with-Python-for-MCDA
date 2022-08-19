@@ -79,7 +79,7 @@ class GroupClassAcceptabilities:
         """
         Calculates unimodal alternatives support for each alternative and category (percentage).
 
-        :param votes: 2D List with alternative support for each category for each alternative
+        :param alternatives_support: 2D List with alternative support for each category for each alternative
 
         :return: 2D List with unimodal alternative support for each category for each alternative
         """

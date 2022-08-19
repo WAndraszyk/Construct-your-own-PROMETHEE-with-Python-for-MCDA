@@ -79,7 +79,7 @@ class FlowSortI:
                     if profile_j[criteria_i] < profile_i[criteria_i]:
                         raise ValueError("Profiles don't fulfill the dominance condition")
 
-    def __limiting_profiles_sorting(self) -> Dict[str][List[str]]:
+    def __limiting_profiles_sorting(self) -> Dict[str, List[str]]:
         """
         Comparing positive and negative flows of each alternative with all limiting profiles and assign them to
         correctly class.
@@ -108,7 +108,7 @@ class FlowSortI:
                     break
         return classification
 
-    def __boundary_profiles_sorting(self) -> Dict[str][List[str]]:
+    def __boundary_profiles_sorting(self) -> Dict[str, List[str]]:
         """
         Comparing positive and negative flows of each alternative with all boundary profiles and assign them to
         correctly class.
@@ -155,7 +155,7 @@ class FlowSortI:
                     break
         return classification
 
-    def __central_profiles_sorting(self) -> Dict[str][List[str]]:
+    def __central_profiles_sorting(self) -> Dict[str, List[str]]:
         """
         Comparing positive and negative flows of each alternative with all central profiles and assign them to
         correctly class.
@@ -205,7 +205,7 @@ class FlowSortI:
                     break
         return classification
 
-    def calculate_sorted_alternatives(self) -> Dict[str][List[str]]:
+    def calculate_sorted_alternatives(self) -> Dict[str, List[str]]:
         """
         Sort alternatives to proper categories.
 
