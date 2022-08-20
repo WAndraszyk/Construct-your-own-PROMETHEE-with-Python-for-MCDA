@@ -52,7 +52,7 @@ class PrometheeVeto:
                         alternative_Vetoes.append(1)
                     else:
                         alternative_Vetoes.append(0)
-                criterionIndices.append((alternative_Vetoes))
+                criterionIndices.append(alternative_Vetoes)
             ppIndices.append(criterionIndices)
         return ppIndices
 
@@ -89,7 +89,6 @@ class PrometheeVeto:
             return (self.__Vetoes(partialVet[1], self.profile_performance_table, self.alternatives_performances),
                     self.__Vetoes(partialVet[0], self.alternatives_performances, self.profile_performance_table)
                     ), partialVetcopied
-
 
     def __Vetoes(self, partialVet, i_iter, j_iter=None):
         if j_iter is None:
