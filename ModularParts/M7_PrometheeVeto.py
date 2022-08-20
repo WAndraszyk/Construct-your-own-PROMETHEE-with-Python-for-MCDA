@@ -17,7 +17,6 @@ class PrometheeVeto:
         """
         :param criteria: list of criteria
         :param alternatives_performances: 2D list of alternatives' value at every criterion
-        :param generalized_criteria: list of Veto functions
         :param weights: list of weights
         :param v_list: list of veto threshold for each criteria
         :param directions: directions of Veto of criteria
@@ -81,15 +80,18 @@ class PrometheeVeto:
         :return: veto
         :return: partial veto
         """
-        partialPref = self.__partialVeto()
-        if not self.categories_profiles:
-            return self.__Vetoes(partialPref, self.alternatives_performances), partialPref
-        else:
-            return (self.__Vetoes(partialPref[0], self.alternatives_performances, self.profile_performance_table),
-                    self.__Vetoes(partialPref[1], self.profile_performance_table,
-                                  self.alternatives_performances)), partialPref
+        partialVet = self.__partialVeto()
 
-    def __Vetoes(self, partialPref, i_iter, j_iter=None):
+        if not self.categories_profiles:
+            return self.__Vetoes(partialVet, self.alternatives_performances), partialVet
+        else:
+            partialVetcopied = partialVet[1], partialVet[0]
+            return (self.__Vetoes(partialVet[1], self.profile_performance_table, self.alternatives_performances),
+                    self.__Vetoes(partialVet[0], self.alternatives_performances, self.profile_performance_table)
+                    ), partialVetcopied
+
+
+    def __Vetoes(self, partialVet, i_iter, j_iter=None):
         if j_iter is None:
             j_iter = i_iter
         Vetoes = []
@@ -98,12 +100,12 @@ class PrometheeVeto:
             for i in range(len(i_iter)):
                 Pi_A_B = 0
                 for k in range(len(self.criteria)):
-                    if (self.full_vet):
-                        if partialPref[k][j][i] == 1:
+                    if self.full_vet:
+                        if partialVet[k][j][i] == 1:
                             Pi_A_B = 1
                             break
                     else:
-                        Pi_A_B += partialPref[k][j][i] * self.weights[k]
+                        Pi_A_B += partialVet[k][j][i] * self.weights[k]
 
                 aggregatedPI.append(Pi_A_B)
             Vetoes.append(aggregatedPI)
