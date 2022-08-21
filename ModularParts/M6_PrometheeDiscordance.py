@@ -1,4 +1,5 @@
 import copy
+from core.preference_commons import overall_preference
 
 
 class PrometheeDiscordance:
@@ -17,6 +18,7 @@ class PrometheeDiscordance:
     def __calculate_partial_discordance(self, partial_preferences, other_partial_preferences=None):
         """
         Calculates partial discordance indices based on partial preference indices
+
         :param partial_preferences: partial preference of every alternative over other alternatives
         or profiles
         :return: 3D matrix of partial discordance indices
@@ -34,6 +36,7 @@ class PrometheeDiscordance:
     def __overall_discordance(self, partial_discordance, tau):
         """
         Calculates overall discordance by aggregating partial discordance indices.
+
         :param partial_discordance: matrix of partial discordance indices
         :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker discordance
         :return: matrix of overall discordance
@@ -51,11 +54,12 @@ class PrometheeDiscordance:
 
         return discordance
 
-    def calculate_discordance(self, tau, calculate_preference=False):
+    def compute_discordance(self, tau, preferences=None):
         """
         Calculates overall discordance by aggregating partial discordance indices.
+
         :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker discordance
-        :param calculate_preference: if True function returns already calculated preference instead of just discordance
+        :param preferences: if not empty function returns already calculated preference instead of just discordance
         :return: matrix of overall discordance and matrix of partial discordance indices. Alternatively: preference
         """
         if tau < 1 or tau > self.k:
@@ -72,7 +76,7 @@ class PrometheeDiscordance:
             for i in partial_discordance:
                 discordance.append(self.__overall_discordance(i, tau))
 
-        if calculate_preference:
-            return 0  # TODO: obliczanie preferencji z M8
+        if preferences is not None:
+            return overall_preference(preferences, discordance, self.categories_profiles)
         else:
             return discordance, partial_discordance

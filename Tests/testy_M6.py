@@ -1,9 +1,6 @@
 from ModularParts.M3_PrometheePreference import (PrometheePreference, PreferenceFunction)
 from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
-from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
-
+from ModularParts.M6_PrometheeDiscordance import PrometheeDiscordance
 
 kryteria = ['G1', 'G2']
 rankingKryteriow = ['G2', 'G1']
@@ -23,26 +20,24 @@ ap = [[10, 12],  # a1
       [11, 13],  # a2
       [12, 14]]  # a3
 
-# TEST M3 SAME WARIANTY
-print("--------Test modułu M3 dla samych wariantów----------")
+# TEST M6 SAME WARIANTY
+print("--------Test modułu M6 dla samych wariantów----------")
 
 aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
                                                 p_param, q_param, s_param, generalized_criteria,
                                                 directions).computePreferenceIndices()
-print("partial preferences", partialPref)
+print("partial preferences: ", partialPref)
 print("preferences : ", aggregatedPI)
 
-positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
-print("positive flow: ", positiveFlow, "negative flow: ", negativeFlow)
+discordance, partial_discordance = PrometheeDiscordance(2, partialPref).compute_discordance(1.5)
+print("partial discordance: ", partial_discordance)
+print("discordance: ", discordance)
 
-pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
-print("Ranking M11_PrometheeIRanking:", pairs)
-intervals, pairs = PrometheeIIIFlow(warianty, positiveFlow, negativeFlow, aggregatedPI).calculate_ranking(0.2)
-print("Intervals:", intervals)
-print("Ranking M13_PrometheeIIIFlow:", pairs)
+overall_preference = PrometheeDiscordance(2, partialPref).compute_discordance(1.5, aggregatedPI)
+print("overall preferences: ", overall_preference)
 
-# TEST M3 PROFILE
-print("--------Test modułu M3 dla wariantów i profili----------")
+# TEST M6 PROFILE
+print("--------Test modułu M6 dla wariantów i profili----------")
 
 profile = ['b1', 'b2']
 #      G1  G2
@@ -55,5 +50,9 @@ aggregatedPI, partialPref = PrometheePreference(warianty, kryteria, ap, weights,
 print("partial preferences", partialPref)
 print("preferences: ", aggregatedPI)
 
-positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
-print(positiveFlow, negativeFlow)
+discordance, partial_discordance = PrometheeDiscordance(2, partialPref, True).compute_discordance(1.25)
+print("partial discordance: ", partial_discordance)
+print("discordance: ", discordance)
+
+overall_preference = PrometheeDiscordance(2, partialPref, True).compute_discordance(1.5, aggregatedPI)
+print("overall preferences: ", overall_preference)

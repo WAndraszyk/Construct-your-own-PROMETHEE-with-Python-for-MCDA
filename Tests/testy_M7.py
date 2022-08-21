@@ -1,8 +1,4 @@
-from ModularParts.M3_PrometheePreference import (PrometheePreference, PreferenceFunction)
 from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
-from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
 from ModularParts.M7_PrometheeVeto import PrometheeVeto
 
 kryteria = ['G1', 'G2']
@@ -23,7 +19,7 @@ ap = [[10, 12],  # a1
 print("--------Test modułu M7 dla samych wariantów----------")
 
 veto, partialVeto = PrometheeVeto(kryteria, ap, weights,
-                                  v_param, directions).computeVetoIndices()
+                                  v_param, directions).compute_veto()
 print("partial veto", partialVeto)
 print("Veto : ", veto)
 
@@ -36,7 +32,7 @@ pp = [[9.5, 11],  # b1
       [14, 13]]  # b2
 
 
-veto, partialVeto = PrometheeVeto( kryteria, ap, weights,
-                                  v_param, directions, categories_profiles=True, profile_performance_table=pp, full_veto=False).computeVetoIndices()
+veto, partialVeto = PrometheeVeto(kryteria, ap, weights,
+                                  v_param, directions, categories_profiles=True, profile_performance_table=pp, full_veto=False).compute_veto()
 print("partial veto", partialVeto)
 print("Veto : ", veto)

@@ -56,10 +56,11 @@ class PrometheeVeto:
             ppIndices.append(criterionIndices)
         return ppIndices
 
-    def __partialVeto(self) -> List[List[List[NumericValue]]]:
+    def __partial_veto(self) -> List[List[List[NumericValue]]]:
         """
         Calculates partial veto of every alternative over other alternatives
         or profiles at every criterion based on deviations using a method chosen by user.
+
         :return: partial veto
         """
         deviations = pc.deviations(self.criteria, self.alternatives_performances, self.profile_performance_table)
@@ -72,25 +73,30 @@ class PrometheeVeto:
                 self.__veto_deep(deviations[1], self.profile_performance_table, self.alternatives_performances)]
         return ppIndices
 
-    def computeVetoIndices(self):
+    def compute_veto(self, preferences=None):
         """
         Calculates veto of every alternative over other alternatives
         or profiles based on partial veto
 
+        :param preferences: if not None function returns already calculated preference instead of just veto
         :return: veto
         :return: partial veto
         """
-        partialVet = self.__partialVeto()
+        partialVet = self.__partial_veto()
 
         if not self.categories_profiles:
-            return self.__Vetoes(partialVet, self.alternatives_performances), partialVet
+            veto = self.__vetoes(partialVet, self.alternatives_performances)
+            partial_veto = partialVet
         else:
-            partialVetcopied = partialVet[1], partialVet[0]
-            return (self.__Vetoes(partialVet[1], self.profile_performance_table, self.alternatives_performances),
-                    self.__Vetoes(partialVet[0], self.alternatives_performances, self.profile_performance_table)
-                    ), partialVetcopied
+            partial_veto = partialVet[1], partialVet[0]
+            veto = (self.__vetoes(partialVet[1], self.profile_performance_table, self.alternatives_performances),
+                    self.__vetoes(partialVet[0], self.alternatives_performances, self.profile_performance_table))
+        if preferences is not None:
+            return pc.overall_preference(preferences, veto)
+        else:
+            return veto, partial_veto
 
-    def __Vetoes(self, partialVet, i_iter, j_iter=None):
+    def __vetoes(self, partialVet, i_iter, j_iter=None):
         if j_iter is None:
             j_iter = i_iter
         Vetoes = []
