@@ -92,7 +92,7 @@ class PrometheeVeto:
             veto = (self.__vetoes(partialVet[1], self.profile_performance_table, self.alternatives_performances),
                     self.__vetoes(partialVet[0], self.alternatives_performances, self.profile_performance_table))
         if preferences is not None:
-            return pc.overall_preference(preferences, veto)
+            return pc.overall_preference(preferences, veto, self.categories_profiles)
         else:
             return veto, partial_veto
 
