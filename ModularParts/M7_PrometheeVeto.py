@@ -4,6 +4,9 @@ import core.preference_commons as pc
 
 
 class PrometheeVeto:
+    """
+    This class computes aggregated veto indices and partial veto indices.
+    """
     def __init__(self,
                  criteria,
                  alternatives_performances: List[List[NumericValue]],
