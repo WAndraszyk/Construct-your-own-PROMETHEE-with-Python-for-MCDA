@@ -1,9 +1,11 @@
 import copy
+
+from core.aliases import NumericValue
 from core.preference_commons import overall_preference
 
 
 class PrometheeDiscordance:
-    def __init__(self, k, partial_preferences, categories_profiles=False):
+    def __init__(self, k: int, partial_preferences, categories_profiles=False):
         """
         :param k: number of criteria
         :param partial_preferences: partial preference of every alternative over other alternatives
@@ -54,7 +56,7 @@ class PrometheeDiscordance:
 
         return discordance
 
-    def compute_discordance(self, tau, preferences=None):
+    def compute_discordance(self, tau: NumericValue, preferences=None):
         """
         Calculates overall discordance by aggregating partial discordance indices.
 
