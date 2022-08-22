@@ -3,7 +3,7 @@ from ModularParts.M1_SurrogateWeights import SurrogateWeights
 from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
 from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
 from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
-
+from ModularParts.M12_PrometheeIIFlow import PrometheeIIFlow
 
 kryteria = ['G1', 'G2']
 rankingKryteriow = ['G2', 'G1']
@@ -56,4 +56,8 @@ print("partial preferences", partialPref)
 print("preferences: ", aggregatedPI)
 
 positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).calculate_flows()
-print(positiveFlow, negativeFlow)
+print("positive flow", positiveFlow)
+print("negative flow", negativeFlow)
+
+outrankingFlow = PrometheeIIFlow(positiveFlow, negativeFlow).calculate_PrometheeIIFlow()
+print("outranking flow", outrankingFlow)
