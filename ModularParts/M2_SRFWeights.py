@@ -4,7 +4,7 @@ from typing import List, Union
 from core.aliases import NumericValue
 
 
-class SurrogateWeights:
+class SRFWeights:
     """
     This module computes weights of criteria using the revised Simos (or Simos-Roy-Figueira; SRF) method.
     """
