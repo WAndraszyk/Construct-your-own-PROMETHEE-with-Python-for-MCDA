@@ -19,7 +19,7 @@ Wykonane moduły:
 - M9  :heavy_check_mark:
 - M10
 - M11 :heavy_check_mark:
-- M12
+- M12 :heavy_check_mark:
 - M13 :heavy_check_mark:
 - M14 :heavy_check_mark:
 - M15 :heavy_check_mark:
