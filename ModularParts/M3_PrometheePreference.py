@@ -136,8 +136,8 @@ class PrometheePreference:
             return self.__preferences(partialPref, self.alternatives_performances), partialPref
         else:
             return (self.__preferences(partialPref[0], self.alternatives_performances, self.profile_performance_table),
-                    self.__preferences(partialPref[1], self.profile_performance_table,
-                                       self.alternatives_performances)), partialPref
+                    self.__preferences(partialPref[1], self.profile_performance_table, self.alternatives_performances)
+                    ), partialPref
 
     def __preferences(self, partialPref, i_iter, j_iter=None):
         if j_iter is None:

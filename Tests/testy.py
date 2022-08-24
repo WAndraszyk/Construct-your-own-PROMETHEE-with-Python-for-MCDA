@@ -4,6 +4,8 @@ from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
 from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
 from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
 from ModularParts.M12_PrometheeIIFlow import PrometheeIIFlow
+from ModularParts.M23_PrometheeV import PrometheeV
+from core.constraint import Constraint, Relation
 
 kryteria = ['G1', 'G2']
 rankingKryteriow = ['G2', 'G1']
@@ -36,6 +38,7 @@ positiveFlow, negativeFlow = PrometheeOutrankingFlows(warianty, aggregatedPI).ca
 print("positive flow: ", positiveFlow, "negative flow: ", negativeFlow)
 
 pairs = PrometheeIRanking(warianty, positiveFlow, negativeFlow).calculate_ranking()
+
 print("Ranking M11_PrometheeIRanking:", pairs)
 intervals, pairs = PrometheeIIIFlow(warianty, positiveFlow, negativeFlow, aggregatedPI).calculate_ranking(0.2)
 print("Intervals:", intervals)
@@ -61,3 +64,7 @@ print("negative flow", negativeFlow)
 
 outrankingFlow = PrometheeIIFlow(positiveFlow, negativeFlow).calculate_PrometheeIIFlow()
 print("outranking flow", outrankingFlow)
+
+constraints = [Constraint([1, 1, 1], Relation.LT, 1)]
+decision = PrometheeV(outrankingFlow, constraints).compute_decision()
+print("decision: ", decision)
