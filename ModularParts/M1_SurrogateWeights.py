@@ -77,11 +77,11 @@ class SurrogateWeights:
         """
         n = len(self.criteria_rank)
         weights = []
-        sigma = 0
         for j in range(1, n + 1):
-            sigma += 1 / j
-        wi = round((1 / n) * sigma, self.decimal_place)
-        for i in range(1, n + 1):
+            sigma = 0
+            for i in range(j, n + 1):
+                sigma += 1 / i
+            wi = round((1 / n) * sigma, self.decimal_place)
             weights.append(wi)
         weightsOrdered = self.__weightOrder(weights)
         return weightsOrdered
