@@ -35,4 +35,4 @@ Wykonane moduły:
 - M25
 - M26
 - M27
-- M28
+- M28 :heavy_check_mark: (Tabela w pliku PDF ale nie LaTeX)
