@@ -6,6 +6,7 @@ class MultipleDMUniNetFlows:
     """
     Extra module for calculating GDSS flows for FlowSortGDSS.
     """
+
     def __init__(self,
                  alternatives: List[str],
                  category_profiles: List[str],
@@ -95,11 +96,10 @@ class MultipleDMUniNetFlows:
             profiles_net_flows.append(profile_alternative_net_flows)
 
         profiles_general_net_flows = [
-            [
-                [sum([criterion_weight * net_flow for criterion_weight, net_flow in
-                      zip(self.criteria_weights, profile_alternative_DM_category_profile_net_flows)])
-                 for profile_alternative_DM_category_profile_net_flows in profile_alternative_DM_net_flows]
-                for profile_alternative_DM_net_flows in profile_alternative_net_flows]
+            [[sum([criterion_weight * net_flow for criterion_weight, net_flow in
+                   zip(self.criteria_weights, profile_alternative_DM_category_profile_net_flows)])
+              for profile_alternative_DM_category_profile_net_flows in profile_alternative_DM_net_flows]
+             for profile_alternative_DM_net_flows in profile_alternative_net_flows]
             for profile_alternative_net_flows in profiles_net_flows]
 
         return profiles_general_net_flows

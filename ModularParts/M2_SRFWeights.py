@@ -9,9 +9,11 @@ class SRFWeights:
     This module computes weights of criteria using the revised Simos (or Simos-Roy-Figueira; SRF) method.
     """
 
-    def __init__(self, criteria_rank: List[Union[None, str, List[str]]], criteria_weight_ratio: NumericValue,
+    def __init__(self, criteria: List[str],
+                 criteria_rank: List[Union[None, str, List[str]]], criteria_weight_ratio: NumericValue,
                  decimal_place: int = 2):
         """
+        :param criteria: List of names of criteria (string only)
         :param criteria_rank: List of criteria in proper order.
                               First criterion in list indicates the least important criterion.
                               User can group criteria by passing them in nested list to indicate
@@ -21,6 +23,7 @@ class SRFWeights:
         :param criteria_weight_ratio: Difference between the least important criterion and the most important criterion.
         :param decimal_place: Number of decimal places for returned weights.
         """
+        self.criteria = criteria
         self.decimal_place = decimal_place
         self.criteria_weight_ratio = criteria_weight_ratio
         self.criteria_rank = criteria_rank
@@ -53,7 +56,15 @@ class SRFWeights:
         """
         criteria_rank_with_out_white_cards = [criterion for criterion in self.criteria_rank if criterion is not None]
 
-        v = len(criteria_rank_with_out_white_cards) - 1
+        flattened_criteria_ranks = []
+
+        for criterion in criteria_rank_with_out_white_cards:
+            if isinstance(criterion, list):
+                flattened_criteria_ranks += criterion
+            else:
+                flattened_criteria_ranks.append(criterion)
+
+        v = len(flattened_criteria_ranks) - 1
 
         not_normalized_weights = []
 
@@ -61,10 +72,15 @@ class SRFWeights:
             weight = 1 + ((self.criteria_weight_ratio - 1) *
                           (i - 1 + np.sum(white_cards_between_criteria[:i])) /
                           (v - 1 + np.sum(white_cards_between_criteria[:v])))
-            if criterion is list:
+            if isinstance(criterion, list):
                 not_normalized_weights += [weight for _ in criterion]
             else:
                 not_normalized_weights.append(weight)
+
+        flattened_criteria_ranks_indices = [self.criteria.index(criterion) for criterion in flattened_criteria_ranks]
+
+        not_normalized_weights = [weight for _, weight in
+                                  sorted(zip(flattened_criteria_ranks_indices, not_normalized_weights))]
 
         return not_normalized_weights
 
@@ -76,11 +92,11 @@ class SRFWeights:
         """
         normalized_weights = []
 
-        sum_of_weights = np.sum(not_normalized_weights)
+        sum_of_weights = sum(not_normalized_weights)
 
         precise_rounding_factor = 10 ** self.decimal_place  # It allows for more precise rounding
 
-        not_normalized_weights = not_normalized_weights * 100 * precise_rounding_factor
+        not_normalized_weights = [weight * 100 * precise_rounding_factor for weight in not_normalized_weights]
 
         for not_normalized_weight in not_normalized_weights[:len(not_normalized_weights) // 2]:
             normalized_weights.append(round(ceil(not_normalized_weight / sum_of_weights) /
@@ -89,7 +105,6 @@ class SRFWeights:
         for not_normalized_weight in not_normalized_weights[len(not_normalized_weights) // 2:]:
             normalized_weights.append(round(floor(not_normalized_weight / sum_of_weights) /
                                             precise_rounding_factor, self.decimal_place))
-
         return normalized_weights
 
     def calculate_srf_weights(self) -> List[float]:

@@ -1,4 +1,5 @@
 from ModularParts.M3_PrometheePreference import PreferenceFunction
+from ModularParts.M4_PrometheePreferenceReinforcedPreference import PreferenceFunction as M4_PreferenceFunction
 
 alternatives_performances = [[35.8, 67.0, 19.7, 0.0, 0.0, 5.0, 4.0],
                              [16.4, 14.5, 59.8, 7.5, 5.2, 5.0, 3.0],
@@ -55,8 +56,12 @@ profiles = ['b12', 'b23', 'b34', 'b45']
 
 criteria = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7']
 criteria_weights = [0.073, 0.370, 0.228, 0.109, 0.156, 0.020, 0.044]
-preference_threshold = [2, 4, 3, 3, 3, 0, 0]
-indifference_threshold = [1, 4, 1, 0, 1, 0, 0]
+preference_thresholds = [2, 4, 3, 3, 3, 0, 0]
+indifference_thresholds = [1, 4, 1, 0, 1, 0, 0]
+reinforced_preferences = [4, 8, 6, 6, 6, 3, 3]
+reinforcement_factors = [1.2, 1.2, 1.2, 1.3, 1.1, 1.1, 1.1]
+srf_criteria_rank = ['g6', None, 'g7', None, None, None, 'g1', ['g4', 'g5'], None, 'g3', 'g2']
+srf_criteria_weight_ratio = 2
 standard_deviations = [None, None, None, None, None, None, None]
 # cost -> 0
 # gain -> 1
@@ -68,3 +73,8 @@ criteria_ranks = [5, 1, 2, 4, 3, 7, 6]
 generalized_criteria = [PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.U_SHAPE,
                         PreferenceFunction.LEVEL, PreferenceFunction.V_SHAPE,
                         PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.USUAL, PreferenceFunction.USUAL]
+
+M4_generalized_criteria = [M4_PreferenceFunction.V_SHAPE_INDIFFERENCE, M4_PreferenceFunction.U_SHAPE,
+                           M4_PreferenceFunction.LEVEL, M4_PreferenceFunction.V_SHAPE,
+                           M4_PreferenceFunction.V_SHAPE_INDIFFERENCE, M4_PreferenceFunction.USUAL,
+                           M4_PreferenceFunction.USUAL]

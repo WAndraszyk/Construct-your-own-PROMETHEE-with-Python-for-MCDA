@@ -22,7 +22,7 @@ class NetFlowScore:
         :param direction: Enum ScoringFunctionDirection - indicate which function direction should be used in
                           calculating Net Flow Score.
         """
-        self.preferences = np.ndarray(preferences)
+        self.preferences = np.array(preferences)
         np.fill_diagonal(self.preferences, np.NaN)
         self.function = function
         self.direction = direction
