@@ -92,7 +92,6 @@ class FlowSortGDSS:
 
         :return: Tuple with updated classification Dictionary and not_classified List
         """
-
         if len(set(alternative_assignments)) > 1:
             assignments_category_indices = sorted(
                 [self.categories.index(category) for category in set(alternative_assignments)])
@@ -136,7 +135,7 @@ class FlowSortGDSS:
                             alternative_assignments.append(self.categories[0])
                             break
                         elif profile_category_i == len(
-                                self.categories) - 1 and alternative_global_net_flow > profile_net_flow:
+                                self.category_profiles) - 1 and alternative_global_net_flow > profile_net_flow:
                             alternative_assignments.append(self.categories[-1])
                             break
                         elif alternative_global_net_flow <= profile_net_flow:
@@ -176,8 +175,8 @@ class FlowSortGDSS:
             DMs_chose_worse_category, DMs_chose_better_category in not_classified:
 
             alternative_index = self.alternatives.index(alternative_name)
-            worse_category_index = self.alternatives.index(worse_category)
-            better_category_index = self.alternatives.index(better_category)
+            worse_category_index = self.categories.index(worse_category)
+            better_category_index = self.categories.index(better_category)
 
             if self.comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
                 worse_distance = sum([DM_weight *
@@ -185,18 +184,22 @@ class FlowSortGDSS:
                                        self.category_profiles_global_net_flows[alternative_index][DM_index][
                                            worse_category_index])
                                       for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_worse_category)])
+                better_distance = sum([DM_weight *
+                                       (self.category_profiles_global_net_flows[alternative_index][DM_index][
+                                            better_category_index] -
+                                        self.alternative_global_net_flows[alternative_index])
+                                       for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_better_category)])
             else:
                 worse_distance = sum([DM_weight *
-                                      (self.category_profiles_global_net_flows[alternative_index][DM_index][
-                                           worse_category_index] -
-                                       self.alternative_global_net_flows[alternative_index])
+                                      abs(self.category_profiles_global_net_flows[alternative_index][DM_index][
+                                              worse_category_index] -
+                                          self.alternative_global_net_flows[alternative_index])
                                       for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_worse_category)])
-
-            better_distance = sum([DM_weight *
-                                   (self.category_profiles_global_net_flows[alternative_index][DM_index][
-                                        better_category_index] -
-                                    self.alternative_global_net_flows[alternative_index])
-                                   for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_better_category)])
+                better_distance = sum([DM_weight *
+                                       abs(self.category_profiles_global_net_flows[alternative_index][DM_index][
+                                               better_category_index] -
+                                           self.alternative_global_net_flows[alternative_index])
+                                       for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_better_category)])
 
             if better_distance > worse_distance:
                 final_classification[worse_category].append(alternative_name)

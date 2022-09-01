@@ -21,7 +21,7 @@ class NetFlowScoreIterative:
                           calculating Net Flow Score.
         """
         self.alternatives = alternatives
-        self.preferences = np.ndarray(preferences)
+        self.preferences = np.array(preferences)
         self.NFS = NetFlowScore(preferences, function, direction)
         np.fill_diagonal(self.preferences, np.NaN)
         self.function = function

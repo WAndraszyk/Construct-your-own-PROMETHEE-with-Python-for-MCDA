@@ -1,6 +1,5 @@
 from core.aliases import NumericValue
 from typing import List, Tuple, Dict
-import numpy as np
 
 
 class GroupClassAcceptabilities:

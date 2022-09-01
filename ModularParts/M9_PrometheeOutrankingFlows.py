@@ -33,13 +33,9 @@ class PrometheeOutrankingFlows:
         """
         if isinstance(self.preferences, tuple):  # check if self.preferences are with category profiles
             if positive:
-                n = len(self.preferences[0])
-                aggregatedPIes = np.sum(self.preferences[0], axis=1)
-                flows = aggregatedPIes / (n - 1)
+                flows = np.mean(self.preferences[0], axis=1)
             else:
-                n = len(self.preferences[1])
-                aggregatedPIes = np.sum(self.preferences[1], axis=0)
-                flows = aggregatedPIes / (n - 1)
+                flows = np.mean(self.preferences[1], axis=0)
         else:
             n = len(self.alternatives)
 

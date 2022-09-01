@@ -130,17 +130,21 @@ class PromSort:
                     PromSort.__define_outranking_relation(alternative_positive_flow, alternative_negative_flow,
                                                           profile_positive_flow, profile_negative_flow))
 
+            # Mistake in paper !!!
             first_P_occurrence = outranking_relations.index("P") if "P" in outranking_relations else float("inf")
             first_R_occurrence = outranking_relations.index("?") if "?" in outranking_relations else float("inf")
             first_I_occurrence = outranking_relations.index("I") if "I" in outranking_relations else float("inf")
+
+            last_P_occurrence = len(outranking_relations) - 1 - outranking_relations[::-1].index("P")\
+                if "P" in outranking_relations else float("inf")
 
             if outranking_relations[-1] == "P":
                 classification[self.categories[-1]].append(alternative_name)
             elif self.__check_if_all_profiles_are_preferred_to_alternative(
                     alternative_positive_flow, alternative_negative_flow):
                 classification[self.categories[0]].append(alternative_name)
-            elif min(first_R_occurrence, first_I_occurrence) < first_P_occurrence:
-                classification[self.categories[first_P_occurrence + 1]].append(alternative_name)
+            elif min(first_R_occurrence, first_I_occurrence) > last_P_occurrence:
+                classification[self.categories[last_P_occurrence + 1]].append(alternative_name)
             else:
                 s = min(first_R_occurrence, first_I_occurrence)
                 not_classified.append((alternative_name, (self.categories[s], self.categories[s + 1])))
@@ -165,6 +169,7 @@ class PromSort:
         new_classification = classification.copy()
 
         for alternative, (worse_category, better_category) in not_classified:
+            print(alternative, worse_category, better_category)
             alternative_index = self.alternatives.index(alternative)
             worse_category_alternatives = classification[worse_category]
             better_category_alternatives = classification[better_category]

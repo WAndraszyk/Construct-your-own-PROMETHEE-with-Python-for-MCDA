@@ -13,7 +13,8 @@ class PrometheeTri:
                  category_profiles: List[str],
                  criteria: List[str],
                  criteria_weights: List[NumericValue],
-                 partial_preferences: Tuple[List[List[NumericValue]], List[List[NumericValue]]],
+                 partial_preferences: Tuple[List[List[List[NumericValue]]], List[List[List[NumericValue]]]],
+                 profiles_partial_preferences: List[List[List[NumericValue]]],
                  assign_to_better_class: bool = True,
                  use_marginal_value: bool = True):
         """
@@ -23,8 +24,9 @@ class PrometheeTri:
         to proper categories (strings only)
         :param criteria: List of criteria names (strings only)
         :param criteria_weights: List of weight of each criterion
-        :param partial_preferences: 2D List of alternatives partial preferences and
-        2D List of profiles partial preferences
+        :param partial_preferences: 3D Lists of partial preferences (alternatives vs profiles and
+        profiles vs alternatives)
+        :param profiles_partial_preferences:
         :param assign_to_better_class: Boolean which describe preference of the DM in final alternative assignment when
         deviation for two or more profiles are the same.
         :param use_marginal_value: Boolean which describe whether deviation should be
@@ -36,6 +38,7 @@ class PrometheeTri:
         self.criteria = criteria
         self.criteria_weights = criteria_weights
         self.partial_preferences = partial_preferences
+        self.profiles_partial_preferences = profiles_partial_preferences
         self.assign_to_better_class = assign_to_better_class
         self.use_marginal_value = use_marginal_value
 
@@ -53,9 +56,9 @@ class PrometheeTri:
             profile_criteria_net_flows = []
             for j, _ in enumerate(self.criteria):
                 criterion_net_flow = 0
-                for k, _ in enumerate(self.alternatives):
+                for k, _ in enumerate(self.category_profiles):
                     if i != k:
-                        criterion_net_flow += self.partial_preferences[0][i][k] - self.partial_preferences[0][k][i]
+                        criterion_net_flow += self.profiles_partial_preferences[j][i][k] - self.profiles_partial_preferences[j][k][i]
                 profile_criteria_net_flows.append(1 / (n_profiles - 1) * criterion_net_flow)
             profiles_criteria_net_flows.append(profile_criteria_net_flows)
 
@@ -64,9 +67,9 @@ class PrometheeTri:
             alternative_criteria_net_flows = []
             for j, _ in enumerate(self.criteria):
                 criterion_net_flow = 0
-                for k, _ in enumerate(self.alternatives):
+                for k, _ in enumerate(self.category_profiles):
                     if i != k:
-                        criterion_net_flow += self.partial_preferences[0][i][k] - self.partial_preferences[0][k][i]
+                        criterion_net_flow += self.partial_preferences[0][j][i][k] - self.partial_preferences[1][j][k][i]
                 alternative_criteria_net_flows.append(1 / n_alternatives * criterion_net_flow)
             alternatives_criteria_net_flows.append(alternative_criteria_net_flows)
 
@@ -101,7 +104,7 @@ class PrometheeTri:
         return deviations
 
     def __assign_alternatives_to_classes_with_minimal_deviation(self, deviations: List[List[NumericValue]]
-                                                                ) -> Dict[str][str]:
+                                                                ) -> Dict[str, List[str]]:
         """
         Assign every alternative to class with minimal deviation for pair alternative, class.
 
@@ -114,9 +117,9 @@ class PrometheeTri:
         for alternative_index, alternative_deviations in enumerate(deviations):
             min_deviation_value = min(alternative_deviations)
 
-            min_deviation_indices = [i for i, deviation in alternative_deviations if deviation == min_deviation_value]
+            min_deviation_indices = [i for i, deviation in enumerate(alternative_deviations) if deviation == min_deviation_value]
 
-            if len(min_deviation_indices) == 1 or self.assign_to_better_class:
+            if len(min_deviation_indices) == 1 or not self.assign_to_better_class:
                 category_index = min_deviation_indices[0]
             else:
                 category_index = min_deviation_indices[-1]
