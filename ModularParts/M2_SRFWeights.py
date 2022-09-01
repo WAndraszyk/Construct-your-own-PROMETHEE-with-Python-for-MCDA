@@ -92,7 +92,7 @@ class SRFWeights:
 
         return normalized_weights
 
-    def srf_weights(self) -> List[float]:
+    def calculate_srf_weights(self) -> List[float]:
         """
         Calculate normalized weights for criteria_rank and criteria_weight_ratio passed to class.
 

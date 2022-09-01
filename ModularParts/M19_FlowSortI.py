@@ -52,20 +52,20 @@ class FlowSortI:
         self.comparison_with_profiles = comparison_with_profiles
         self.__check_dominance_condition()
 
-    def __append_to_classification(self, classification: Dict, positive_flow_category: str, negative_flow_category: str,
+    def __append_to_classification(self, classification: Dict, pessimistic_category: str, optimistic_category: str,
                                    alternative_name: str) -> None:
 
-        positive_category_index = self.categories.index(positive_flow_category)
-        negative_category_index = self.categories.index(negative_flow_category)
+        pessimistic_category_index = self.categories.index(pessimistic_category)
+        optimistic_category_index = self.categories.index(optimistic_category)
 
-        if positive_category_index > negative_category_index:
-            for category in self.categories[negative_category_index:positive_category_index]:
+        if pessimistic_category_index > optimistic_category_index:
+            for category in self.categories[optimistic_category_index:pessimistic_category_index+1]:
                 classification[category].append(alternative_name)
-        elif positive_category_index < negative_category_index:
-            for category in self.categories[positive_category_index:negative_category_index]:
+        elif pessimistic_category_index < optimistic_category_index:
+            for category in self.categories[pessimistic_category_index:optimistic_category_index+1]:
                 classification[category].append(alternative_name)
         else:  # positive_category_index = negative_category_index i.e. precise assignment to a specific category
-            classification[self.categories[positive_category_index]].append(alternative_name)
+            classification[self.categories[pessimistic_category_index]].append(alternative_name)
 
     def __check_dominance_condition(self):
         """
