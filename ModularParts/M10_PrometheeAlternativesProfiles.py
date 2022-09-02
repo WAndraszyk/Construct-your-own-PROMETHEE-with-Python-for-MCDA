@@ -1,5 +1,5 @@
 from core.aliases import NumericValue
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 
 class PrometheeAlternativesProfiles:
@@ -46,17 +46,19 @@ class PrometheeAlternativesProfiles:
 
         criteria_weights = [criterion_weight for _, criterion_weight in self.criteria]
 
-        net_flows = [sum([criteria_weight * criterion_net_flow for criterion_net_flow in criteria_net_flows])
-                     for criteria_weight in criteria_weights]
+        net_flows = [sum([criterion_weight * criterion_net_flow for criterion_net_flow, criterion_weight
+                          in zip(alternative_criteria_net_flows, criteria_weights)])
+                     for alternative_criteria_net_flows in criteria_net_flows]
 
         return net_flows
 
-    def calculate_alternatives_profiles(self) -> List[NumericValue]:
+    def calculate_alternatives_profiles(self) -> Dict[str, NumericValue]:
         """
         Calculate the alternatives profiles.
         """
         criteria_net_flows = self.__calculate_criteria_net_flows()
         net_flows = self.__calculate_net_flows(criteria_net_flows)
-        return net_flows
 
-
+        alternatives_with_assigned_flows = {alternative: net_flow for alternative, net_flow
+                                            in zip(self.alternatives, net_flows)}
+        return alternatives_with_assigned_flows

@@ -58,13 +58,13 @@ class TablePDF:
         return data_set
 
     def create_PDF_file(self):
-        data_set = [['Alternative', 'Lover class', 'Upper class']]
+        data_set = [['Alternative', 'Lower class', 'Upper class']]
         alternatives_bounds = self.__transform_assignments_to_upper_lower_bound_form()
         data_set = self.__create_data_set(data_set, alternatives_bounds)
 
         pdf = SimpleDocTemplate(self.out_file_name, pagesize=letter, title=self.out_file_name)
 
-        table = Table(data_set)
+        table = Table(data_set, repeatRows=1)
         style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                             ('FONT', (0, 0), (-1, -1), 'Courier', 12),
                             ('FONT', (0, 0), (-1, 0), 'Courier-Bold', 16),
