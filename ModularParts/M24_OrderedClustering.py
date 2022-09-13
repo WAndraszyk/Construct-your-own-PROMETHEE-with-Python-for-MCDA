@@ -46,7 +46,7 @@ class OrderedClustering:
         return max_pi, pi_i, pi_j
 
     def __check_graph__(self, graph, K):
-        g = Graph(K)
+        g = Graph(len(graph))
         for i in range(len(graph)):
             for j in range(len(graph[0])):
                 if graph[i][j] == 1:
