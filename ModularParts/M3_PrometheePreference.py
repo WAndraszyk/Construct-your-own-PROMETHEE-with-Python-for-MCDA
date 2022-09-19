@@ -61,68 +61,6 @@ class PrometheePreference:
         else:
             self.profile_performance_table = profile_performance_table
 
-    def __pp_deep(self, deviations, i_iter, j_iter):
-        ppIndices = []
-        for k in range(len(self.criteria)):
-            method = self.generalized_criteria[k]
-            q = self.q_list[k]
-            p = self.p_list[k]
-            s = self.s_list[k]
-            criterionIndices = []
-            for i in range(len(i_iter)):
-                alternativeIndices = []
-                for j in range(len(j_iter)):
-                    if method is PreferenceFunction.USUAL:
-                        alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
-                    elif method is PreferenceFunction.U_SHAPE:
-                        alternativeIndices.append(gc.uShapeCriterion(deviations[k][i][j], q))
-                    elif method is PreferenceFunction.V_SHAPE:
-                        alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p, self.decimal_place))
-                    elif method is PreferenceFunction.LEVEL:
-                        if q > p:
-                            raise ValueError(
-                                "incorrect threshold : q "
-                                + str(q)
-                                + " greater than p "
-                                + str(p)
-                            )
-                        alternativeIndices.append(gc.levelCriterion(deviations[k][i][j], p, q))
-                    elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
-                        if q > p:
-                            raise ValueError(
-                                "incorrect threshold : q "
-                                + str(q)
-                                + " greater than p "
-                                + str(p)
-                            )
-                        alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j],
-                                                                                 p, q, self.decimal_place))
-                    elif method is PreferenceFunction.GAUSSIAN:
-                        alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
-                    else:
-                        raise ValueError(
-                            "pref_func "
-                            + str(method)
-                            + " is not known."
-                        )
-                criterionIndices.append(alternativeIndices)
-            ppIndices.append(criterionIndices)
-        return ppIndices
-
-    def __partialPreference(self) -> List[List[List[NumericValue]]]:
-        """
-        Calculates partial preference of every alternative over other alternatives
-        or profiles at every criterion based on deviations using a method chosen by user.
-        :return: partial preference indices
-        """
-        deviations = pc.deviations(self.criteria, self.alternatives_performances, self.profile_performance_table)
-        if self.categories_profiles is None:
-            ppIndices = self.__pp_deep(deviations, self.alternatives_performances, self.alternatives_performances)
-        else:
-            ppIndices = [self.__pp_deep(deviations[0], self.alternatives_performances, self.profile_performance_table),
-                         self.__pp_deep(deviations[1], self.profile_performance_table, self.alternatives_performances)]
-        return ppIndices
-
     def computePreferenceIndices(self):
         """
         Calculates preference of every alternative over other alternatives
@@ -131,7 +69,13 @@ class PrometheePreference:
         :return: preferences
         :return: partial preferences
         """
-        partialPref = self.__partialPreference()
+        partialPref = pc.partialPreference(criteria=self.criteria, p_list=self.p_list,
+                                           q_list=self.q_list, s_list=self.s_list,
+                                           generalized_criteria=self.generalized_criteria,
+                                           categories_profiles=self.categories_profiles,
+                                           alternatives_performances=self.alternatives_performances,
+                                           profile_performance_table=self.profile_performance_table,
+                                           decimal_place=self.decimal_place)
         if self.categories_profiles is None:
             return self.__preferences(partialPref, self.alternatives_performances), partialPref
         else:
