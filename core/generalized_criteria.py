@@ -24,19 +24,18 @@ def uShapeCriterion(d: NumericValue, q: NumericValue):
         return 1
 
 
-def vShapeCriterion(d: NumericValue, p: NumericValue, decimal_place):
+def vShapeCriterion(d: NumericValue, p: NumericValue):
     """
     Returns 0 if difference is less or equal to p, 1 if it is greater then p.
     Else it calculates the number between 0 and 1 based on the difference.
 
     :param d: difference between two alternatives on a specified criterion
     :param p: threshold of strict prefference
-    :param decimal_place: decimal place used in calculations
     """
     if d <= 0:
         return 0
     elif d <= p:
-        return round(d / p, decimal_place)
+        return d / p
     else:
         return 1
 
@@ -59,7 +58,7 @@ def levelCriterion(d: NumericValue, p: NumericValue, q: NumericValue):
         return 1
 
 
-def vShapeIndifferenceCriterion(d: NumericValue, p: NumericValue, q: NumericValue, decimal_place):
+def vShapeIndifferenceCriterion(d: NumericValue, p: NumericValue, q: NumericValue):
     """
     Returns 0 if difference is less or equal to q, 1 if it is greater then p.
     Else it calculates the number between 0 and 1 based on the difference.
@@ -67,12 +66,11 @@ def vShapeIndifferenceCriterion(d: NumericValue, p: NumericValue, q: NumericValu
     :param d: difference between two alternatives on a specified criterion
     :param p: threshold of strict prefference
     :param q: threshold of indifference
-    :param decimal_place: decimal place used in calculations
     """
     if d <= q:
         return 0
     elif d <= p:
-        return round((d - q) / (p - q), decimal_place)
+        return (d - q) / (p - q)
     else:
         return 1
 

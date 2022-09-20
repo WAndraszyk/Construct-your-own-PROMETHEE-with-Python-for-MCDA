@@ -1,21 +1,11 @@
-from enum import Enum
 from core.aliases import NumericValue
 from typing import List
 import core.preference_commons as pc
+from core.Interactions_between_criteria import Interactions
+from core.preference_commons import criteria_dict
 
 
-class PreferenceFunction(Enum):
-    """Enumeration of the preference functions."""
-
-    USUAL = 1
-    U_SHAPE = 2
-    V_SHAPE = 3
-    LEVEL = 4
-    V_SHAPE_INDIFFERENCE = 5
-    GAUSSIAN = 6
-
-
-class PrometheePreference:
+class PrometheePreferenceWithInteractions:
     def __init__(self,
                  alternatives,
                  criteria,
@@ -26,9 +16,12 @@ class PrometheePreference:
                  s_list: List[NumericValue],
                  generalized_criteria,
                  directions: List[NumericValue],
+                 interactions: Interactions,
+                 interaction_effects_fuction: int = 0,
                  categories_profiles: List[str] = None,
                  profile_performance_table: List[List[NumericValue]] = None,
-                 decimal_place: NumericValue = 3):
+                 decimal_place: NumericValue = 3,
+                 z_function: NumericValue = 0):
         """
         :param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
         :param criteria: list of criteria
@@ -40,6 +33,7 @@ class PrometheePreference:
         :param generalized_criteria: list of preference functions
         :param directions: directions of preference of criteria
         :param decimal_place: with this you can choose the decimal_place of the output numbers
+        :param interactions: interactions between criteria with coefficient weight
         :param categories_profiles: list of profiles (names, strings)
         :param profile_performance_table: 2D list of profiles performance (value) at every criterion
         """
@@ -48,17 +42,28 @@ class PrometheePreference:
         self.criteria = criteria
         self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
         self.weights = weights
-        self.decimal_place = decimal_place
-        self.generalized_criteria = generalized_criteria
         self.p_list = p_list
         self.q_list = q_list
         self.s_list = s_list
+        self.generalized_criteria = generalized_criteria
+        self.interactions = interactions
         self.categories_profiles = categories_profiles
+        self.interaction_effects_fuction = interaction_effects_fuction
         if profile_performance_table is not None:
             self.profile_performance_table = pc.directed_alternatives_performances(profile_performance_table,
                                                                                    directions)
         else:
             self.profile_performance_table = profile_performance_table
+
+        self.decimal_place = decimal_place
+        self.z_function = z_function
+        self.critrioDict = criteria_dict(self.criteria, self.weights)
+
+    def __Z_function(self, pi, pj):
+        if self.z_function != 0:
+            return pi * pj
+        else:
+            return min(pi, pj)
 
     def computePreferenceIndices(self):
         """
@@ -89,9 +94,17 @@ class PrometheePreference:
             aggregatedPI = []
             for j in range(len(j_iter)):
                 Pi_A_B = 0
+                Integartion_A_B = 0
                 for k in range(len(self.criteria)):
                     Pi_A_B += partialPref[k][i][j] * self.weights[k]
-                aggregatedPI.append(round(Pi_A_B, self.decimal_place))
+                for ik in range(len(self.interactions.Criterion_A)):
+                    k1 = self.criteria.index(self.interactions.Criterion_A[ik])
+                    k2 = self.criteria.index(self.interactions.Criterion_B[ik])
+                    Integartion_A_B += self.__Z_function(partialPref[k1][i][j], partialPref[k2][i][j]) * \
+                                       self.interactions.Coefficient[ik] * self.interactions.Types[ik].value
+
+                aggregatedPI.append(
+                    round((Pi_A_B + Integartion_A_B) / (sum(self.weights) + Integartion_A_B), self.decimal_place))
             preferences.append(aggregatedPI)
 
         return preferences
