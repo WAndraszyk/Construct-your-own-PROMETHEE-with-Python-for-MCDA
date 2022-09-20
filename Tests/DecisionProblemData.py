@@ -1,5 +1,6 @@
-from ModularParts.M3_PrometheePreference import PreferenceFunction
+from core.preference_commons import PreferenceFunction
 from ModularParts.M4_PrometheePreferenceReinforcedPreference import PreferenceFunction as M4_PreferenceFunction
+from core.Interactions_between_criteria import *
 
 alternatives_performances = [[35.8, 67.0, 19.7, 0.0, 0.0, 5.0, 4.0],
                              [16.4, 14.5, 59.8, 7.5, 5.2, 5.0, 3.0],
@@ -63,6 +64,10 @@ reinforcement_factors = [1.2, 1.2, 1.2, 1.3, 1.1, 1.1, 1.1]
 srf_criteria_rank = ['g6', None, 'g7', None, None, None, 'g1', ['g4', 'g5'], None, 'g3', 'g2']
 srf_criteria_weight_ratio = 2
 standard_deviations = [None, None, None, None, None, None, None]
+interactions = Interactions(['g6', 'g1', 'g4', 'g2'],
+                ['g7', 'g3', 'g5', 'g3'],
+                [Interaction_type.STN, Interaction_type.STN, Interaction_type.WKN, Interaction_type.ANT],
+                [0.03, 0.02, -0.05, 0.08])
 # cost -> 0
 # gain -> 1
 

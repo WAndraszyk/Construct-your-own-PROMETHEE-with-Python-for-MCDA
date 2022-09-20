@@ -1,9 +1,22 @@
+from enum import Enum
 import copy
 from typing import List
+import core.generalized_criteria as gc
 
 import numpy as np
 
 from core.aliases import NumericValue
+
+
+class PreferenceFunction(Enum):
+    """Enumeration of the preference functions."""
+
+    USUAL = 1
+    U_SHAPE = 2
+    V_SHAPE = 3
+    LEVEL = 4
+    V_SHAPE_INDIFFERENCE = 5
+    GAUSSIAN = 6
 
 
 def directed_alternatives_performances(alternatives_performances: List[List[NumericValue]],
@@ -25,7 +38,7 @@ def directed_alternatives_performances(alternatives_performances: List[List[Nume
     return copy_alternatives_performances
 
 
-def deviations(criteria, alternatives_performances, profile_performance_table=None) -> List[List[List[NumericValue]]]:
+def deviations(criteria, alternatives_performances, profile_performance_table=None):
     """
     Compares alternatives on criteria.
 
@@ -83,3 +96,81 @@ def overall_preference(preferences, discordances, profiles):
         overall_preferences = np.multiply(preferences, discordances).tolist()
 
     return overall_preferences
+
+
+def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, i_iter, j_iter, decimal_place):
+    ppIndices = []
+    for k in range(len(criteria)):
+        method = generalized_criteria[k]
+        q = q_list[k]
+        p = p_list[k]
+        s = s_list[k]
+        criterionIndices = []
+        for i in range(len(i_iter)):
+            alternativeIndices = []
+            for j in range(len(j_iter)):
+                if method is PreferenceFunction.USUAL:
+                    alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
+                elif method is PreferenceFunction.U_SHAPE:
+                    alternativeIndices.append(gc.uShapeCriterion(deviations[k][i][j], q))
+                elif method is PreferenceFunction.V_SHAPE:
+                    alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p, decimal_place))
+                elif method is PreferenceFunction.LEVEL:
+                    if q > p:
+                        raise ValueError(
+                            "incorrect threshold : q "
+                            + str(q)
+                            + " greater than p "
+                            + str(p)
+                        )
+                    alternativeIndices.append(gc.levelCriterion(deviations[k][i][j], p, q))
+                elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
+                    if q > p:
+                        raise ValueError(
+                            "incorrect threshold : q "
+                            + str(q)
+                            + " greater than p "
+                            + str(p)
+                        )
+                    alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j],
+                                                                             p, q, decimal_place))
+                elif method is PreferenceFunction.GAUSSIAN:
+                    alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
+                else:
+                    raise ValueError(
+                        "pref_func "
+                        + str(method)
+                        + " is not known."
+                    )
+            criterionIndices.append(alternativeIndices)
+        ppIndices.append(criterionIndices)
+    return ppIndices
+
+
+
+
+def partialPreference(criteria, p_list, q_list, s_list, generalized_criteria,  decimal_place,
+                      categories_profiles, alternatives_performances, profile_performance_table):
+    """
+    Calculates partial preference of every alternative over other alternatives
+    or profiles at every criterion based on deviations using a method chosen by user.
+    :return: partial preference indices
+    """
+
+    deviation = deviations(criteria=criteria, alternatives_performances=alternatives_performances, profile_performance_table = profile_performance_table)
+    if categories_profiles is None:
+        ppIndices = pp_deep(deviations=deviation, criteria=criteria, p_list=p_list,
+                            q_list=q_list, s_list=s_list,
+                            i_iter=alternatives_performances, j_iter=alternatives_performances,
+                            generalized_criteria=generalized_criteria, decimal_place=decimal_place)
+    else:
+        ppIndices = [pp_deep(deviations=deviation[0], criteria=criteria, p_list=p_list,
+                             q_list=q_list, s_list=s_list,
+                             i_iter=alternatives_performances, j_iter=profile_performance_table,
+                             generalized_criteria=generalized_criteria, decimal_place=decimal_place),
+                     pp_deep(deviations=deviation[1], criteria=criteria, p_list=p_list,
+                             q_list=q_list, s_list=s_list,
+                             i_iter=profile_performance_table, j_iter=alternatives_performances,
+                             generalized_criteria=generalized_criteria, decimal_place=decimal_place)
+                     ]
+    return ppIndices
