@@ -98,7 +98,7 @@ def overall_preference(preferences, discordances, profiles):
     return overall_preferences
 
 
-def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, i_iter, j_iter, decimal_place):
+def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, i_iter, j_iter):
     ppIndices = []
     for k in range(len(criteria)):
         method = generalized_criteria[k]
@@ -114,7 +114,7 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                 elif method is PreferenceFunction.U_SHAPE:
                     alternativeIndices.append(gc.uShapeCriterion(deviations[k][i][j], q))
                 elif method is PreferenceFunction.V_SHAPE:
-                    alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p, decimal_place))
+                    alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p))
                 elif method is PreferenceFunction.LEVEL:
                     if q > p:
                         raise ValueError(
@@ -133,7 +133,7 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                             + str(p)
                         )
                     alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j],
-                                                                             p, q, decimal_place))
+                                                                             p, q))
                 elif method is PreferenceFunction.GAUSSIAN:
                     alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
                 else:
@@ -147,8 +147,8 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
     return ppIndices
 
 
-def partialPreference(criteria, p_list, q_list, s_list, generalized_criteria, decimal_place,
-                      categories_profiles, alternatives_performances, profile_performance_table):
+def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
+                       categories_profiles, alternatives_performances, profile_performance_table):
     """
     Calculates partial preference of every alternative over other alternatives
     or profiles at every criterion based on deviations using a method chosen by user.
@@ -161,21 +161,21 @@ def partialPreference(criteria, p_list, q_list, s_list, generalized_criteria, de
         ppIndices = pp_deep(deviations=deviation, criteria=criteria, p_list=p_list,
                             q_list=q_list, s_list=s_list,
                             i_iter=alternatives_performances, j_iter=alternatives_performances,
-                            generalized_criteria=generalized_criteria, decimal_place=decimal_place)
+                            generalized_criteria=generalized_criteria)
     else:
         ppIndices = [pp_deep(deviations=deviation[0], criteria=criteria, p_list=p_list,
                              q_list=q_list, s_list=s_list,
                              i_iter=alternatives_performances, j_iter=profile_performance_table,
-                             generalized_criteria=generalized_criteria, decimal_place=decimal_place),
+                             generalized_criteria=generalized_criteria),
                      pp_deep(deviations=deviation[1], criteria=criteria, p_list=p_list,
                              q_list=q_list, s_list=s_list,
                              i_iter=profile_performance_table, j_iter=alternatives_performances,
-                             generalized_criteria=generalized_criteria, decimal_place=decimal_place)
+                             generalized_criteria=generalized_criteria)
                      ]
     return ppIndices
 
 
-def criteriaDict(criteria, weights):
+def criteria_dict(criteria, weights):
     """
     Connect criterion name with its weight.
 

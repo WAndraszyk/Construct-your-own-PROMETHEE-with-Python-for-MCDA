@@ -1,9 +1,8 @@
-from enum import Enum
 from core.aliases import NumericValue
 from typing import List
 import core.preference_commons as pc
 from core.Interactions_between_criteria import Interactions
-from core.preference_commons import criteriaDict
+from core.preference_commons import criteria_dict
 
 
 class PrometheePreferenceWithInteractions:
@@ -58,7 +57,7 @@ class PrometheePreferenceWithInteractions:
 
         self.decimal_place = decimal_place
         self.z_function = z_function
-        self.critrioDict = criteriaDict(self.criteria, self.weights)
+        self.critrioDict = criteria_dict(self.criteria, self.weights)
 
     def __Z_function(self, pi, pj):
         if self.z_function != 0:
@@ -74,13 +73,12 @@ class PrometheePreferenceWithInteractions:
         :return: preferences
         :return: partial preferences
         """
-        partialPref = pc.partialPreference(criteria=self.criteria, p_list=self.p_list,
-                                           q_list=self.q_list, s_list=self.s_list,
-                                           generalized_criteria=self.generalized_criteria,
-                                           categories_profiles=self.categories_profiles,
-                                           alternatives_performances=self.alternatives_performances,
-                                           profile_performance_table=self.profile_performance_table,
-                                           decimal_place=self.decimal_place)
+        partialPref = pc.partial_preference(criteria=self.criteria, p_list=self.p_list,
+                                            q_list=self.q_list, s_list=self.s_list,
+                                            generalized_criteria=self.generalized_criteria,
+                                            categories_profiles=self.categories_profiles,
+                                            alternatives_performances=self.alternatives_performances,
+                                            profile_performance_table=self.profile_performance_table)
         if self.categories_profiles is None:
             return self.__preferences(partialPref, self.alternatives_performances), partialPref
         else:

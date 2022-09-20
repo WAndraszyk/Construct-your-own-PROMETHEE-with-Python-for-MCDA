@@ -1,7 +1,6 @@
 from enum import Enum
 from core.aliases import NumericValue
 from typing import List
-import core.generalized_criteria as gc
 import core.preference_commons as pc
 
 
@@ -69,13 +68,12 @@ class PrometheePreference:
         :return: preferences
         :return: partial preferences
         """
-        partialPref = pc.partialPreference(criteria=self.criteria, p_list=self.p_list,
-                                           q_list=self.q_list, s_list=self.s_list,
-                                           generalized_criteria=self.generalized_criteria,
-                                           categories_profiles=self.categories_profiles,
-                                           alternatives_performances=self.alternatives_performances,
-                                           profile_performance_table=self.profile_performance_table,
-                                           decimal_place=self.decimal_place)
+        partialPref = pc.partial_preference(criteria=self.criteria, p_list=self.p_list,
+                                            q_list=self.q_list, s_list=self.s_list,
+                                            generalized_criteria=self.generalized_criteria,
+                                            categories_profiles=self.categories_profiles,
+                                            alternatives_performances=self.alternatives_performances,
+                                            profile_performance_table=self.profile_performance_table)
         if self.categories_profiles is None:
             return self.__preferences(partialPref, self.alternatives_performances), partialPref
         else:
@@ -93,7 +91,7 @@ class PrometheePreference:
                 Pi_A_B = 0
                 for k in range(len(self.criteria)):
                     Pi_A_B += partialPref[k][i][j] * self.weights[k]
-                aggregatedPI.append(Pi_A_B)
+                aggregatedPI.append(round(Pi_A_B, self.decimal_place))
             preferences.append(aggregatedPI)
 
         return preferences
