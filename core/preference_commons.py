@@ -147,9 +147,7 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
     return ppIndices
 
 
-
-
-def partialPreference(criteria, p_list, q_list, s_list, generalized_criteria,  decimal_place,
+def partialPreference(criteria, p_list, q_list, s_list, generalized_criteria, decimal_place,
                       categories_profiles, alternatives_performances, profile_performance_table):
     """
     Calculates partial preference of every alternative over other alternatives
@@ -157,7 +155,8 @@ def partialPreference(criteria, p_list, q_list, s_list, generalized_criteria,  d
     :return: partial preference indices
     """
 
-    deviation = deviations(criteria=criteria, alternatives_performances=alternatives_performances, profile_performance_table = profile_performance_table)
+    deviation = deviations(criteria=criteria, alternatives_performances=alternatives_performances,
+                           profile_performance_table=profile_performance_table)
     if categories_profiles is None:
         ppIndices = pp_deep(deviations=deviation, criteria=criteria, p_list=p_list,
                             q_list=q_list, s_list=s_list,
@@ -174,3 +173,14 @@ def partialPreference(criteria, p_list, q_list, s_list, generalized_criteria,  d
                              generalized_criteria=generalized_criteria, decimal_place=decimal_place)
                      ]
     return ppIndices
+
+
+def criteriaDict(criteria, weights):
+    """
+    Connect criterion name with its weight.
+
+    :param criteria: criteria names as list of string.
+    :param weights: criteria weights as list of Numeric Values.
+    Returns dictionary of connection.
+    """
+    return {criteria[i]: weights[i] for i in range(len(criteria))}
