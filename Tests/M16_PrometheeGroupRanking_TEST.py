@@ -27,6 +27,7 @@ pro_pref = PrometheePreference(alternatives=alternatives, criteria=criteria,
                                decimal_place=3)
 
 preferences, partial_preferences = pro_pref.computePreferenceIndices()
+print(preferences)
 
 
 ## M-9 Flows

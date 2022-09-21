@@ -1,5 +1,4 @@
 from core.preference_commons import PreferenceFunction
-from ModularParts.M4_PrometheePreferenceReinforcedPreference import PreferenceFunction as M4_PreferenceFunction
 from core.Interactions_between_criteria import *
 
 alternatives_performances = [[35.8, 67.0, 19.7, 0.0, 0.0, 5.0, 4.0],
@@ -79,7 +78,3 @@ generalized_criteria = [PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunct
                         PreferenceFunction.LEVEL, PreferenceFunction.V_SHAPE,
                         PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.USUAL, PreferenceFunction.USUAL]
 
-M4_generalized_criteria = [M4_PreferenceFunction.V_SHAPE_INDIFFERENCE, M4_PreferenceFunction.U_SHAPE,
-                           M4_PreferenceFunction.LEVEL, M4_PreferenceFunction.V_SHAPE,
-                           M4_PreferenceFunction.V_SHAPE_INDIFFERENCE, M4_PreferenceFunction.USUAL,
-                           M4_PreferenceFunction.USUAL]
