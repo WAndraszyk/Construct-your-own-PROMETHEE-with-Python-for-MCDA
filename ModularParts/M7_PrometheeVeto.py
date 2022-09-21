@@ -51,7 +51,9 @@ class PrometheeVeto:
             for j in range(len(j_iter)):
                 alternative_Vetoes = []
                 for i in range(len(i_iter)):
-                    if deviations[k][i][j] >= v:
+                    if v is None:
+                        alternative_Vetoes.append(0)
+                    elif deviations[k][i][j] >= v:
                         alternative_Vetoes.append(1)
                     else:
                         alternative_Vetoes.append(0)

@@ -1,4 +1,5 @@
-from ModularParts.M3_PrometheePreference import (PrometheePreference, PreferenceFunction)
+from ModularParts.M3_PrometheePreference import PrometheePreference
+from core.preference_commons import PreferenceFunction
 from ModularParts.M1_SurrogateWeights import SurrogateWeights
 from ModularParts.M6_PrometheeDiscordance import PrometheeDiscordance
 

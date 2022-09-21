@@ -1,18 +1,8 @@
-from enum import Enum
+from core.preference_commons import PreferenceFunction
 from core.aliases import NumericValue
 from typing import List
 import core.generalized_criteria as gc
 import core.preference_commons as pc
-
-
-class PreferenceFunction(Enum):
-    """Enumeration of the preference functions."""
-
-    USUAL = 1
-    U_SHAPE = 2
-    V_SHAPE = 3
-    LEVEL = 4
-    V_SHAPE_INDIFFERENCE = 5
 
 
 class PrometheePreferenceReinforcedPreference:
@@ -87,7 +77,7 @@ class PrometheePreferenceReinforcedPreference:
                         elif method is PreferenceFunction.U_SHAPE:
                             alternativeIndex = gc.uShapeCriterion(deviations[k][i][j], q)
                         elif method is PreferenceFunction.V_SHAPE:
-                            alternativeIndex = gc.vShapeCriterion(deviations[k][i][j], p, self.decimal_place)
+                            alternativeIndex = gc.vShapeCriterion(deviations[k][i][j], p)
                         elif method is PreferenceFunction.LEVEL:
                             if q > p:
                                 raise ValueError(
@@ -105,8 +95,7 @@ class PrometheePreferenceReinforcedPreference:
                                     + " greater than p "
                                     + str(p)
                                 )
-                            alternativeIndex = gc.vShapeIndifferenceCriterion(deviations[k][i][j], p, q,
-                                                                              self.decimal_place)
+                            alternativeIndex = gc.vShapeIndifferenceCriterion(deviations[k][i][j], p, q)
                         else:
                             raise ValueError(
                                 "pref_func "
