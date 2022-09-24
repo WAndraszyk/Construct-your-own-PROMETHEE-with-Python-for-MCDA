@@ -12,6 +12,7 @@ class OrderedClustering:
     def group_alternatives(self, clusters_no: int):
         graph = np.zeros(np.shape(self.preferences))
         clusters = []
+        deleted_nodes = []
         while True:
             max_pi, i, j = self.__search_max__()
             if max_pi == 0:
@@ -27,9 +28,10 @@ class OrderedClustering:
             if no_nodes:
                 break
             for i in range(len(degrees)):
-                if degrees[i] == 0:
+                if degrees[i] == 0 and i not in deleted_nodes:
                     cluster.append(self.alternatives[i])
-                    self.__clean_row__(graph, i)
+                    self.__delete_node__(graph, i)
+                    deleted_nodes.append(i)
             clusters.append(cluster)
         return clusters
 
@@ -69,6 +71,7 @@ class OrderedClustering:
             degrees.append(degree)
         return degrees, no_nodes
 
-    def __clean_row__(self, graph, row):
-        for i in graph[row]:
-            i = 0
+    def __delete_node__(self, graph, row):
+        for i in range(len(graph[row])):
+            graph[row][i] = 0
+            graph[i][row] = 0
