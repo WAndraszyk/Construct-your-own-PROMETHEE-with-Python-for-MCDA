@@ -1,3 +1,4 @@
+import pandas as pd
 from core.preference_commons import PreferenceFunction
 from core.Interactions_between_criteria import *
 
@@ -77,4 +78,16 @@ criteria_ranks = [5, 1, 2, 4, 3, 7, 6]
 generalized_criteria = [PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.U_SHAPE,
                         PreferenceFunction.LEVEL, PreferenceFunction.V_SHAPE,
                         PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.USUAL, PreferenceFunction.USUAL]
+
+df_alternatives = pd.DataFrame(alternatives_performances, index=alternatives, columns=criteria)
+
+df_criteria = pd.DataFrame([criteria_weights, preference_thresholds, indifference_thresholds,
+                            reinforced_preferences, reinforcement_factors, standard_deviations,
+                            criteria_directions, criteria_ranks, generalized_criteria],
+                           index=criteria,
+                           columns=['criteria_weights', 'preference_thresholds', 'indifference_thresholds',
+                                    'reinforced_preferences', 'reinforcement_factors', 'standard_deviations',
+                                    'criteria_directions', 'criteria_ranks', 'generalized_criteria'])
+df_category_profiles = pd.DataFrame(profiles_performances, index=profiles, columns=criteria)
+
 

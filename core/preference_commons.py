@@ -1,6 +1,6 @@
 from enum import Enum
 import copy
-from typing import List
+from typing import List, Union
 import core.generalized_criteria as gc
 
 import numpy as np
@@ -19,8 +19,8 @@ class PreferenceFunction(Enum):
     GAUSSIAN = 6
 
 
-def directed_alternatives_performances(alternatives_performances: List[List[NumericValue]],
-                                       directions: List[NumericValue]) -> List[List[NumericValue]]:
+def directed_alternatives_performances(alternatives_performances: Union[List[List[NumericValue]], np.ndarray],
+                                       directions: List[NumericValue]) -> Union[List[List[NumericValue]], np.ndarray]:
     """
     Changes value of alternative performance to the opposite value if the direction of preference is
     min (represented by 0)
