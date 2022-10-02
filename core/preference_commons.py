@@ -4,6 +4,7 @@ from typing import List, Union
 import core.generalized_criteria as gc
 
 import numpy as np
+import pandas as pd
 
 from core.aliases import NumericValue
 
@@ -175,12 +176,13 @@ def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
     return ppIndices
 
 
-def criteria_dict(criteria, weights):
+def criteria_series(criteria, weights):
     """
     Connect criterion name with its weight.
 
     :param criteria: criteria names as list of string.
     :param weights: criteria weights as list of Numeric Values.
-    Returns dictionary of connection.
+
+    :return: dictionary of connection.
     """
-    return {criteria[i]: weights[i] for i in range(len(criteria))}
+    return pd.Series(weights, criteria)
