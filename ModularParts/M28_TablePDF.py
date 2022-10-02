@@ -2,7 +2,6 @@ from typing import List, Dict
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-import os
 
 
 class TablePDF:
@@ -32,14 +31,14 @@ class TablePDF:
         """
         alternatives_bounds = []
 
-        DM_alternatives_bounds = {alternative: [] for alternative in self.alternatives}
+        dm_alternatives_bounds = {alternative: [] for alternative in self.alternatives}
         for category_i, to_category_assignments in enumerate(self.assignments.values()):
             for alternative in to_category_assignments:
-                DM_alternatives_bounds[alternative].append(self.categories[category_i])
-        for (alternative, alternative_assignments) in DM_alternatives_bounds.items():
+                dm_alternatives_bounds[alternative].append(self.categories[category_i])
+        for (alternative, alternative_assignments) in dm_alternatives_bounds.items():
             if len(alternative_assignments) == 1:
-                DM_alternatives_bounds[alternative].append(alternative_assignments[0])
-        alternatives_bounds.append(DM_alternatives_bounds)
+                dm_alternatives_bounds[alternative].append(alternative_assignments[0])
+        alternatives_bounds.append(dm_alternatives_bounds)
 
         return alternatives_bounds
 
@@ -57,7 +56,7 @@ class TablePDF:
 
         return data_set
 
-    def create_PDF_file(self):
+    def create_pdf_file(self):
         data_set = [['Alternative', 'Lower class', 'Upper class']]
         alternatives_bounds = self.__transform_assignments_to_upper_lower_bound_form()
         data_set = self.__create_data_set(data_set, alternatives_bounds)

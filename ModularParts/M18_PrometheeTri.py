@@ -58,7 +58,8 @@ class PrometheeTri:
                 criterion_net_flow = 0
                 for k, _ in enumerate(self.category_profiles):
                     if i != k:
-                        criterion_net_flow += self.profiles_partial_preferences[j][i][k] - self.profiles_partial_preferences[j][k][i]
+                        criterion_net_flow += self.profiles_partial_preferences[j][i][k] - \
+                                              self.profiles_partial_preferences[j][k][i]
                 profile_criteria_net_flows.append(1 / (n_profiles - 1) * criterion_net_flow)
             profiles_criteria_net_flows.append(profile_criteria_net_flows)
 
@@ -69,7 +70,8 @@ class PrometheeTri:
                 criterion_net_flow = 0
                 for k, _ in enumerate(self.category_profiles):
                     if i != k:
-                        criterion_net_flow += self.partial_preferences[0][j][i][k] - self.partial_preferences[1][j][k][i]
+                        criterion_net_flow += self.partial_preferences[0][j][i][k] - \
+                                              self.partial_preferences[1][j][k][i]
                 alternative_criteria_net_flows.append(1 / n_alternatives * criterion_net_flow)
             alternatives_criteria_net_flows.append(alternative_criteria_net_flows)
 
@@ -117,7 +119,8 @@ class PrometheeTri:
         for alternative_index, alternative_deviations in enumerate(deviations):
             min_deviation_value = min(alternative_deviations)
 
-            min_deviation_indices = [i for i, deviation in enumerate(alternative_deviations) if deviation == min_deviation_value]
+            min_deviation_indices = [i for i, deviation in enumerate(alternative_deviations)
+                                     if deviation == min_deviation_value]
 
             if len(min_deviation_indices) == 1 or not self.assign_to_better_class:
                 category_index = min_deviation_indices[0]

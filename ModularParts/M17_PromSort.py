@@ -131,11 +131,10 @@ class PromSort:
                                                           profile_positive_flow, profile_negative_flow))
 
             # Mistake in paper !!!
-            first_P_occurrence = outranking_relations.index("P") if "P" in outranking_relations else float("inf")
-            first_R_occurrence = outranking_relations.index("?") if "?" in outranking_relations else float("inf")
-            first_I_occurrence = outranking_relations.index("I") if "I" in outranking_relations else float("inf")
+            first_r_occurrence = outranking_relations.index("?") if "?" in outranking_relations else float("inf")
+            first_i_occurrence = outranking_relations.index("I") if "I" in outranking_relations else float("inf")
 
-            last_P_occurrence = len(outranking_relations) - 1 - outranking_relations[::-1].index("P")\
+            last_p_occurrence = len(outranking_relations) - 1 - outranking_relations[::-1].index("P") \
                 if "P" in outranking_relations else float("inf")
 
             if outranking_relations[-1] == "P":
@@ -143,10 +142,10 @@ class PromSort:
             elif self.__check_if_all_profiles_are_preferred_to_alternative(
                     alternative_positive_flow, alternative_negative_flow):
                 classification[self.categories[0]].append(alternative_name)
-            elif min(first_R_occurrence, first_I_occurrence) > last_P_occurrence:
-                classification[self.categories[last_P_occurrence + 1]].append(alternative_name)
+            elif min(first_r_occurrence, first_i_occurrence) > last_p_occurrence:
+                classification[self.categories[last_p_occurrence + 1]].append(alternative_name)
             else:
-                s = min(first_R_occurrence, first_I_occurrence)
+                s = min(first_r_occurrence, first_i_occurrence)
                 not_classified.append((alternative_name, (self.categories[s], self.categories[s + 1])))
 
         return classification, not_classified
@@ -196,8 +195,9 @@ class PromSort:
                      for better_category_alternative_net_outranking_flow
                      in better_category_alternatives_net_outranking_flows])
 
-            total_distance = 1 / len(worse_category_alternatives) * positive_distance \
-                             - 1 / len(better_category_alternatives) * negative_distance
+            total_distance = \
+                1 / len(worse_category_alternatives) * positive_distance - 1 / \
+                len(better_category_alternatives) * negative_distance
 
             if total_distance > self.cut_point:
                 new_classification[better_category].append(alternative)

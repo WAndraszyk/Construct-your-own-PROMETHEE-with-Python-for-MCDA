@@ -1,5 +1,5 @@
-from core.aliases import NumericValue, PerformanceTable, CriteriaFeatures, PreferencesTable, FlowsTable
-from typing import List, Tuple, Dict
+from core.aliases import NumericValue, PerformanceTable, CriteriaFeatures
+from typing import List, Dict
 
 
 class PrometheeAlternativesProfiles:
@@ -10,7 +10,7 @@ class PrometheeAlternativesProfiles:
     def __init__(self,
                  alternatives: PerformanceTable,
                  criteria: CriteriaFeatures,
-                 partial_preferences: cipa):
+                 partial_preferences: cenzura):
         """
         :param alternatives: List of alternatives names (strings only)
         :param criteria: List of Tuples with name and weight of each criterion

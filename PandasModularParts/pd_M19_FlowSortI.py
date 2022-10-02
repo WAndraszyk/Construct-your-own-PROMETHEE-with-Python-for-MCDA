@@ -1,23 +1,15 @@
 import pandas as pd
-from enum import Enum
-from typing import List, Tuple, Dict, Hashable
-
-from core.aliases import NumericValue, PerformanceTable, FlowsTable, CriteriaFeatures
+from typing import List, Hashable
+from core.enums import CompareProfiles
+from core.aliases import PerformanceTable, FlowsTable, CriteriaFeatures
 from core.preference_commons import directed_alternatives_performances
-
-
-class CompareProfiles(Enum):
-    """Enumeration of the compare profiles types."""
-
-    CENTRAL_PROFILES = 1
-    BOUNDARY_PROFILES = 2
-    LIMITING_PROFILES = 3
+from core.sorting import pandas_check_dominance_condition
 
 
 class FlowSortI:
     """
     This module computes the assignments of given alternatives to categories using FlowSort procedure based on
-    Promethee I flows.
+    PrometheeI flows.
     """
 
     def __init__(self,
@@ -44,19 +36,7 @@ class FlowSortI:
         self.alternatives_flows = alternatives_flows
         self.category_profiles_flows = category_profiles_flows
         self.comparison_with_profiles = comparison_with_profiles
-        self.__check_dominance_condition()
-
-    def __check_dominance_condition(self):
-        """
-        Check if each boundary profile is strictly worse in each criterion than betters profiles
-
-        :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
-        """
-        for (criterion, _) in self.criteria['criteria_names'].items():
-            for i, (_, profile_i) in enumerate(self.category_profiles.iloc[:-1].iterrows()):
-                for _, profile_j in self.category_profiles.iloc[i + 1:].iterrows():
-                    if profile_j[criterion] < profile_i[criterion]:
-                        raise ValueError("Profiles don't fulfill the dominance condition")
+        pandas_check_dominance_condition(self.criteria, self.category_profiles)
 
     def __append_to_classification(self, classification: pd.DataFrame, pessimistic_category: str,
                                    optimistic_category: str, alternative_name: Hashable) -> None:

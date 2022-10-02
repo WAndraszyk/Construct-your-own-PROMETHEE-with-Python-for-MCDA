@@ -1,18 +1,8 @@
 import pandas as pd
-
-from enum import Enum
-from typing import List, Tuple, Dict
-
-from core.aliases import NumericValue, PerformanceTable, FlowsTable, CriteriaFeatures
-from core.preference_commons import directed_alternatives_performances
-
-
-class CompareProfiles(Enum):
-    """Enumeration of the compare profiles types."""
-
-    CENTRAL_PROFILES = 1
-    BOUNDARY_PROFILES = 2
-    LIMITING_PROFILES = 3
+from typing import List
+from core.enums import CompareProfiles
+from core.aliases import PerformanceTable, CriteriaFeatures
+from core.sorting import pandas_check_dominance_condition
 
 
 class FlowSortII:
@@ -44,19 +34,7 @@ class FlowSortII:
         self.alternatives_flows = alternatives_flows
         self.category_profiles_flows = category_profiles_flows
         self.comparison_with_profiles = comparison_with_profiles
-        self.__check_dominance_condition()
-
-    def __check_dominance_condition(self):
-        """
-        Check if each boundary profile is strictly worse in each criterion than betters profiles
-
-        :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
-        """
-        for (criterion, _) in self.criteria['criteria_names'].items():
-            for i, (_, profile_i) in enumerate(self.category_profiles.iloc[:-1].iterrows()):
-                for _, profile_j in self.category_profiles.iloc[i + 1:].iterrows():
-                    if profile_j[criterion] < profile_i[criterion]:
-                        raise ValueError("Profiles don't fulfill the dominance condition")
+        pandas_check_dominance_condition(self.criteria, self.category_profiles)
 
     def __limiting_profiles_sorting(self) -> pd.Series:
         """

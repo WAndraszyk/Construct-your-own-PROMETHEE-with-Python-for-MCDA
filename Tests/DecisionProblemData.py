@@ -88,6 +88,7 @@ df_criteria = pd.DataFrame([criteria_weights, preference_thresholds, indifferenc
                            columns=['criteria_weights', 'preference_thresholds', 'indifference_thresholds',
                                     'reinforced_preferences', 'reinforcement_factors', 'standard_deviations',
                                     'criteria_directions', 'criteria_ranks', 'generalized_criteria'])
+
 df_category_profiles = pd.DataFrame(profiles_performances, index=profiles, columns=criteria)
 
 

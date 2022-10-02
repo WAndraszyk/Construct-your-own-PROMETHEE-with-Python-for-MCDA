@@ -3,7 +3,7 @@ from core.aliases import PerformanceTable, PreferencesTable, FlowsTable
 from typing import Tuple, Union
 
 
-class pd_PrometheeOutrankingFlows:
+class PdPrometheeOutrankingFlows:
     """
     This class computes positive and negative outranking flows
     based on preferences.
@@ -36,8 +36,8 @@ class pd_PrometheeOutrankingFlows:
             n = self.preferences.shape[0]
 
             axis = 1 if positive else 0
-            aggregatedPIes = self.preferences.sum(axis=axis)
-            flows = aggregatedPIes / (n - 1)
+            aggregated_preferences = self.preferences.sum(axis=axis)
+            flows = aggregated_preferences / (n - 1)
 
         return flows
 

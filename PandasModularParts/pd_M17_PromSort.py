@@ -118,11 +118,11 @@ class PromSort:
                     alternative_row['positive'], alternative_row['negative'],
                     category_profile_row['positive'], category_profile_row['negative']), axis=1)
 
-            first_I_occurrence = outranking_relations.str.contains('I').idxmax() if outranking_relations.str.contains(
+            first_i_occurrence = outranking_relations.str.contains('I').idxmax() if outranking_relations.str.contains(
                 'I').any() else float('inf')
-            first_R_occurrence = outranking_relations.str.contains('?').idxmax() if outranking_relations.str.contains(
+            first_r_occurrence = outranking_relations.str.contains('?').idxmax() if outranking_relations.str.contains(
                 '?').any() else float('inf')
-            last_P_occurrence = outranking_relations.str.contains('P').idxmin() if outranking_relations.str.contains(
+            last_p_occurrence = outranking_relations.str.contains('P').idxmin() if outranking_relations.str.contains(
                 'P').any() else float('inf')
 
             if outranking_relations[-1] == 'P':
@@ -130,11 +130,11 @@ class PromSort:
             elif self.__check_if_all_profiles_are_preferred_to_alternative(alternative_row['positive'],
                                                                            alternative_row['negative']):
                 classification[alternative] = [self.categories[0], self.categories[0]]
-            elif min(first_R_occurrence, first_I_occurrence) > last_P_occurrence:
-                classification[alternative] = [self.categories[last_P_occurrence + 1],
-                                                   self.categories[last_P_occurrence + 1]]
+            elif min(first_r_occurrence, first_i_occurrence) > last_p_occurrence:
+                classification[alternative] = \
+                    [self.categories[last_p_occurrence + 1], self.categories[last_p_occurrence + 1]]
             else:
-                min_idx = min(first_R_occurrence, first_I_occurrence)
+                min_idx = min(first_r_occurrence, first_i_occurrence)
                 classification[alternative] = [self.categories[min_idx], self.categories[min_idx + 1]]
 
         return pd.DataFrame.from_dict(classification, orient='index', columns=['worse', 'better'])
@@ -161,8 +161,8 @@ class PromSort:
             better_category_alternatives = self.alternatives_flows.loc[
                 classified[classified['worse'] == alternative_row['better']].index]
 
-            alternative_net_outranking_flow = self.alternatives_flows[alternative]['positive'] \
-                                              - self.alternatives_flows[alternative]['negative']
+            alternative_net_outranking_flow = \
+                self.alternatives_flows[alternative]['positive'] - self.alternatives_flows[alternative]['negative']
 
             worse_category_net_outranking_flow = worse_category_alternatives.apply(lambda row:
                                                                                    row['positive'] - row['negative'],
@@ -177,8 +177,9 @@ class PromSort:
             negative_distance = better_category_net_outranking_flow.map(lambda x:
                                                                         x - alternative_net_outranking_flow).sum()
 
-            total_distance = 1 / worse_category_alternatives.shape[0] * positive_distance \
-                             - 1 / better_category_alternatives.shape[0] * negative_distance
+            total_distance = \
+                1 / worse_category_alternatives.shape[0] * positive_distance - 1 / \
+                better_category_alternatives.shape[0] * negative_distance
 
             if total_distance > self.cut_point:
                 new_classification[alternative] = alternative_row['better']
