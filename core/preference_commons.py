@@ -74,31 +74,6 @@ def deviations(criteria, alternatives_performances, profile_performance_table=No
     return deviations_list
 
 
-def overall_preference(preferences, discordances, profiles):
-    """
-    Combines preference and discordance/veto indices to compute overall preference
-
-    :param preferences: aggregated preference indices
-    :param discordances: aggregated discordance/veto indices
-    :param profiles: were the preferences and discordance/veto calculated with profiles
-    :returns: overall preference indices
-    """
-    if profiles:
-        for n in range(len(discordances)):
-            for i in range(len(discordances[n])):
-                for j in range(len(discordances[n][i])):
-                    discordances[n][i][j] = 1 - discordances[n][i][j]
-        overall_preferences = (np.multiply(preferences[0], discordances[0]).tolist(),
-                               np.multiply(preferences[1], discordances[1]).tolist())
-    else:
-        for n in range(len(discordances)):
-            for i in range(len(discordances[n])):
-                discordances[n][i] = 1 - discordances[n][i]
-        overall_preferences = np.multiply(preferences, discordances).tolist()
-
-    return overall_preferences
-
-
 def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, i_iter, j_iter):
     ppIndices = []
     for k in range(len(criteria)):
@@ -174,6 +149,31 @@ def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
                              generalized_criteria=generalized_criteria)
                      ]
     return ppIndices
+
+
+def overall_preference(preferences, discordances, profiles):
+    """
+    Combines preference and discordance/veto indices to compute overall preference
+
+    :param preferences: aggregated preference indices
+    :param discordances: aggregated discordance/veto indices
+    :param profiles: were the preferences and discordance/veto calculated with profiles
+    :returns: overall preference indices
+    """
+    if profiles:
+        for n in range(len(discordances)):
+            for i in range(len(discordances[n])):
+                for j in range(len(discordances[n][i])):
+                    discordances[n][i][j] = 1 - discordances[n][i][j]
+        overall_preferences = (np.multiply(preferences[0], discordances[0]).tolist(),
+                               np.multiply(preferences[1], discordances[1]).tolist())
+    else:
+        for n in range(len(discordances)):
+            for i in range(len(discordances[n])):
+                discordances[n][i] = 1 - discordances[n][i]
+        overall_preferences = np.multiply(preferences, discordances).tolist()
+
+    return overall_preferences
 
 
 def criteria_series(criteria, weights):
