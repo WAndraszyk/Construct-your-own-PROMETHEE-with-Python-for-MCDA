@@ -17,13 +17,13 @@ Wykonane moduły (pandas refactor):
 - M7  :heavy_check_mark:
 - M8  :heavy_check_mark:
 - M9  :heavy_check_mark: (:heavy_check_mark:)
-- M10 :heavy_check_mark: (:heavy_cross_mark: - partial preferences)
+- M10 :heavy_check_mark: (:x: - partial preferences)
 - M11 :heavy_check_mark: (:heavy_check_mark:)
 - M12 :heavy_check_mark:
 - M13 :heavy_check_mark:
 - M14 :heavy_check_mark: (:heavy_check_mark:)
-- M15 :heavy_check_mark:
-- M16 :heavy_check_mark:
+- M15 :heavy_check_mark: (:heavy_check_mark:)
+- M16 :heavy_check_mark: (:heavy_check_mark:)
 - M17 :heavy_check_mark:
 - M18 :heavy_check_mark:
 - M19 :heavy_check_mark:
