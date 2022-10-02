@@ -1,12 +1,7 @@
 import numpy as np
 import pandas as pd
-from core.aliases import NumericValue, PreferencesTable
-from typing import List
+from core.aliases import PreferencesTable
 from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
-
-
-#  NOTATKI:
-#  Bez category_profiles?
 
 
 class NetFlowScore:

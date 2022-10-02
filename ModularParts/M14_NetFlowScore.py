@@ -4,10 +4,6 @@ from typing import List, Union
 from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
 
 
-#  NOTATKI:
-#  Bez category_profiles?
-
-
 class NetFlowScore:
     """
     This class computes Net Flow Score which bases on calculating scores associated with

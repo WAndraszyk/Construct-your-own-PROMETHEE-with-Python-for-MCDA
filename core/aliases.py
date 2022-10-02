@@ -1,4 +1,4 @@
-from typing import Callable, List, NamedTuple, Union
+from typing import Union
 
 import pandas as pd
 
@@ -15,5 +15,6 @@ PerformanceTable = pd.DataFrame  # Alternatives performances or Category Profile
 CriteriaFeatures = pd.DataFrame
 PreferencesTable = pd.DataFrame
 FlowsTable = pd.DataFrame
+DMsTable = pd.DataFrame
 
 

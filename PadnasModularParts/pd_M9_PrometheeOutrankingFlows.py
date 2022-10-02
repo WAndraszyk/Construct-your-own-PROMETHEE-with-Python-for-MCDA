@@ -1,7 +1,6 @@
-import numpy as np
 import pandas as pd
 from core.aliases import PerformanceTable, PreferencesTable, FlowsTable
-from typing import List, Tuple, Union
+from typing import Tuple, Union
 
 
 class pd_PrometheeOutrankingFlows:
