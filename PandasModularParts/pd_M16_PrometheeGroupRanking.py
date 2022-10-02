@@ -13,21 +13,21 @@ class PrometheeGroupRanking:
         """
         :param dms_data: DMsTable of DMs flows (positive or negative) and weights values.
         """
-        self.dms_data = dms_data
+        self.dms_data = dms_data.T
 
     def __calculate_weighted_flows(self) -> np.ndarray:
         """
         Calculates weighted flows by multiplying flows by each DM weight.
         :return: ndarray(2 dim) of weighted flows
         """
-        return np.multiply(self.dms_data['weights'], self.dms_data['flows'].T).T
+        return np.multiply(self.dms_data['weights'], self.dms_data[self.dms_data.columns.difference(['weights'])].T).T
 
     def calculate_group_ranking(self) -> pd.DataFrame:
         """
         Calculates aggregated flows.
-        :return: Tuple of ndarray(2 dim) of aggregated flows and ndarray(2 dim) of weighted flows
+        :return: DataFrame with aggregated flows(column 'aggregated') and  weighted flows(column 'weighted')
         """
-        alternatives = self.dms_data['flows'].index
+        alternatives = self.dms_data.index
         weighted_flows = self.__calculate_weighted_flows()
         aggregated_flows = np.sum(weighted_flows, axis=0)
 
