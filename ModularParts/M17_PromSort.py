@@ -169,7 +169,6 @@ class PromSort:
         new_classification = classification.copy()
 
         for alternative, (worse_category, better_category) in not_classified:
-            print(alternative, worse_category, better_category)
             alternative_index = self.alternatives.index(alternative)
             worse_category_alternatives = classification[worse_category]
             better_category_alternatives = classification[better_category]
