@@ -1,5 +1,5 @@
 from enum import Enum
-from core.aliases import NumericValue
+from core.aliases import NumericValue, PerformanceTable, CriteriaFeatures
 from typing import List
 import core.preference_commons as pc
 import pandas as pd
@@ -18,16 +18,10 @@ class PreferenceFunction(Enum):
 
 class PrometheePreference:
     def __init__(self,
-                 alternatives,
-                 alternatives_performances: List[List[NumericValue]],
+                 alternatives_performances: PerformanceTable,
+                 criteria_features: CriteriaFeatures,
                  weights: pd.Series,
-                 p_list: List[NumericValue],
-                 q_list: List[NumericValue],
-                 s_list: List[NumericValue],
-                 generalized_criteria,
-                 directions: List[NumericValue],
-                 categories_profiles: List[str] = None,
-                 profile_performance_table: List[List[NumericValue]] = None,
+                 profiles_performance: PerformanceTable = None,
                  decimal_place: NumericValue = 3):
         """
         :param alternatives: list of alternatives names
@@ -43,21 +37,27 @@ class PrometheePreference:
         :param profile_performance_table: 2D list of profiles performance (value) at every criterion
         """
 
-        self.alternatives = alternatives
+        self.alternatives = alternatives_performances.keys()
         self.criteria = weights.keys()
-        self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
+        self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances,
+                                                                               pd.Series(criteria_features[
+                                                                                             "criteria_directions"],
+                                                                                         criteria_features.keys()))
         self.weights = weights
         self.decimal_place = decimal_place
-        self.generalized_criteria = generalized_criteria
-        self.p_list = p_list
-        self.q_list = q_list
-        self.s_list = s_list
-        self.categories_profiles = categories_profiles
-        if profile_performance_table is not None:
-            self.profile_performance_table = pc.directed_alternatives_performances(profile_performance_table,
-                                                                                   directions)
+        self.generalized_criteria = criteria_features["generalized_criteria"]
+        self.p_list = criteria_features["preference_thresholds"]
+        self.q_list = criteria_features["indifference_thresholds"]
+        self.s_list = criteria_features["standard_deviations"]
+        if profiles_performance is not None:
+            self.categories_profiles = profiles_performance.keys()
+            self.profile_performance_table = pc.directed_alternatives_performances(profiles_performance,
+                                                                             pd.Series(criteria_features[
+                                                                                           "criteria_directions"],
+                                                                                       criteria_features.keys()))
         else:
-            self.profile_performance_table = profile_performance_table
+            self.categories_profiles = None
+            self.profile_performance_table = None
 
     def computePreferenceIndices(self):
         """
@@ -93,7 +93,7 @@ class PrometheePreference:
                 Pi_A_B = 0
                 for k in range(len(self.criteria)):
                     Pi_A_B += partialPref[k][i][j] * self.weights[k]
-                Pi_A_B = Pi_A_B/weight_sum
+                Pi_A_B = Pi_A_B / weight_sum
                 aggregatedPI.append(round(Pi_A_B, self.decimal_place))
             preferences.append(aggregatedPI)
 

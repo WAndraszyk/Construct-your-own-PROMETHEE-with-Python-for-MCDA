@@ -1,5 +1,4 @@
 from enum import Enum
-import copy
 from typing import List, Union
 import core.generalized_criteria as gc
 
@@ -20,8 +19,8 @@ class PreferenceFunction(Enum):
     GAUSSIAN = 6
 
 
-def directed_alternatives_performances(alternatives_performances: Union[List[List[NumericValue]], np.ndarray],
-                                       directions: List[NumericValue]) -> Union[List[List[NumericValue]], np.ndarray]:
+def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
+                                       directions: pd.Series) -> Union[List[List[NumericValue]], np.ndarray]:
     """
     Changes value of alternative performance to the opposite value if the direction of preference is
     min (represented by 0)
@@ -30,43 +29,43 @@ def directed_alternatives_performances(alternatives_performances: Union[List[Lis
     :param directions: directions of preference of criteria
     :return: 2D list of alternatives' value at every criterion
     """
-    copy_alternatives_performances = copy.deepcopy(alternatives_performances)
-    for i in range(len(directions)):
-        if directions[i] == 0:
-            for j in range(len(alternatives_performances)):
-                copy_alternatives_performances[j][i] = -alternatives_performances[j][i]
+    copy_alternatives_performances = alternatives_performances
+    for direction in directions.keys():
+        if directions[direction] == 0:
+            copy_alternatives_performances = copy_alternatives_performances[direction] * -1
 
     return copy_alternatives_performances
 
 
-def deviations(criteria, alternatives_performances, profile_performance_table=None):
+def deviations(criteria: List[str], alternatives_performances: pd.DataFrame,
+               profile_performance_table: pd.DataFrame = None):
     """
     Compares alternatives on criteria.
 
     :return: 3D matrix of deviations in evaluations on criteria
     """
 
-    def dev_calc(i_iter, j_iter, k):
-        for i in range(len(i_iter)):
+    def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, k):
+        for _, i in i_iter.iterrows():
             comparison_direct = []
-            for j in range(len(j_iter)):
-                comparison_direct.append(i_iter[i][k] - j_iter[j][k])
+            for _, j in j_iter.iterrows():
+                comparison_direct.append(i[k] - j[k])
             comparisons.append(comparison_direct)
         return comparisons
 
     deviations_list = []
     if profile_performance_table is None:
-        for k in range(len(criteria)):
+        for k in criteria:
             comparisons = []
             deviations_list.append(dev_calc(alternatives_performances, alternatives_performances, k))
     else:
         deviations_part = []
-        for k in range(len(criteria)):
+        for k in criteria:
             comparisons = []
             deviations_part.append(dev_calc(alternatives_performances, profile_performance_table, k))
         deviations_list.append(deviations_part)
         deviations_part = []
-        for k in range(len(criteria)):
+        for k in criteria:
             comparisons = []
             deviations_part.append(dev_calc(profile_performance_table, alternatives_performances, k))
         deviations_list.append(deviations_part)
@@ -82,9 +81,9 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
         p = p_list[k]
         s = s_list[k]
         criterionIndices = []
-        for i in range(len(i_iter)):
+        for i in range(i_iter.shape[0]):
             alternativeIndices = []
-            for j in range(len(j_iter)):
+            for j in range(j_iter.shape[0]):
                 if method is PreferenceFunction.USUAL:
                     alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
                 elif method is PreferenceFunction.U_SHAPE:
