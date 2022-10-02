@@ -16,5 +16,5 @@ CriteriaFeatures = pd.DataFrame
 PreferencesTable = pd.DataFrame
 FlowsTable = pd.DataFrame
 DMsTable = pd.DataFrame
-
+RankedCriteria = pd.Series
 

@@ -2,7 +2,7 @@ from core.aliases import NumericValue
 from typing import List
 import core.preference_commons as pc
 from core.Interactions_between_criteria import Interactions
-from core.preference_commons import criteria_dict
+from core.preference_commons import criteria_series
 
 
 class PrometheePreferenceWithInteractions:
@@ -57,7 +57,7 @@ class PrometheePreferenceWithInteractions:
 
         self.decimal_place = decimal_place
         self.z_function = z_function
-        self.critrioDict = criteria_dict(self.criteria, self.weights)
+        self.critrioDict = criteria_series(self.criteria, self.weights)
 
     def __Z_function(self, pi, pj):
         if self.z_function != 0:

@@ -1,5 +1,6 @@
 from core.aliases import NumericValue
 from typing import List
+from core.preference_commons import criteria_series
 
 
 class SurrogateWeights:
@@ -22,7 +23,7 @@ class SurrogateWeights:
                 if crit == critOrderd:
                     weightsOut.append(weights[num_b])
                     break
-        return weightsOut
+        return criteria_series(self.criteria, weightsOut)
 
     def equalWeights(self) -> List[NumericValue]:
         """
@@ -36,7 +37,7 @@ class SurrogateWeights:
         for i in range(1, n + 1):
             weights.append(wi)
         weightsOrdered = self.__weightOrder(weights)
-        return weightsOrdered
+        return criteria_series(self.criteria, weightsOrdered)
 
     def rankSum(self) -> List[NumericValue]:
         """
@@ -49,7 +50,7 @@ class SurrogateWeights:
         for i in range(1, n + 1):
             weights.append(round(2 * (n + 1 - i) / (n * (n + 1)), self.decimal_place))
         weightsOrdered = self.__weightOrder(weights)
-        return weightsOrdered
+        return criteria_series(self.criteria, weightsOrdered)
 
     def reciprocalOfRanks(self) -> List[NumericValue]:
         """
