@@ -30,13 +30,13 @@ class PrometheePreference:
                  profile_performance_table: List[List[NumericValue]] = None,
                  decimal_place: NumericValue = 3):
         """
-        :param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
+        :param alternatives: list of alternatives names
         :param criteria: list of criteria
         :param alternatives_performances: 2D list of alternatives' value at every criterion
         :param weights: list of weights
-        :param p_list: list of preference threshold for each criteria
-        :param q_list: list of indifference threshold for each criteria
-        :param s_list: list of standard deviation for each criteria
+        :param p_list: list of preference threshold for each criterion
+        :param q_list: list of indifference threshold for each criterion
+        :param s_list: list of standard deviation for each criterion
         :param generalized_criteria: list of preference functions
         :param directions: directions of preference of criteria
         :param decimal_place: with this you can choose the decimal_place of the output numbers
