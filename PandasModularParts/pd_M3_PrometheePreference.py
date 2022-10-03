@@ -81,20 +81,20 @@ class PrometheePreference:
                     ), partialPref
 
     def __preferences(self, partialPref, i_iter, j_iter=None):
-        weight_sum = 0
-        for i in self.weights:
-            weight_sum += i
-        if j_iter is None:
-            j_iter = i_iter
-        preferences = []
-        for i in range(len(i_iter)):
-            aggregatedPI = []
-            for j in range(len(j_iter)):
-                Pi_A_B = 0
-                for k in range(len(self.criteria)):
-                    Pi_A_B += partialPref[k][i][j] * self.weights[k]
-                Pi_A_B = Pi_A_B / weight_sum
-                aggregatedPI.append(round(Pi_A_B, self.decimal_place))
-            preferences.append(aggregatedPI)
+        # weight_sum = 0
+        # for i in self.weights:
+        #     weight_sum += i
+        # if j_iter is None:
+        #     j_iter = i_iter
+        # preferences = []
+        # for i in range(len(i_iter)):
+        #     aggregatedPI = []
+        #     for j in range(len(j_iter)):
+        #         Pi_A_B = 0
+        #         for k in range(len(self.criteria)):
+        #             Pi_A_B += partialPref[k][i][j] * self.weights[k]
+        #         Pi_A_B = Pi_A_B / weight_sum
+        #         aggregatedPI.append(round(Pi_A_B, self.decimal_place))
+        #     preferences.append(aggregatedPI)
 
-        return preferences
+        return None

@@ -119,6 +119,12 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                     )
             criterionIndices.append(alternativeIndices)
         ppIndices.append(criterionIndices)
+    ppIndices = pd.concat([pd.DataFrame(x) for x in ppIndices],
+                          keys=np.arange(len(ppIndices[0])))
+    ppIndices.index = pd.MultiIndex.from_arrays(
+        [sum([[crit] * len(i_iter.index) for crit in criteria], []),
+         [alt for alt in i_iter.index] * len(criteria)], names=['criteria', 'alternatives'])
+    ppIndices.columns = j_iter.index
     return ppIndices
 
 
@@ -147,6 +153,7 @@ def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
                              i_iter=profile_performance_table, j_iter=alternatives_performances,
                              generalized_criteria=generalized_criteria)
                      ]
+
     return ppIndices
 
 

@@ -1,3 +1,5 @@
+import numpy as np
+
 from PandasModularParts.pd_M1_SurrogateWeights import SurrogateWeights
 import pandas as pd
 from ModularParts.M5_PrometheePreferenceWithInteractions import PrometheePreferenceWithInteractions
@@ -15,5 +17,5 @@ preference, partial_preference = PrometheePreference(alternatives_performances=
                                                      ).computePreferenceIndices()
 
 print("----------------------PREFERENCE--------------")
-for i in preference:
-    print(i)
+print(partial_preference)
+
