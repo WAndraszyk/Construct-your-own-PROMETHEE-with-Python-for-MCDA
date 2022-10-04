@@ -1,6 +1,6 @@
 import pandas as pd
 
-from core.aliases import NumericValue, PerformanceTable, CriteriaFeatures, FlowsTable
+from core.aliases import NumericValue, PerformanceTable, FlowsTable
 from typing import List, Tuple
 from core.preference_commons import directed_alternatives_performances
 
@@ -13,7 +13,8 @@ class PromSort:
     def __init__(self,
                  categories: List[str],
                  category_profiles: PerformanceTable,
-                 criteria: CriteriaFeatures,
+                 criteria_directions: pd.Series,
+                 criteria_thresholds: pd.Series,
                  alternatives_flows: FlowsTable,
                  category_profiles_flows: FlowsTable,
                  cut_point: NumericValue,  # <-1, 1>, used in second phase
@@ -21,7 +22,8 @@ class PromSort:
         """
         :param categories: List of categories names
         :param category_profiles: Performance table with category profiles performances
-        :param criteria: Criteria features table with criteria direction and thresholds
+        :param criteria_directions: Series with criteria directions
+        :param criteria_thresholds: Series with criteria thresholds
         :param alternatives_flows: Flows table with alternatives flows
         :param category_profiles_flows: Flows table with category profiles flows
         :param cut_point: Numeric Value in range <-1, 1> which define DM preference of classifying alternative to worse
@@ -32,9 +34,9 @@ class PromSort:
         """
         self.categories = categories
         self.category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles.values,
-                                                                                 criteria['criteria_directions']),
+                                                                                 criteria_directions.to_list()),
                                               index=category_profiles.columns, columns=category_profiles.columns)
-        self.criteria = criteria
+        self.criteria_thresholds = criteria_thresholds
         self.alternatives_flows = alternatives_flows
         self.category_profiles_flows = category_profiles_flows
         self.cut_point = cut_point
@@ -47,7 +49,7 @@ class PromSort:
 
         :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
         """
-        for criterion, threshold in self.criteria['preference_thresholds'].items():
+        for criterion, threshold in self.criteria_thresholds.items():
             for i, (_, profile_i) in enumerate(self.category_profiles.iloc[:-1].iterrows()):
                 profile_j = self.category_profiles.iloc[i + 1]
                 if profile_i[criterion] + threshold > profile_j[criterion]:

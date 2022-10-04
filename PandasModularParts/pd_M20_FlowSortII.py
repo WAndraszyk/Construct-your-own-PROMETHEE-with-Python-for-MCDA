@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import List
 from core.enums import CompareProfiles
-from core.aliases import PerformanceTable, CriteriaFeatures
+from core.aliases import PerformanceTable
 from core.sorting import pandas_check_dominance_condition
 
 
@@ -14,14 +14,14 @@ class FlowSortII:
     def __init__(self,
                  categories: List[str],
                  category_profiles: PerformanceTable,
-                 criteria: CriteriaFeatures,
+                 criteria_directions: pd.Series,
                  alternatives_flows: pd.Series,
                  category_profiles_flows: pd.Series,
                  comparison_with_profiles: CompareProfiles):
         """
         :param categories: List of categories names (strings only)
         :param category_profiles: DataFrame with category profiles performances
-        :param criteria: Criteria features with preference direction of each criterion
+        :param criteria_directions: Series with criteria directions (max or min)
         :param alternatives_flows: Series with alternatives names as index and net flows as values
         :param category_profiles_flows: Series with categories names as index and net flows as values
         :param comparison_with_profiles: Enum CompareProfiles - indicate information of profiles types used
@@ -30,11 +30,11 @@ class FlowSortII:
 
         self.categories = categories
         self.category_profiles = category_profiles
-        self.criteria = criteria
+        self.criteria_directions = criteria_directions
         self.alternatives_flows = alternatives_flows
         self.category_profiles_flows = category_profiles_flows
         self.comparison_with_profiles = comparison_with_profiles
-        pandas_check_dominance_condition(self.criteria, self.category_profiles)
+        pandas_check_dominance_condition(self.criteria_directions, self.category_profiles)
 
     def __limiting_profiles_sorting(self) -> pd.Series:
         """

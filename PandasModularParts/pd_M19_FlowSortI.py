@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import List, Hashable
 from core.enums import CompareProfiles
-from core.aliases import PerformanceTable, FlowsTable, CriteriaFeatures
+from core.aliases import PerformanceTable, FlowsTable
 from core.preference_commons import directed_alternatives_performances
 from core.sorting import pandas_check_dominance_condition
 
@@ -15,14 +15,14 @@ class FlowSortI:
     def __init__(self,
                  categories: List[str],
                  category_profiles: PerformanceTable,
-                 criteria: CriteriaFeatures,
+                 criteria_directions: pd.Series,
                  alternatives_flows: FlowsTable,
                  category_profiles_flows: FlowsTable,
                  comparison_with_profiles: CompareProfiles):
         """
         :param categories: List of categories names (strings only)
         :param category_profiles: Preference table with category profiles
-        :param criteria: Criteria features with direction of each criterion
+        :param criteria_directions: Series with criteria directions
         :param alternatives_flows: Flows table with alternatives flows
         :param category_profiles_flows: Flows table with category profiles flows
         :param comparison_with_profiles: Enum CompareProfiles - indicate information of profiles types used
@@ -30,13 +30,13 @@ class FlowSortI:
         """
         self.categories = categories
         self.category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles.values,
-                                                                                 criteria['criteria_directions']),
+                                                                                 criteria_directions.to_list()),
                                               index=category_profiles.columns, columns=category_profiles.columns)
-        self.criteria = criteria
+        self.criteria_directions = criteria_directions
         self.alternatives_flows = alternatives_flows
         self.category_profiles_flows = category_profiles_flows
         self.comparison_with_profiles = comparison_with_profiles
-        pandas_check_dominance_condition(self.criteria, self.category_profiles)
+        pandas_check_dominance_condition(self.criteria_directions, self.category_profiles)
 
     def __append_to_classification(self, classification: pd.DataFrame, pessimistic_category: str,
                                    optimistic_category: str, alternative_name: Hashable) -> None:

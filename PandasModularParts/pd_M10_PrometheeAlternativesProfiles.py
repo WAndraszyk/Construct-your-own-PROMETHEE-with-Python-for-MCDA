@@ -1,4 +1,6 @@
-from core.aliases import NumericValue, PerformanceTable, CriteriaFeatures
+import pandas as pd
+
+from core.aliases import NumericValue, PerformanceTable
 from typing import List, Dict
 
 
@@ -9,17 +11,17 @@ class PrometheeAlternativesProfiles:
 
     def __init__(self,
                  alternatives: PerformanceTable,
-                 criteria: CriteriaFeatures,
-                 partial_preferences: cenzura):
+                 criteria_weights: pd.Series,
+                 partial_preferences: pd.DataFrame):
         """
         :param alternatives: List of alternatives names (strings only)
-        :param criteria: List of Tuples with name and weight of each criterion
-        :param partial_preferences: List of partial preferences of every alternative over others on each criterion.
-        Nesting order: criterion, alternative, alternative
+        :param criteria_weights: Series with name as index and weight of each criterion
+        :param partial_preferences: DataFrame with MultiIndex of criterion and alternative and alternative as columns.
+         Represents partial preferences of every alternative over others on each criterion.
         """
 
         self.alternatives = alternatives
-        self.criteria = criteria
+        self.criteria_weights= criteria_weights
         self.partial_preferences = partial_preferences
 
     def __calculate_criteria_net_flows(self) -> List[List[NumericValue]]:
