@@ -1,5 +1,5 @@
 from enum import Enum
-from core.aliases import NumericValue, PerformanceTable, CriteriaFeatures
+from core.aliases import NumericValue, PerformanceTable
 from typing import List
 import core.preference_commons as pc
 import pandas as pd
@@ -17,44 +17,35 @@ class PreferenceFunction(Enum):
 
 
 class PrometheePreference:
-    def __init__(self,
-                 alternatives_performances: PerformanceTable,
-                 criteria_features: CriteriaFeatures,
-                 weights: pd.Series,
+    def __init__(self, alternatives_performances: PerformanceTable, preference_thresholds: pd.Series,
+                 indifference_thresholds: pd.Series, standard_deviations: pd.Series, generalized_criteria: pd.Series,
+                 directions: pd.Series, weights: pd.Series,
                  profiles_performance: PerformanceTable = None,
                  decimal_place: NumericValue = 3):
         """
-        :param alternatives: list of alternatives names
-        :param alternatives_performances: 2D list of alternatives' value at every criterion
-        :param weights: criteria with weights
-        :param p_list: list of preference threshold for each criterion
-        :param q_list: list of indifference threshold for each criterion
-        :param s_list: list of standard deviation for each criterion
+        :param alternatives_performances: Dataframe of alternatives' value at every criterion
+        :param preference_thresholds: preference threshold for each criterion
+        :param indifference_thresholds: indifference threshold for each criterion
+        :param standard_deviations: standard deviation for each criterion
         :param generalized_criteria: list of preference functions
         :param directions: directions of preference of criteria
+        :param weights: criteria with weights
+        :param profiles_performance: Dataframe of profiles performance (value) at every criterion
         :param decimal_place: with this you can choose the decimal_place of the output numbers
-        :param categories_profiles: list of profiles (names, strings)
-        :param profile_performance_table: 2D list of profiles performance (value) at every criterion
         """
 
         self.alternatives = alternatives_performances.keys()
         self.criteria = weights.keys()
-        self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances,
-                                                                               pd.Series(criteria_features[
-                                                                                             "criteria_directions"],
-                                                                                         criteria_features.keys()))
+        self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
         self.weights = weights
         self.decimal_place = decimal_place
-        self.generalized_criteria = criteria_features["generalized_criteria"]
-        self.p_list = criteria_features["preference_thresholds"]
-        self.q_list = criteria_features["indifference_thresholds"]
-        self.s_list = criteria_features["standard_deviations"]
+        self.generalized_criteria = generalized_criteria
+        self.preference_thresholds = preference_thresholds
+        self.indifference_thresholds = indifference_thresholds
+        self.standard_deviations = standard_deviations
         if profiles_performance is not None:
             self.categories_profiles = profiles_performance.keys()
-            self.profile_performance_table = pc.directed_alternatives_performances(profiles_performance,
-                                                                             pd.Series(criteria_features[
-                                                                                           "criteria_directions"],
-                                                                                       criteria_features.keys()))
+            self.profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
         else:
             self.categories_profiles = None
             self.profile_performance_table = None
@@ -67,8 +58,8 @@ class PrometheePreference:
         :return: preferences
         :return: partial preferences
         """
-        partialPref = pc.partial_preference(criteria=self.criteria, p_list=self.p_list,
-                                            q_list=self.q_list, s_list=self.s_list,
+        partialPref = pc.partial_preference(criteria=self.criteria, p_list=self.preference_thresholds,
+                                            q_list=self.indifference_thresholds, s_list=self.standard_deviations,
                                             generalized_criteria=self.generalized_criteria,
                                             categories_profiles=self.categories_profiles,
                                             alternatives_performances=self.alternatives_performances,

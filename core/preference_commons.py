@@ -1,5 +1,8 @@
 from enum import Enum
 from typing import List, Union
+
+from pandas import DataFrame
+
 import core.generalized_criteria as gc
 
 import numpy as np
@@ -20,7 +23,7 @@ class PreferenceFunction(Enum):
 
 
 def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
-                                       directions: pd.Series) -> Union[List[List[NumericValue]], np.ndarray]:
+                                       directions: pd.Series) -> DataFrame:
     """
     Changes value of alternative performance to the opposite value if the direction of preference is
     min (represented by 0)
@@ -32,7 +35,7 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
     copy_alternatives_performances = alternatives_performances
     for direction in directions.keys():
         if directions[direction] == 0:
-            copy_alternatives_performances = copy_alternatives_performances[direction] * -1
+            copy_alternatives_performances[direction] = copy_alternatives_performances[direction] * -1
 
     return copy_alternatives_performances
 
