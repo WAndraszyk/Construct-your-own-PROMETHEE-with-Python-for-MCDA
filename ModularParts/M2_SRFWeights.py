@@ -40,8 +40,6 @@ class SRFWeights:
     def __calculate_non_normalized_weights(self, white_cards_between_criteria: List[NumericValue])\
             -> List[NumericValue]:
         """
-        # TO DO: Compare method with the one in the Słowiński's paper
-
         Calculate non-normalized weights of criteria.
 
         :param white_cards_between_criteria: List amount of white cards between criteria.
@@ -49,26 +47,14 @@ class SRFWeights:
         """
         non_normalized_weights = []
 
-        ranks_with_white_cards = []
-        last_rank = 1
-        for rank in self.criteria_rank:
-            while rank - last_rank > 1:
-                last_rank += 1
-                ranks_with_white_cards.append(last_rank)
-            ranks_with_white_cards.append(rank)
-            last_rank = rank
-
-        positions = {}
-        for rank in list(set(self.criteria_rank)):
-            rank_positions = [i+1 for i, rank_i in enumerate(ranks_with_white_cards) if rank_i == rank]
-            positions[rank] = sum(rank_positions)/len(rank_positions)
-
-        position_of_the_most_important_criterion = len(self.criteria_rank) - 1
-
+        rank_without_white_cards = []
         for i, rank in enumerate(self.criteria_rank):
+            rank_without_white_cards.append(rank - sum(white_cards_between_criteria[:i]))
+
+        for i, rank in enumerate(rank_without_white_cards):
             weight = 1 + (self.criteria_weight_ratio - 1) * \
-                     (positions[rank] - 1 + sum(white_cards_between_criteria[:i])) / (
-                    position_of_the_most_important_criterion - 1 + sum(white_cards_between_criteria))
+                     (rank - 1 + sum(white_cards_between_criteria[:i])) / (
+                    rank_without_white_cards[-1] - 1 + sum(white_cards_between_criteria))
             non_normalized_weights.append(weight)
 
         return non_normalized_weights
