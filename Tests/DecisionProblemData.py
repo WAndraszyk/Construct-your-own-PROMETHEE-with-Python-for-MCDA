@@ -81,11 +81,14 @@ generalized_criteria = [PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunct
 
 df_alternatives = pd.DataFrame(alternatives_performances, index=alternatives, columns=criteria)
 
-df_criteria = pd.DataFrame(zip(criteria_weights, preference_thresholds, indifference_thresholds,
-                               reinforced_preferences, reinforcement_factors, standard_deviations,
-                               criteria_directions, criteria_ranks, generalized_criteria),
+df_criteria = pd.DataFrame(list(zip(criteria_weights, preference_thresholds, indifference_thresholds,
+                            reinforced_preferences, reinforcement_factors, standard_deviations,
+                            criteria_directions, criteria_ranks, generalized_criteria)),
                            index=criteria,
                            columns=['criteria_weights', 'preference_thresholds', 'indifference_thresholds',
                                     'reinforced_preferences', 'reinforcement_factors', 'standard_deviations',
                                     'criteria_directions', 'criteria_ranks', 'generalized_criteria'])
+
 df_category_profiles = pd.DataFrame(profiles_performances, index=profiles, columns=criteria)
+
+

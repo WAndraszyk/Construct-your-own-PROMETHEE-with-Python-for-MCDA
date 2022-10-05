@@ -29,14 +29,14 @@ class GroupClassAcceptabilities:
         alternatives_bounds = []
 
         for DM_i, DM_assignments in enumerate(self.assignments):
-            DM_alternatives_bounds = {alternative: [] for alternative in self.alternatives}
+            dm_alternatives_bounds = {alternative: [] for alternative in self.alternatives}
             for category_i, to_category_assignments in enumerate(DM_assignments.values()):
                 for alternative in to_category_assignments:
-                    DM_alternatives_bounds[alternative].append(self.categories[category_i])
-            for (alternative, alternative_assignments) in DM_alternatives_bounds.items():
+                    dm_alternatives_bounds[alternative].append(self.categories[category_i])
+            for (alternative, alternative_assignments) in dm_alternatives_bounds.items():
                 if len(alternative_assignments) == 1:
-                    DM_alternatives_bounds[alternative].append(alternative_assignments[0])
-            alternatives_bounds.append(DM_alternatives_bounds)
+                    dm_alternatives_bounds[alternative].append(alternative_assignments[0])
+            alternatives_bounds.append(dm_alternatives_bounds)
 
         return alternatives_bounds
 
@@ -67,9 +67,9 @@ class GroupClassAcceptabilities:
 
         :return: 2D List with alternative support for each category for each alternative
         """
-        n_DM = len(self.assignments)
+        n_dm = len(self.assignments)
 
-        alternatives_support = [[category_alternative_votes / n_DM * 100 for category_alternative_votes
+        alternatives_support = [[category_alternative_votes / n_dm * 100 for category_alternative_votes
                                  in alternative_votes] for alternative_votes in votes]
         return alternatives_support
 
@@ -111,4 +111,3 @@ class GroupClassAcceptabilities:
         unimodal_alternatives_support = self.__calculate_unimodal_alternatives_support(alternatives_support)
 
         return alternatives_support, unimodal_alternatives_support
-

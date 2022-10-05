@@ -1,16 +1,8 @@
-from enum import Enum
 from typing import List, Tuple, Dict
-
+from core.sorting import check_dominance_condition
+from core.enums import CompareProfiles
 from core.aliases import NumericValue
 from core.preference_commons import directed_alternatives_performances
-
-
-class CompareProfiles(Enum):
-    """Enumeration of the compare profiles types."""
-
-    CENTRAL_PROFILES = 1
-    BOUNDARY_PROFILES = 2
-    LIMITING_PROFILES = 3
 
 
 class FlowSortII:
@@ -46,19 +38,7 @@ class FlowSortII:
         self.criteria = criteria
         self.flows = flows
         self.comparison_with_profiles = comparison_with_profiles
-        self.__check_dominance_condition()
-
-    def __check_dominance_condition(self):
-        """
-        Check if each boundary profile is strictly worse in each criterion than betters profiles
-
-        :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
-        """
-        for criteria_i in range(len(self.criteria[0])):
-            for i, profile_i in enumerate(self.profiles_performances):
-                for j, profile_j in enumerate(self.profiles_performances[i:]):
-                    if profile_j[criteria_i] < profile_i[criteria_i]:
-                        raise ValueError("Profiles don't fulfill the dominance condition")
+        check_dominance_condition(self.criteria, self.profiles_performances)
 
     def __limiting_profiles_sorting(self) -> Dict[str, List[str]]:
         """

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from core.aliases import PreferencesTable
-from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
+from core.enums import ScoringFunction, ScoringFunctionDirection
 
 
 class NetFlowScore:
@@ -78,7 +78,8 @@ class NetFlowScore:
                 duplicated_values = self.__find_duplicates_values(scores)
                 for duplicated_value in duplicated_values:
                     duplicated_score_indices = [i for i, score in enumerate(scores) if score == duplicated_value]
-                    sub_preferences = self.preferences.iloc[:, duplicated_score_indices].iloc[duplicated_score_indices, :]
+                    sub_preferences = \
+                        self.preferences.iloc[:, duplicated_score_indices].iloc[duplicated_score_indices, :]
                     sub_scores = self.__calculate_score(sub_preferences)
                     for index, score in zip(duplicated_score_indices, sub_scores):
                         scores[index] = score

@@ -1,36 +1,28 @@
 import pandas as pd
-from enum import Enum
-from typing import List, Tuple, Dict, Hashable
-
-from core.aliases import NumericValue, PerformanceTable, FlowsTable, CriteriaFeatures
+from typing import List, Hashable
+from core.enums import CompareProfiles
+from core.aliases import PerformanceTable, FlowsTable
 from core.preference_commons import directed_alternatives_performances
-
-
-class CompareProfiles(Enum):
-    """Enumeration of the compare profiles types."""
-
-    CENTRAL_PROFILES = 1
-    BOUNDARY_PROFILES = 2
-    LIMITING_PROFILES = 3
+from core.sorting import pandas_check_dominance_condition
 
 
 class FlowSortI:
     """
     This module computes the assignments of given alternatives to categories using FlowSort procedure based on
-    Promethee I flows.
+    PrometheeI flows.
     """
 
     def __init__(self,
                  categories: List[str],
                  category_profiles: PerformanceTable,
-                 criteria: CriteriaFeatures,
+                 criteria_directions: pd.Series,
                  alternatives_flows: FlowsTable,
                  category_profiles_flows: FlowsTable,
                  comparison_with_profiles: CompareProfiles):
         """
         :param categories: List of categories names (strings only)
         :param category_profiles: Preference table with category profiles
-        :param criteria: Criteria features with direction of each criterion
+        :param criteria_directions: Series with criteria directions
         :param alternatives_flows: Flows table with alternatives flows
         :param category_profiles_flows: Flows table with category profiles flows
         :param comparison_with_profiles: Enum CompareProfiles - indicate information of profiles types used
@@ -38,25 +30,13 @@ class FlowSortI:
         """
         self.categories = categories
         self.category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles.values,
-                                                                                 criteria['criteria_directions']),
+                                                                                 criteria_directions.to_list()),
                                               index=category_profiles.columns, columns=category_profiles.columns)
-        self.criteria = criteria
+        self.criteria_directions = criteria_directions
         self.alternatives_flows = alternatives_flows
         self.category_profiles_flows = category_profiles_flows
         self.comparison_with_profiles = comparison_with_profiles
-        self.__check_dominance_condition()
-
-    def __check_dominance_condition(self):
-        """
-        Check if each boundary profile is strictly worse in each criterion than betters profiles
-
-        :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
-        """
-        for (criterion, _) in self.criteria['criteria_names'].items():
-            for i, (_, profile_i) in enumerate(self.category_profiles.iloc[:-1].iterrows()):
-                for _, profile_j in self.category_profiles.iloc[i + 1:].iterrows():
-                    if profile_j[criterion] < profile_i[criterion]:
-                        raise ValueError("Profiles don't fulfill the dominance condition")
+        pandas_check_dominance_condition(self.criteria_directions, self.category_profiles)
 
     def __append_to_classification(self, classification: pd.DataFrame, pessimistic_category: str,
                                    optimistic_category: str, alternative_name: Hashable) -> None:

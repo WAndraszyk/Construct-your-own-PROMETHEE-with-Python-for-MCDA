@@ -40,8 +40,8 @@ class PrometheeOutrankingFlows:
             n = len(self.alternatives)
 
             axis = 1 if positive else 0
-            aggregatedPIes = np.sum(self.preferences, axis=axis)
-            flows = aggregatedPIes / (n - 1)
+            aggregated_preferences = np.sum(self.preferences, axis=axis)
+            flows = aggregated_preferences / (n - 1)
 
         return flows
 

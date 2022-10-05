@@ -1,6 +1,6 @@
 import pandas as pd
 
-from core.aliases import NumericValue, PerformanceTable, CriteriaFeatures, FlowsTable
+from core.aliases import NumericValue, PerformanceTable, FlowsTable
 from typing import List, Tuple
 from core.preference_commons import directed_alternatives_performances
 
@@ -13,7 +13,8 @@ class PromSort:
     def __init__(self,
                  categories: List[str],
                  category_profiles: PerformanceTable,
-                 criteria: CriteriaFeatures,
+                 criteria_directions: pd.Series,
+                 criteria_thresholds: pd.Series,
                  alternatives_flows: FlowsTable,
                  category_profiles_flows: FlowsTable,
                  cut_point: NumericValue,  # <-1, 1>, used in second phase
@@ -21,7 +22,8 @@ class PromSort:
         """
         :param categories: List of categories names
         :param category_profiles: Performance table with category profiles performances
-        :param criteria: Criteria features table with criteria direction and thresholds
+        :param criteria_directions: Series with criteria directions
+        :param criteria_thresholds: Series with criteria thresholds
         :param alternatives_flows: Flows table with alternatives flows
         :param category_profiles_flows: Flows table with category profiles flows
         :param cut_point: Numeric Value in range <-1, 1> which define DM preference of classifying alternative to worse
@@ -32,9 +34,9 @@ class PromSort:
         """
         self.categories = categories
         self.category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles.values,
-                                                                                 criteria['criteria_directions']),
+                                                                                 criteria_directions.to_list()),
                                               index=category_profiles.columns, columns=category_profiles.columns)
-        self.criteria = criteria
+        self.criteria_thresholds = criteria_thresholds
         self.alternatives_flows = alternatives_flows
         self.category_profiles_flows = category_profiles_flows
         self.cut_point = cut_point
@@ -47,7 +49,7 @@ class PromSort:
 
         :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
         """
-        for criterion, threshold in self.criteria['preference_thresholds'].items():
+        for criterion, threshold in self.criteria_thresholds.items():
             for i, (_, profile_i) in enumerate(self.category_profiles.iloc[:-1].iterrows()):
                 profile_j = self.category_profiles.iloc[i + 1]
                 if profile_i[criterion] + threshold > profile_j[criterion]:
@@ -118,11 +120,11 @@ class PromSort:
                     alternative_row['positive'], alternative_row['negative'],
                     category_profile_row['positive'], category_profile_row['negative']), axis=1)
 
-            first_I_occurrence = outranking_relations.str.contains('I').idxmax() if outranking_relations.str.contains(
+            first_i_occurrence = outranking_relations.str.contains('I').idxmax() if outranking_relations.str.contains(
                 'I').any() else float('inf')
-            first_R_occurrence = outranking_relations.str.contains('?').idxmax() if outranking_relations.str.contains(
+            first_r_occurrence = outranking_relations.str.contains('?').idxmax() if outranking_relations.str.contains(
                 '?').any() else float('inf')
-            last_P_occurrence = outranking_relations.str.contains('P').idxmin() if outranking_relations.str.contains(
+            last_p_occurrence = outranking_relations.str.contains('P').idxmin() if outranking_relations.str.contains(
                 'P').any() else float('inf')
 
             if outranking_relations[-1] == 'P':
@@ -130,11 +132,11 @@ class PromSort:
             elif self.__check_if_all_profiles_are_preferred_to_alternative(alternative_row['positive'],
                                                                            alternative_row['negative']):
                 classification[alternative] = [self.categories[0], self.categories[0]]
-            elif min(first_R_occurrence, first_I_occurrence) > last_P_occurrence:
-                classification[alternative] = [self.categories[last_P_occurrence + 1],
-                                                   self.categories[last_P_occurrence + 1]]
+            elif min(first_r_occurrence, first_i_occurrence) > last_p_occurrence:
+                classification[alternative] = \
+                    [self.categories[last_p_occurrence + 1], self.categories[last_p_occurrence + 1]]
             else:
-                min_idx = min(first_R_occurrence, first_I_occurrence)
+                min_idx = min(first_r_occurrence, first_i_occurrence)
                 classification[alternative] = [self.categories[min_idx], self.categories[min_idx + 1]]
 
         return pd.DataFrame.from_dict(classification, orient='index', columns=['worse', 'better'])
@@ -161,8 +163,8 @@ class PromSort:
             better_category_alternatives = self.alternatives_flows.loc[
                 classified[classified['worse'] == alternative_row['better']].index]
 
-            alternative_net_outranking_flow = self.alternatives_flows[alternative]['positive'] \
-                                              - self.alternatives_flows[alternative]['negative']
+            alternative_net_outranking_flow = \
+                self.alternatives_flows[alternative]['positive'] - self.alternatives_flows[alternative]['negative']
 
             worse_category_net_outranking_flow = worse_category_alternatives.apply(lambda row:
                                                                                    row['positive'] - row['negative'],
@@ -177,8 +179,9 @@ class PromSort:
             negative_distance = better_category_net_outranking_flow.map(lambda x:
                                                                         x - alternative_net_outranking_flow).sum()
 
-            total_distance = 1 / worse_category_alternatives.shape[0] * positive_distance \
-                             - 1 / better_category_alternatives.shape[0] * negative_distance
+            total_distance = \
+                1 / worse_category_alternatives.shape[0] * positive_distance - 1 / \
+                better_category_alternatives.shape[0] * negative_distance
 
             if total_distance > self.cut_point:
                 new_classification[alternative] = alternative_row['better']

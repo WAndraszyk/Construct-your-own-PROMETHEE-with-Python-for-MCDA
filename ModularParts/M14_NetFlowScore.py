@@ -1,7 +1,7 @@
 import numpy as np
 from core.aliases import NumericValue
 from typing import List, Union
-from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
+from core.enums import ScoringFunction, ScoringFunctionDirection
 
 
 class NetFlowScore:

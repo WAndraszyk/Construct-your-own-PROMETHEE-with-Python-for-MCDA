@@ -24,7 +24,7 @@ class FlowSortGDSS:
                  alternative_global_net_flows: List[NumericValue],  # M21x
                  category_profiles_global_net_flows: List[List[List[NumericValue]]],  # M21x
                  profiles_performances: List[List[List[NumericValue]]],  # at least 2
-                 weights_DMs: List[NumericValue],  # at least 2
+                 weights_dms: List[NumericValue],  # at least 2
                  comparison_with_profiles: CompareProfiles,
                  assign_to_better_class: bool = True
                  ):
@@ -38,7 +38,7 @@ class FlowSortGDSS:
         :param category_profiles_global_net_flows: 3D List of global net flow for each
         alternative, DM and category profile
         :param profiles_performances: 2D List of performances of each boundary profile in each criterion
-        :param weights_DMs: List of weight of each DM
+        :param weights_dms: List of weight of each DM
         :param comparison_with_profiles: Enum CompareProfiles - indicate information of profiles types used
         in calculation.
         :param assign_to_better_class: Boolean which describe preference of the DMs in final alternative assignment when
@@ -52,7 +52,7 @@ class FlowSortGDSS:
         self.category_profiles_global_net_flows = category_profiles_global_net_flows
         self.profiles_performances = [directed_alternatives_performances(single_DM_profiles_performances, criteria)
                                       for single_DM_profiles_performances in profiles_performances]
-        self.weights_DMs = weights_DMs
+        self.weights_DMs = weights_dms
         self.comparison_with_profiles = comparison_with_profiles
         self.assign_to_better_class = assign_to_better_class
 
@@ -98,12 +98,12 @@ class FlowSortGDSS:
             worse_category = self.categories[assignments_category_indices[0]]
             better_category = self.categories[assignments_category_indices[1]]
 
-            DMs_chose_worse_category = [i for i, category in enumerate(alternative_assignments) if
+            dms_chose_worse_category = [i for i, category in enumerate(alternative_assignments) if
                                         category == worse_category]
-            DMs_chose_better_category = [i for i, category in enumerate(alternative_assignments) if
+            dms_chose_better_category = [i for i, category in enumerate(alternative_assignments) if
                                          category == better_category]
-            not_classified.append((alternative_name, (worse_category, better_category), DMs_chose_worse_category,
-                                   DMs_chose_better_category))
+            not_classified.append((alternative_name, (worse_category, better_category), dms_chose_worse_category,
+                                   dms_chose_better_category))
         else:
             classification[alternative_assignments[0]].append(alternative_name)
 
@@ -171,8 +171,8 @@ class FlowSortGDSS:
         """
         final_classification = classification.copy()
 
-        for alternative_name, (worse_category, better_category), \
-            DMs_chose_worse_category, DMs_chose_better_category in not_classified:
+        for alternative_name, (worse_category, better_category), DMs_chose_worse_category, DMs_chose_better_category \
+                in not_classified:
 
             alternative_index = self.alternatives.index(alternative_name)
             worse_category_index = self.categories.index(worse_category)

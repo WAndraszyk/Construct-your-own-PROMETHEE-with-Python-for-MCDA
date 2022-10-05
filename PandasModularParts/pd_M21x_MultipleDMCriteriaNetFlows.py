@@ -1,3 +1,5 @@
+import pandas as pd
+
 from core.aliases import NumericValue
 from typing import List, Tuple
 
@@ -8,58 +10,51 @@ class MultipleDMUniNetFlows:
     """
 
     def __init__(self,
-                 alternatives: List[str],
-                 category_profiles: List[str],
-                 dms_profiles_partial_preferences: List[List[List[List[NumericValue]]]],  # P(r,a)
-                 dms_alternatives_partial_preferences: List[List[List[List[NumericValue]]]],  # P(a,r)
-                 dms_profile_vs_profile_partial_preferences: List[List[List[List[NumericValue]]]],  # P(r_i,r_j)
-                 criteria_weights: List[NumericValue]):
+                 dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
+                 dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
+                 dms_profile_vs_profile_partial_preferences: List[pd.DataFrame],  # P(r_i,r_j)
+                 criteria_weights: pd.Series):
         """
-        :param alternatives: List of names of alternatives
-        :param category_profiles: List of names of category profiles
         :param dms_profiles_partial_preferences: List of partial preferences profiles vs alternatives.
          Nesting order: DM, criterion, profile, alternative
         :param dms_alternatives_partial_preferences: List of partial preferences alternatives vs profiles.
          Nesting order: DM, criterion, alternative, profile
         :param dms_profile_vs_profile_partial_preferences: List of partial preferences profiles vs profiles.
          Nesting order: DM, criterion, profile_i, profile_j
-         :param criteria_weights: List of numeric value weights for each criterion
+        :param criteria_weights: List of numeric value weights for each criterion
         """
-        self.alternatives = alternatives
-        self.category_profiles = category_profiles
+        self.alternatives = dms_profiles_partial_preferences[0].columns
+        self.category_profiles = dms_alternatives_partial_preferences[0].columns
         self.DMs_profiles_partial_preferences = dms_profiles_partial_preferences
         self.DMs_alternatives_partial_preferences = dms_alternatives_partial_preferences
         self.DMs_profile_vs_profile_partial_preferences = dms_profile_vs_profile_partial_preferences
         self.criteria_weights = criteria_weights
 
-    def __calculate_alternatives_general_net_flows(self) -> List[NumericValue]:
+    def __calculate_alternatives_general_net_flows(self) -> pd.Series:
         """
         First calculate net flows for each alternative, each profile and each criterion,
          then accumulate criteria values to global alternative net flows.
 
-        :return: List of global net flows (for each alternative)
+        :return: Series with global net flows (for each alternative)
         """
-        alternatives_net_flows = []
+        alternatives_net_flows = pd.Series(index=self.alternatives)
+
         n_profiles = len(self.category_profiles) * len(self.DMs_profiles_partial_preferences)
 
-        for alternative_i, _ in enumerate(self.alternatives):
-            alternative_net_flow = []
-            for criterion_j, _ in enumerate(self.criteria_weights):
-                net_flow = 0
-                for alternative_preferences, profile_preferences in zip(self.DMs_alternatives_partial_preferences,
-                                                                        self.DMs_profiles_partial_preferences):
-                    for profile_k, _ in enumerate(profile_preferences[0]):
-                        net_flow += alternative_preferences[criterion_j][alternative_i][profile_k] - \
-                                    profile_preferences[criterion_j][profile_k][alternative_i]
-                net_flow /= n_profiles
-                alternative_net_flow.append(net_flow)
-            alternatives_net_flows.append(alternative_net_flow)
+        for alternatives_partial_preferences, profiles_partial_preferences \
+                in zip(self.DMs_alternatives_partial_preferences, self.DMs_profiles_partial_preferences):
 
-        alternatives_general_net_flows = [sum([criterion_weight * net_flow for criterion_weight, net_flow in
-                                               zip(self.criteria_weights, alternative_net_flow)])
-                                          for alternative_net_flow in alternatives_net_flows]
+            for (criterion, criterion_preferences1, criterion, criterion_preferences2) \
+                    in zip(alternatives_partial_preferences.groupby(level=0),
+                           profiles_partial_preferences.groupby(level=0)):
+                for alternative_i, alternative_i_row, profile_j, profile_j_col \
+                        in zip(criterion_preferences1.droplevel(0).iterrows(),
+                               criterion_preferences2.droplevel(0).T.iterrows()):
+                    alternatives_net_flows[alternative_i] += alternative_i_row - profile_j_col
 
-        return alternatives_general_net_flows
+        alternatives_net_flows /= n_profiles
+
+        return alternatives_net_flows
 
     def __calculate_profiles_general_net_flows(self) -> List[List[List[NumericValue]]]:
         """

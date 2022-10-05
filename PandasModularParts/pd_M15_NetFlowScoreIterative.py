@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from core.aliases import PreferencesTable
-from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
+from core.enums import ScoringFunction, ScoringFunctionDirection
 from PandasModularParts.pd_M14_NetFlowScore import NetFlowScore
 
 

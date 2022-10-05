@@ -1,6 +1,6 @@
 import numpy as np
 from core.aliases import NumericValue
-from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
+from core.enums import ScoringFunction, ScoringFunctionDirection
 from ModularParts.M14_NetFlowScore import NetFlowScore
 from typing import List
 

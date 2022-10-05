@@ -1,22 +1,14 @@
-from enum import Enum
 from typing import List, Tuple, Dict
-
 from core.aliases import NumericValue
 from core.preference_commons import directed_alternatives_performances
-
-
-class CompareProfiles(Enum):
-    """Enumeration of the compare profiles types."""
-
-    CENTRAL_PROFILES = 1
-    BOUNDARY_PROFILES = 2
-    LIMITING_PROFILES = 3
+from core.enums import CompareProfiles
+from core.sorting import check_dominance_condition
 
 
 class FlowSortI:
     """
     This module computes the assignments of given alternatives to categories using FlowSort procedure based on
-    Promethee I flows.
+    PrometheeI flows.
     """
 
     def __init__(self,
@@ -50,7 +42,7 @@ class FlowSortI:
         self.negative_flows = negative_flows
         self.positive_flows = positive_flows
         self.comparison_with_profiles = comparison_with_profiles
-        self.__check_dominance_condition()
+        check_dominance_condition(self.criteria, self.profiles_performances)
 
     def __append_to_classification(self, classification: Dict, pessimistic_category: str, optimistic_category: str,
                                    alternative_name: str) -> None:
@@ -66,18 +58,6 @@ class FlowSortI:
                 classification[category].append(alternative_name)
         else:  # positive_category_index = negative_category_index i.e. precise assignment to a specific category
             classification[self.categories[pessimistic_category_index]].append(alternative_name)
-
-    def __check_dominance_condition(self):
-        """
-        Check if each boundary profile is strictly worse in each criterion than betters profiles
-
-        :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
-        """
-        for criteria_i in range(len(self.criteria[0])):
-            for i, profile_i in enumerate(self.profiles_performances):
-                for j, profile_j in enumerate(self.profiles_performances[i:]):
-                    if profile_j[criteria_i] < profile_i[criteria_i]:
-                        raise ValueError("Profiles don't fulfill the dominance condition")
 
     def __limiting_profiles_sorting(self) -> Dict[str, List[str]]:
         """
