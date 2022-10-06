@@ -8,6 +8,7 @@ from core.preference_commons import overall_preference
 class PrometheeDiscordance:
     def __init__(self, criteria: List[str], partial_preferences: pd.DataFrame, categories_profiles=False):
         """
+        :param criteria: list of criteria names
         :param partial_preferences: partial preference of every alternative over other alternatives
         or profiles
         :param categories_profiles: were the preferences calculated for profiles
@@ -24,15 +25,19 @@ class PrometheeDiscordance:
 
         :param partial_preferences: partial preference of every alternative over other alternatives
         or profiles
-        :return: 3D matrix of partial discordance indices
+
+        :returns: 3D matrix of partial discordance indices
         """
-        partial_discordance = partial_preferences.copy(deep=True)
         if other_partial_preferences is None:
             other_partial_preferences = partial_preferences
+
+        partial_discordance_data = []
+
         for criterion in self.criteria:
-            for j in partial_preferences.keys():
-                for i in other_partial_preferences.columns:
-                    partial_discordance.loc[criterion, j][i] = other_partial_preferences.loc[criterion, i][j]
+            partial_discordance_on_criterion = other_partial_preferences.loc[criterion].T
+            partial_discordance_data.append(partial_discordance_on_criterion)
+
+        partial_discordance = pd.concat(partial_discordance_data, axis=0, keys=self.criteria)
 
         return partial_discordance
 

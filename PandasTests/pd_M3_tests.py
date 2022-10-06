@@ -17,7 +17,6 @@ preference, partial_preference = PrometheePreference(alternatives_performances, 
 
 print("----------------------PREFERENCE--------------")
 print(partial_preference)
-print(preference)
 
 discordance, partial_discordance = PrometheeDiscordance(criteria, partial_preference).compute_discordance(3)
 print(discordance)
