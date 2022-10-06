@@ -66,38 +66,31 @@ class MultipleDMUniNetFlows:
         profiles_net_flows = []
         n_profiles = len(self.category_profiles) * len(self.DMs_profiles_partial_preferences)
 
-        for alternative_i, _ in enumerate(self.alternatives):
-            profile_alternative_net_flows = []
-            for DM_i, _ in enumerate(self.DMs_profiles_partial_preferences):
-                profile_alternative_dm_net_flows = []
-                for profile_i, _ in enumerate(self.category_profiles):
-                    profile_alternative_dm_category_profile_net_flows = []
-                    for criterion_i, _ in enumerate(self.criteria_weights):
-                        net_flow = 0
-                        net_flow += \
-                            self.DMs_profiles_partial_preferences[DM_i][criterion_i][profile_i][alternative_i] - \
-                            self.DMs_alternatives_partial_preferences[DM_i][criterion_i][alternative_i][profile_i]
-                        for profile_j, _ in enumerate(self.category_profiles):
-                            for DM_j, _ in enumerate(self.DMs_profiles_partial_preferences):
-                                net_flow += \
-                                    self.DMs_profile_vs_profile_partial_preferences[DM_i][criterion_i][profile_i][
-                                        profile_j] - \
-                                    self.DMs_profile_vs_profile_partial_preferences[DM_j][criterion_i][profile_j][
-                                        profile_i]
-                        net_flow /= (n_profiles + 1)
-                        profile_alternative_dm_category_profile_net_flows.append(net_flow)
-                    profile_alternative_dm_net_flows.append(profile_alternative_dm_category_profile_net_flows)
-                profile_alternative_net_flows.append(profile_alternative_dm_net_flows)
-            profiles_net_flows.append(profile_alternative_net_flows)
+        for i, DM_i_df in enumerate(self.DMs_profile_vs_profile_partial_preferences):
+            dm_alternatives_partial_preferences = self.DMs_alternatives_partial_preferences[i]
+            dm_profiles_partial_preferences = self.DMs_profiles_partial_preferences[i]
+            for DM_i_index, criterion_i, profiles_partial_preferences_i in DM_i_df.groupby([0, 1]):
+                dm_profile_net_flows = pd.Series(index=[DM_i_index, criterion_i, profiles_partial_preferences_i.index])
+                for _, criterion_preferences1, _, criterion_preferences2 in zip(
+                        dm_alternatives_partial_preferences.groupby([0, 1]),
+                        dm_profiles_partial_preferences.groupby([0, 1])):
+                    for DM_j_df in self.DMs_profile_vs_profile_partial_preferences:
+                        for DM_j_index, criterion_j, profiles_partial_preferences_j in DM_j_df.groupby([0, 1]):
+                            for profile_i, profile_i_row, profile_j, profile_j_col \
+                                    in zip(profiles_partial_preferences_i.droplevel(0).iterrows(),
+                                           profiles_partial_preferences_j.droplevel(0).T.iterrows()):
+                                dm_profile_net_flows[DM_i_index, criterion_i, profile_i] += \
+                                    profile_i_row - profile_j_col
 
-        profiles_general_net_flows = [
-            [[sum([criterion_weight * net_flow for criterion_weight, net_flow in
-                   zip(self.criteria_weights, profile_alternative_DM_category_profile_net_flows)])
-              for profile_alternative_DM_category_profile_net_flows in profile_alternative_DM_net_flows]
-             for profile_alternative_DM_net_flows in profile_alternative_net_flows]
-            for profile_alternative_net_flows in profiles_net_flows]
+        # Old sum
+        # profiles_general_net_flows = [
+        #     [[sum([criterion_weight * net_flow for criterion_weight, net_flow in
+        #            zip(self.criteria_weights, profile_alternative_DM_category_profile_net_flows)])
+        #       for profile_alternative_DM_category_profile_net_flows in profile_alternative_DM_net_flows]
+        #      for profile_alternative_DM_net_flows in profile_alternative_net_flows]
+        #     for profile_alternative_net_flows in profiles_net_flows]
 
-        return profiles_general_net_flows
+        return profiles_net_flows
 
     def calculate_gdss_flows(self) -> Tuple[List[NumericValue], List[List[List[NumericValue]]]]:
         """
