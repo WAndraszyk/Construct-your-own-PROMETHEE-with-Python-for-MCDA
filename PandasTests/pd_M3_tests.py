@@ -1,5 +1,6 @@
 from PandasModularParts.pd_M1_SurrogateWeights import SurrogateWeights
 from PandasModularParts.pd_M3_PrometheePreference import PrometheePreference
+from PandasModularParts.pd_M6_PrometheeDiscordance import PrometheeDiscordance
 from Tests.DecisionProblemData import *
 
 alternatives_performances = pd.DataFrame(data=alternatives_performances, index=alternatives, columns=criteria)
@@ -16,3 +17,6 @@ preference, partial_preference = PrometheePreference(alternatives_performances, 
 
 print("----------------------PREFERENCE--------------")
 print(partial_preference)
+
+discordance, partial_discordance = PrometheeDiscordance(criteria, partial_preference).compute_discordance(3)
+print(discordance)
