@@ -34,7 +34,7 @@ class PrometheePreference:
         :param decimal_place: with this you can choose the decimal_place of the output numbers
         """
 
-        self.alternatives = alternatives_performances.keys()
+        self.alternatives = alternatives_performances.index
         self.criteria = weights.keys()
         self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
         self.weights = weights
@@ -65,27 +65,26 @@ class PrometheePreference:
                                             alternatives_performances=self.alternatives_performances,
                                             profile_performance_table=self.profile_performance_table)
         if self.categories_profiles is None:
-            return self.__preferences(partialPref, self.alternatives_performances), partialPref
+            return self.__preferences(partialPref, self.alternatives), partialPref
         else:
-            return (self.__preferences(partialPref[0], self.alternatives_performances, self.profile_performance_table),
-                    self.__preferences(partialPref[1], self.profile_performance_table, self.alternatives_performances)
+            return (self.__preferences(partialPref[0], self.alternatives, self.categories_profiles),
+                    self.__preferences(partialPref[1], self.categories_profiles, self.alternatives)
                     ), partialPref
 
-    def __preferences(self, partialPref, i_iter, j_iter=None):
-        # weight_sum = 0
-        # for i in self.weights:
-        #     weight_sum += i
-        # if j_iter is None:
-        #     j_iter = i_iter
-        # preferences = []
-        # for i in range(len(i_iter)):
-        #     aggregatedPI = []
-        #     for j in range(len(j_iter)):
-        #         Pi_A_B = 0
-        #         for k in range(len(self.criteria)):
-        #             Pi_A_B += partialPref[k][i][j] * self.weights[k]
-        #         Pi_A_B = Pi_A_B / weight_sum
-        #         aggregatedPI.append(round(Pi_A_B, self.decimal_place))
-        #     preferences.append(aggregatedPI)
+    def __preferences(self, partialPref, alternatives, categories_profiles=None):
+        weight_sum = sum(self.weights.values)
+        if categories_profiles is None:
+            categories_profiles = alternatives
+        preferences = []
+        for i in alternatives:
+            aggregatedPI = []
+            for j in categories_profiles:
+                Pi_A_B = 0
+                for k in self.criteria:
+                    Pi_A_B += partialPref.loc[k,i][j] * self.weights[k]
+                Pi_A_B = Pi_A_B / weight_sum
+                aggregatedPI.append(round(Pi_A_B, self.decimal_place))
+            preferences.append(aggregatedPI)
 
-        return None
+        preferences = pd.DataFrame(data=preferences, columns=categories_profiles, index=alternatives)
+        return preferences

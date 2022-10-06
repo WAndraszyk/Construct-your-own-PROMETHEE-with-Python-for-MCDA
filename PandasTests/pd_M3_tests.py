@@ -16,3 +16,4 @@ preference, partial_preference = PrometheePreference(alternatives_performances, 
 
 print("----------------------PREFERENCE--------------")
 print(partial_preference)
+print(preference)
