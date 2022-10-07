@@ -168,17 +168,16 @@ def overall_preference(preferences, discordances, profiles):
     :returns: overall preference indices
     """
     if profiles:
-        for n in range(len(discordances)):
-            for i in range(len(discordances[n])):
-                for j in range(len(discordances[n][i])):
-                    discordances[n][i][j] = 1 - discordances[n][i][j]
-        overall_preferences = (np.multiply(preferences[0], discordances[0]).tolist(),
-                               np.multiply(preferences[1], discordances[1]).tolist())
+        for discordance in discordances:
+            for n in discordance.index:
+                for i in discordance.columns:
+                    discordance[n][i] = 1 - discordance[n][i]
+        overall_preferences = (preferences[0] * discordances[0], preferences[1], * discordances[1])
     else:
-        for n in range(len(discordances)):
-            for i in range(len(discordances[n])):
+        for n in discordances.index:
+            for i in discordances.columns:
                 discordances[n][i] = 1 - discordances[n][i]
-        overall_preferences = np.multiply(preferences, discordances).tolist()
+        overall_preferences = preferences * discordances
 
     return overall_preferences
 
