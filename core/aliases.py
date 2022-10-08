@@ -14,6 +14,7 @@ Criterion = Id
 PerformanceTable = pd.DataFrame  # Alternatives performances or Category Profiles performances
 PreferencesTable = pd.DataFrame
 FlowsTable = pd.DataFrame
+NetOutrankingFlows = pd.Series
 DMsTable = pd.DataFrame
 RankedCriteria = pd.Series
 
