@@ -9,7 +9,7 @@ class PrometheeIIFlow:
     'Net outranking flow' is a difference between positive and negative flow for each alternative.
     """
 
-    def __init__(self,  flows: FlowsTable):
+    def __init__(self, flows: FlowsTable):
         """
         :param flows: FlowsTable of both positive and negative outranking flows.
         """
