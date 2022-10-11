@@ -122,9 +122,11 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                     )
             criterionIndices.append(alternativeIndices)
         ppIndices.append(criterionIndices)
+    names = ['criteria'] + i_iter.index.names
     ppIndices = pd.concat([pd.DataFrame(data=x, index=i_iter.index, columns=j_iter.index) for x in ppIndices],
                           keys=criteria,
-                          names=['criteria', 'alternatives'])
+                          names=names)
+
 
     return ppIndices
 
