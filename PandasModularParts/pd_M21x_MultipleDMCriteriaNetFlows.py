@@ -12,15 +12,15 @@ class MultipleDMUniNetFlows:
     def __init__(self,
                  dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
                  dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
-                 dms_profile_vs_profile_partial_preferences: List[pd.DataFrame],  # P(r_i,r_j)
+                 dms_profile_vs_profile_partial_preferences: pd.DataFrame,  # P(r_i,r_j)
                  criteria_weights: pd.Series):
         """
         :param dms_profiles_partial_preferences: List of partial preferences profiles vs alternatives.
-         Nesting order: DM, criterion, profile, alternative
+         MultiIndex: DM, criterion, profile; Column: alternative
         :param dms_alternatives_partial_preferences: List of partial preferences alternatives vs profiles.
          Nesting order: DM, criterion, alternative, profile
-        :param dms_profile_vs_profile_partial_preferences: List of partial preferences profiles vs profiles.
-         Nesting order: DM, criterion, profile_i, profile_j
+        :param dms_profile_vs_profile_partial_preferences: DataFrame with partial preferences profiles vs profiles
+         between any DM. Nesting order: DM, criterion, profile_i, profile_j
         :param criteria_weights: List of numeric value weights for each criterion
         """
         self.alternatives = dms_profiles_partial_preferences[0].columns
@@ -64,7 +64,9 @@ class MultipleDMUniNetFlows:
         :return: List of global profiles net flows. Nesting order: alternative, DM, profile
         """
         profiles_net_flows = []
-        n_profiles = len(self.category_profiles) * len(self.DMs_profiles_partial_preferences)
+        n_profiles = self.DMs_profile_vs_profile_partial_preferences.shape[0]
+
+
 
         for i, DM_i_df in enumerate(self.DMs_profile_vs_profile_partial_preferences):
             dm_alternatives_partial_preferences = self.DMs_alternatives_partial_preferences[i]

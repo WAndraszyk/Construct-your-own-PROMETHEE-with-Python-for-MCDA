@@ -3,7 +3,7 @@ from core.aliases import PerformanceTable, PreferencesTable, FlowsTable
 from typing import Tuple, Union
 
 
-class PdPrometheeOutrankingFlows:
+class PrometheeOutrankingFlows:
     """
     This class computes positive and negative outranking flows
     based on preferences.

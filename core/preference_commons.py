@@ -1,6 +1,9 @@
 from enum import Enum
 import copy
 from typing import List, Union
+
+import pandas as pd
+
 import core.generalized_criteria as gc
 
 import numpy as np
@@ -19,8 +22,8 @@ class PreferenceFunction(Enum):
     GAUSSIAN = 6
 
 
-def directed_alternatives_performances(alternatives_performances: Union[List[List[NumericValue]], np.ndarray],
-                                       directions: List[NumericValue]) -> Union[List[List[NumericValue]], np.ndarray]:
+def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
+                                       directions: pd.Series) -> pd.DataFrame:
     """
     Changes value of alternative performance to the opposite value if the direction of preference is
     min (represented by 0)
@@ -29,11 +32,10 @@ def directed_alternatives_performances(alternatives_performances: Union[List[Lis
     :param directions: directions of preference of criteria
     :return: 2D list of alternatives' value at every criterion
     """
-    copy_alternatives_performances = copy.deepcopy(alternatives_performances)
-    for i in range(len(directions)):
-        if directions[i] == 0:
-            for j in range(len(alternatives_performances)):
-                copy_alternatives_performances[j][i] = -alternatives_performances[j][i]
+    copy_alternatives_performances = alternatives_performances
+    for direction in directions.keys():
+        if directions[direction] == 0:
+            copy_alternatives_performances[direction] = copy_alternatives_performances[direction] * -1
 
     return copy_alternatives_performances
 
