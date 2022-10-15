@@ -9,8 +9,8 @@ Założenia implementacyjne:
 
 Wykonane moduły (pandas refactor):
 - M1  :heavy_check_mark: (:heavy_check_mark:)
-- M2  :heavy_check_mark:
-- M3  :heavy_check_mark:
+- M2  :heavy_check_mark: (:heavy_check_mark:)
+- M3  :heavy_check_mark: (:heavy_check_mark:)
 - M4  :heavy_check_mark:
 - M5
 - M6  :heavy_check_mark: (:heavy_check_mark:)
