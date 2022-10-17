@@ -81,7 +81,7 @@ class PrometheePreference:
             for j in categories_profiles:
                 Pi_A_B = 0
                 for k in self.criteria:
-                    Pi_A_B += partialPref.loc[k,i][j] * self.weights[k]
+                    Pi_A_B += partialPref.loc[k, i][j] * self.weights[k]
                 Pi_A_B = Pi_A_B / weight_sum
                 aggregatedPI.append(round(Pi_A_B, self.decimal_place))
             preferences.append(aggregatedPI)
