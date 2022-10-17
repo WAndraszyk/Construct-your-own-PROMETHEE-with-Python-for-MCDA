@@ -1,6 +1,5 @@
 from enum import Enum
 from core.aliases import NumericValue, PerformanceTable
-from typing import List
 import core.preference_commons as pc
 import pandas as pd
 
