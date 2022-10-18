@@ -1,5 +1,5 @@
 import pandas as pd
-from core.aliases import PerformanceTable, PreferencesTable, FlowsTable
+from core.aliases import PreferencesTable, FlowsTable
 from typing import Tuple, Union
 
 
@@ -9,16 +9,13 @@ class PrometheeOutrankingFlows:
     based on preferences.
     """
 
-    def __init__(self, preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable],
-                 category_profiles: PerformanceTable = None):
+    def __init__(self, preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable]):
         # Rozkminic czy zamiast tupla nie wrzucac drugiego df jako category_profiles
 
         """
         :param preferences: PreferenceTable of aggregated preferences (profile over profile ) or 2-element
         tuple of PreferenceTables of aggregated preferences (profile over category and category over profile).
-        :param category_profiles: PreferenceTable of category profiles.
         """
-        self.category_profiles = category_profiles
         self.preferences = preferences
 
     def __calculate_flow(self, positive: bool = True) -> pd.Series:
