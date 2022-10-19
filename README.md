@@ -12,9 +12,9 @@ Wykonane moduły (pandas refactor):
 - M2  :heavy_check_mark: (:heavy_check_mark:)
 - M3  :heavy_check_mark: (:heavy_check_mark:)
 - M4  :heavy_check_mark:
-- M5
+- M5  :heavy_check_mark: (:heavy_check_mark:)
 - M6  :heavy_check_mark: (:heavy_check_mark:)
-- M7  :heavy_check_mark:
+- M7  :heavy_check_mark: (:heavy_check_mark:)
 - M8  :heavy_check_mark: (:heavy_check_mark:)
 - M9  :heavy_check_mark: (:heavy_check_mark:)
 - M10 :heavy_check_mark: (:x: - partial preferences)
@@ -31,7 +31,7 @@ Wykonane moduły (pandas refactor):
 - M21 :heavy_check_mark: (:x: - partial preferences)
 - M22 :heavy_check_mark: (:heavy_check_mark:)
 - M23 :heavy_check_mark: (:heavy_check_mark:)
-- M24 :heavy_check_mark:
+- M24 :heavy_check_mark: (:heavy_check_mark:)
 - M25
 - M26
 - M27
