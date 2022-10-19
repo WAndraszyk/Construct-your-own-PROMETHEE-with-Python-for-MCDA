@@ -1,3 +1,4 @@
+import pandas as pd
 from core.aliases import NumericValue
 from typing import List, Tuple, Dict
 
@@ -8,131 +9,112 @@ class PrometheeTri:
     """
 
     def __init__(self,
-                 alternatives: List[str],
                  categories: List[str],
-                 category_profiles: List[str],
-                 criteria: List[str],
-                 criteria_weights: List[NumericValue],
-                 partial_preferences: Tuple[List[List[List[NumericValue]]], List[List[List[NumericValue]]]],
-                 profiles_partial_preferences: List[List[List[NumericValue]]],
+                 criteria_weights: pd.Series,
+                 alternatives_partial_preferences: Tuple[pd.DataFrame, pd.DataFrame],
+                 profiles_partial_preferences: pd.DataFrame,
                  assign_to_better_class: bool = True,
                  use_marginal_value: bool = True):
         """
-        :param alternatives: List of alternatives names (strings only)
         :param categories: List of categories names (strings only)
-        :param category_profiles: List of boundary profiles names which divide alternatives
-        to proper categories (strings only)
-        :param criteria: List of criteria names (strings only)
-        :param criteria_weights: List of weight of each criterion
-        :param partial_preferences: 3D Lists of partial preferences (alternatives vs profiles and
+        :param criteria_weights: Series with weights of each criterion
+        :param alternatives_partial_preferences: Tuple with 2 DataFrames with partial preferences (alternatives vs profiles and
         profiles vs alternatives)
-        :param profiles_partial_preferences:
+        :param profiles_partial_preferences: DataFrame with partial preferences (profiles vs profiles)
         :param assign_to_better_class: Boolean which describe preference of the DM in final alternative assignment when
         deviation for two or more profiles are the same.
         :param use_marginal_value: Boolean which describe whether deviation should be
         calculated as absolute value or not
         """
-        self.alternatives = alternatives
+        self.alternatives = alternatives_partial_preferences[1].columns.tolist()
         self.categories = categories
-        self.category_profiles = category_profiles
-        self.criteria = criteria
+        self.category_profiles = profiles_partial_preferences.columuns.to_list()
         self.criteria_weights = criteria_weights
-        self.partial_preferences = partial_preferences
+        self.alternatives_partial_preferences = alternatives_partial_preferences
         self.profiles_partial_preferences = profiles_partial_preferences
         self.assign_to_better_class = assign_to_better_class
         self.use_marginal_value = use_marginal_value
 
-    def __calculate_criteria_net_flows(self) -> Tuple[List[List[NumericValue]], List[List[NumericValue]]]:
+    def __calculate_criteria_net_flows(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Calculate criteria net flows for profiles and alternatives.
 
-        :return: 2D List of criteria net flows for profiles and 2D List of criteria net flows for alternatives.
+        :return: Tuple with 2 DataFrames with criteria net flows for profiles and alternatives
         """
-        profiles_criteria_net_flows = []
-        alternatives_criteria_net_flows = []
+        profiles_criteria_net_flows = pd.DataFrame()
+        alternatives_criteria_net_flows = pd.DataFrame()
 
         n_profiles = len(self.category_profiles)
-        for i, _ in enumerate(self.category_profiles):
-            profile_criteria_net_flows = []
-            for j, _ in enumerate(self.criteria):
-                criterion_net_flow = 0
-                for k, _ in enumerate(self.category_profiles):
-                    if i != k:
-                        criterion_net_flow += self.profiles_partial_preferences[j][i][k] - self.profiles_partial_preferences[j][k][i]
-                profile_criteria_net_flows.append(1 / (n_profiles - 1) * criterion_net_flow)
-            profiles_criteria_net_flows.append(profile_criteria_net_flows)
+
+        for criterion, criterion_preferences in self.profiles_partial_preferences.groupby(level=0):
+            for profile_i, profile_i_row, profile_j, profile_j_col \
+                    in zip(criterion_preferences.droplevel(0).iterrows(),
+                           criterion_preferences.droplevel(0).T.iterrows()):
+                profiles_criteria_net_flows[profile_i] = (profile_i_row - profile_j_col) / (n_profiles - 1)
+
+        profiles_criteria_net_flows = profiles_criteria_net_flows.T
+        profiles_criteria_net_flows.columns = self.profiles_partial_preferences.index.get_level_values(0)
+        profiles_criteria_net_flows.index = self.alternatives
 
         n_alternatives = len(self.alternatives)
-        for i, _ in enumerate(self.alternatives):
-            alternative_criteria_net_flows = []
-            for j, _ in enumerate(self.criteria):
-                criterion_net_flow = 0
-                for k, _ in enumerate(self.category_profiles):
-                    if i != k:
-                        criterion_net_flow += self.partial_preferences[0][j][i][k] - self.partial_preferences[1][j][k][i]
-                alternative_criteria_net_flows.append(1 / n_alternatives * criterion_net_flow)
-            alternatives_criteria_net_flows.append(alternative_criteria_net_flows)
+
+        for (criterion, criterion_preferences1, criterion, criterion_preferences2)\
+                in zip(self.alternatives_partial_preferences[0].groupby(level=0),
+                       self.alternatives_partial_preferences[0].groupby(level=0)):
+            for alternative_i, alternative_i_row, profile_j, profile_j_col \
+                    in zip(criterion_preferences1.droplevel(0).iterrows(),
+                           criterion_preferences2.droplevel(0).T.iterrows()):
+                alternatives_criteria_net_flows[alternative_i] = (alternative_i_row - profile_j_col) / n_alternatives
+
+        alternatives_criteria_net_flows = alternatives_criteria_net_flows.T
+        alternatives_criteria_net_flows.columns = self.alternatives_partial_preferences[0].index.get_level_values(0)
+        alternatives_criteria_net_flows.index = self.alternatives
 
         return profiles_criteria_net_flows, alternatives_criteria_net_flows
 
-    def __calculate_deviations(self, profiles_criteria_net_flows: List[List[NumericValue]],
-                               alternatives_criteria_net_flows: List[List[NumericValue]]) -> List[List[NumericValue]]:
+    def __calculate_deviations(self, profiles_criteria_net_flows: pd.DataFrame,
+                               alternatives_criteria_net_flows: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate deviation for each alternative and each profile.
 
-        :param profiles_criteria_net_flows: 2D List of criteria net flows for profiles
-        :param alternatives_criteria_net_flows: 2D List of criteria net flows for alternatives
+        :param profiles_criteria_net_flows: DataFrame with criteria net flows for profiles
+        :param alternatives_criteria_net_flows: DataFrame with criteria net flows for alternatives
 
-        :return: 2D List of deviations
+        :return: DataFrame with deviations
         """
-        deviations = []
+        deviations = pd.DataFrame(columns=self.profiles_partial_preferences.index, index=self.alternatives)
 
-        for alternative_criteria_net_flows in alternatives_criteria_net_flows:
-            alternative_deviations = []
-            for profile_criteria_net_flows in profiles_criteria_net_flows:
-                deviation = 0
-                for i, criteria_weight in enumerate(self.criteria_weights):
-                    if self.use_marginal_value:
-                        deviation += abs(alternative_criteria_net_flows[i] - profile_criteria_net_flows[i])\
-                                     * criteria_weight
-                    else:
-                        deviation += (alternative_criteria_net_flows[i] - profile_criteria_net_flows[i]) \
-                                     * criteria_weight
-                alternative_deviations.append(deviation)
-            deviations.append(alternative_deviations)
+        for alternative, alternative_row in alternatives_criteria_net_flows.iterrows():
+            for profile, profile_row in profiles_criteria_net_flows.iterrows():
+                if self.use_marginal_value:
+                    deviations[profile][alternative] = abs(alternative_row - profile_row).sum()
+                else:
+                    deviations[profile][alternative] = (self.criteria_weights * (alternative_row - profile_row)).sum()
 
         return deviations
 
-    def __assign_alternatives_to_classes_with_minimal_deviation(self, deviations: List[List[NumericValue]]
-                                                                ) -> Dict[str, List[str]]:
+    def __assign_alternatives_to_classes_with_minimal_deviation(self, deviations: pd.DataFrame) -> pd.Series:
         """
         Assign every alternative to class with minimal deviation for pair alternative, class.
 
-        :param deviations: 2D List of deviations
+        :param deviations: DataFrame with deviations
 
-        :return: Dictionary with alternatives assigned to proper classes
+        :return: Series with precise assignments of alternatives to categories
         """
-        classification = {category: [] for category in self.categories}
-
-        for alternative_index, alternative_deviations in enumerate(deviations):
-            min_deviation_value = min(alternative_deviations)
-
-            min_deviation_indices = [i for i, deviation in enumerate(alternative_deviations) if deviation == min_deviation_value]
-
-            if len(min_deviation_indices) == 1 or not self.assign_to_better_class:
-                category_index = min_deviation_indices[0]
+        classification = pd.Series(index=self.alternatives)
+        for alternative, alternative_row in deviations.iterrows():
+            if self.assign_to_better_class:
+                classification[alternative] = alternative_row.contains(alternative_row.min()).idxmax()
             else:
-                category_index = min_deviation_indices[-1]
-
-            classification[self.categories[category_index]].append(self.alternatives[alternative_index])
+                classification[alternative] = alternative_row.contains(alternative_row.min()).idxmin()
 
         return classification
 
-    def calculate_sorted_alternatives(self):
+    def calculate_sorted_alternatives(self) -> pd.Series:
         """
         Sort alternatives to proper categories.
 
-        :return: Dictionary with alternatives assigned to proper classes
+        :return: Series with precise assignments of alternatives to categories
         """
         profiles_criteria_net_flows, alternatives_criteria_net_flows = self.__calculate_criteria_net_flows()
         deviations = self.__calculate_deviations(profiles_criteria_net_flows, alternatives_criteria_net_flows)

@@ -1,6 +1,6 @@
-import numpy as np
-from core.aliases import NumericValue
-from typing import List, Tuple, Union
+import pandas as pd
+from core.aliases import PreferencesTable, FlowsTable
+from typing import Tuple, Union
 
 
 class PrometheeOutrankingFlows:
@@ -9,21 +9,16 @@ class PrometheeOutrankingFlows:
     based on preferences.
     """
 
-    def __init__(self, alternatives: List[str],
-                 preferences: Union[List[List[NumericValue]],
-                                    Tuple[List[List[NumericValue]], List[List[NumericValue]]]],
-                 category_profiles: List[str] = None):
+    def __init__(self, preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable]):
+        # Rozkminic czy zamiast tupla nie wrzucac drugiego df jako category_profiles
+
         """
-        :param alternatives: List of alternatives names (strings only).
-        :param preferences: 2D array of aggregated preferences (profile over profile ) or 2-element tuple of 2D arrays
-        of aggregated preferences (profile over category and category over profile).
-        :param category_profiles: List of category profiles names (stings only).
+        :param preferences: PreferenceTable of aggregated preferences (profile over profile ) or 2-element
+        tuple of PreferenceTables of aggregated preferences (profile over category and category over profile).
         """
-        self.category_profiles = category_profiles
-        self.alternatives = alternatives
         self.preferences = preferences
 
-    def __calculate_flow(self, positive: bool = True) -> List[NumericValue]:
+    def __calculate_flow(self, positive: bool = True) -> pd.Series:
         """
         Calculate positive or negative outranking flow.
 
@@ -31,26 +26,26 @@ class PrometheeOutrankingFlows:
                          else returns negative outranking flow.
         :return: List of outranking flow's values.
         """
-        if isinstance(self.preferences, tuple):  # check if self.preferences are with category profiles
+        if isinstance(self.preferences, tuple):
             if positive:
-                flows = np.mean(self.preferences[0], axis=1)
+                flows = self.preferences[0].mean(axis=1)
             else:
-                flows = np.mean(self.preferences[1], axis=0)
+                flows = self.preferences[1].mean(axis=0)
         else:
-            n = len(self.alternatives)
+            n = self.preferences.shape[0]
 
             axis = 1 if positive else 0
-            aggregatedPIes = np.sum(self.preferences, axis=axis)
-            flows = aggregatedPIes / (n - 1)
+            aggregated_preferences = self.preferences.sum(axis=axis)
+            flows = aggregated_preferences / (n - 1)
 
         return flows
 
-    def calculate_flows(self) -> Tuple[List[NumericValue], List[NumericValue]]:
+    def calculate_flows(self) -> FlowsTable:
         """
         Calculate both positive and negative outranking flows.
 
-        :return:
-                OUT1: positive outranking flow.
-                OUT2: negative outranking flow.
+        :return: FlowTable of both positive and negative outranking flows.
         """
-        return self.__calculate_flow(), self.__calculate_flow(positive=False)
+        index = self.preferences[0].index if isinstance(self.preferences, tuple) else self.preferences.index
+        return pd.DataFrame({'positive': self.__calculate_flow(), 'negative': self.__calculate_flow(positive=False)},
+                            index=index)

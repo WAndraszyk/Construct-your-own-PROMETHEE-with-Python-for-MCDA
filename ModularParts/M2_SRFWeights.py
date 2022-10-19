@@ -1,6 +1,7 @@
-import numpy as np
+import pandas as pd
+
 from math import ceil, floor
-from typing import List, Union
+from typing import List, Tuple, Dict
 from core.aliases import NumericValue
 
 
@@ -9,112 +10,173 @@ class SRFWeights:
     This module computes weights of criteria using the revised Simos (or Simos-Roy-Figueira; SRF) method.
     """
 
-    def __init__(self, criteria: List[str],
-                 criteria_rank: List[Union[None, str, List[str]]], criteria_weight_ratio: NumericValue,
+    def __init__(self, criteria_ranks: pd.Series, criteria_weight_ratio: NumericValue,
                  decimal_place: int = 2):
         """
-        :param criteria: List of names of criteria (string only)
-        :param criteria_rank: List of criteria in proper order.
-                              First criterion in list indicates the least important criterion.
-                              User can group criteria by passing them in nested list to indicate
-                              the same importance for them.
-                              User can insert to list "White cards" (None's) to make difference between
-                              separated criteria more substantial.
+        :param criteria_ranks: Series with ranks of criteria. Ranks can be the same for the same weight.
+                              Gaps between ranks indicate amount of white cards between criteria.
+                              Smallest rank indicates the lowest weight and has to be 1
         :param criteria_weight_ratio: Difference between the least important criterion and the most important criterion.
         :param decimal_place: Number of decimal places for returned weights.
         """
-        self.criteria = criteria
-        self.decimal_place = decimal_place
+        self.criteria_ranks = criteria_ranks
         self.criteria_weight_ratio = criteria_weight_ratio
-        self.criteria_rank = criteria_rank
+        self.decimal_place = decimal_place
 
-    def __calculate_white_cards_between_criteria(self) -> List[int]:
+    def __calculate_spaces_between_criteria_ranks(self) -> pd.Series:
         """
-        Calculate amount of white cards between criteria.
-
-        :return: List amount of white cards between criteria.
+        Calculate amount of spaces between criteria ranks.
+        :return: Series with amount of spaces between criteria ranks
         """
-        white_cards_between_criteria = []
+        spaces_between_criteria_ranks = pd.Series(dtype=int)
 
-        for i, criterion in enumerate(self.criteria_rank):
-            if criterion is not None:
-                n_white_cards = 0
-                for next_criterion in self.criteria_rank[i + 1:]:
-                    if next_criterion is None:
-                        n_white_cards += 1
-                    else:
-                        break
-                white_cards_between_criteria.append(n_white_cards)
+        sorted_criteria_ranks = self.criteria_ranks.sort_values()
 
-        return white_cards_between_criteria
+        for i, (criterion, rank) in enumerate(sorted_criteria_ranks[:-1].items()):
+            spaces_between_criteria_ranks[criterion] = rank - sorted_criteria_ranks[i + 1]
 
-    def __calculate_not_normalized_weights(self, white_cards_between_criteria) -> List[float]:
+        return spaces_between_criteria_ranks
+
+    def __calculate_non_normalized_weights(self, spaces_between_criteria_ranks: pd.Series) -> pd.Series:
         """
-        Calculate not normalized weights for every criterion.
-
-        :return: List of not normalized weights.
+        Calculate non-normalized weights of criteria.
+        :param spaces_between_criteria_ranks: Series with amount of spaces between criteria ranks
+        :return: Series with non-normalized weights of criteria
         """
-        criteria_rank_with_out_white_cards = [criterion for criterion in self.criteria_rank if criterion is not None]
+        non_normalized_weights = pd.Series(dtype=float)
 
-        flattened_criteria_ranks = []
+        ranks_without_white_cards = pd.Series()
+        for i, (criterion, rank) in enumerate(self.criteria_ranks.sort_values().items()):
+            ranks_without_white_cards[criterion] = rank - sum((spaces_between_criteria_ranks - 1)[:i])
 
-        for criterion in criteria_rank_with_out_white_cards:
-            if isinstance(criterion, list):
-                flattened_criteria_ranks += criterion
-            else:
-                flattened_criteria_ranks.append(criterion)
+        for i, (criterion, rank) in enumerate(ranks_without_white_cards.items()):
+            non_normalized_weights[criterion] = 1 + (self.criteria_weight_ratio - 1) \
+                                                * sum(spaces_between_criteria_ranks[:i]) / \
+                                                sum(spaces_between_criteria_ranks)
 
-        v = len(flattened_criteria_ranks) - 1
+        return non_normalized_weights
 
-        not_normalized_weights = []
-
-        for i, criterion in enumerate(criteria_rank_with_out_white_cards):
-            weight = 1 + ((self.criteria_weight_ratio - 1) *
-                          (i - 1 + np.sum(white_cards_between_criteria[:i])) /
-                          (v - 1 + np.sum(white_cards_between_criteria[:v])))
-            if isinstance(criterion, list):
-                not_normalized_weights += [weight for _ in criterion]
-            else:
-                not_normalized_weights.append(weight)
-
-        flattened_criteria_ranks_indices = [self.criteria.index(criterion) for criterion in flattened_criteria_ranks]
-
-        not_normalized_weights = [weight for _, weight in
-                                  sorted(zip(flattened_criteria_ranks_indices, not_normalized_weights))]
-
-        return not_normalized_weights
-
-    def __normalize_weights(self, not_normalized_weights) -> List[float]:
+    @staticmethod
+    def __normalize_weight_up_to_100(non_normalized_weights: pd.Series) -> pd.Series:
         """
-        Normalize weights passed as argument.
-
-        :return: List of normalized weights. Weights sum up to 100.
+        Normalize weights of criteria up to 100.
+        :param non_normalized_weights: Series with non-normalized weights of criteria
+        :return: Series with normalized weights of criteria
         """
-        normalized_weights = []
+        sum_of_weights = sum(non_normalized_weights)
+        return non_normalized_weights / sum_of_weights * 100
 
-        sum_of_weights = sum(not_normalized_weights)
-
-        precise_rounding_factor = 10 ** self.decimal_place  # It allows for more precise rounding
-
-        not_normalized_weights = [weight * 100 * precise_rounding_factor for weight in not_normalized_weights]
-
-        for not_normalized_weight in not_normalized_weights[:len(not_normalized_weights) // 2]:
-            normalized_weights.append(round(ceil(not_normalized_weight / sum_of_weights) /
-                                            precise_rounding_factor, self.decimal_place))
-
-        for not_normalized_weight in not_normalized_weights[len(not_normalized_weights) // 2:]:
-            normalized_weights.append(round(floor(not_normalized_weight / sum_of_weights) /
-                                            precise_rounding_factor, self.decimal_place))
-        return normalized_weights
-
-    def calculate_srf_weights(self) -> List[float]:
+    def __truncate_normalized_weights(self, normalized_weights: pd.Series) -> pd.Series:
         """
-        Calculate normalized weights for criteria_rank and criteria_weight_ratio passed to class.
-
-        :return: List of normalized weights. Weights sum up to 100.
+        Truncate normalized weights of criteria to self.decimal_place number of figures after the decimal point.
+        :param normalized_weights: List with normalized weights of criteria
+        :return: Series with truncated weights of criteria
         """
-        white_cards = self.__calculate_white_cards_between_criteria()
-        not_normalized_weights = self.__calculate_not_normalized_weights(white_cards)
-        normalized_weights = self.__normalize_weights(not_normalized_weights)
 
-        return normalized_weights
+        return normalized_weights.map(lambda weight:
+                                      max(floor(10 ** self.decimal_place * weight) /
+                                          10 ** self.decimal_place, 10 ** -self.decimal_place))
+
+    def __calculate_correction_ratios(self, normalized_weights: pd.Series,
+                                      truncated_weights: pd.Series
+                                      ) -> pd.DataFrame:
+        """
+        Calculate positive and negative ratios for final rounding.
+        :param normalized_weights: Series with normalized weights of criteria
+        :param truncated_weights: Series with truncated weights of criteria
+        :return: DataFrame with positive and negative ratios for final rounding
+        """
+        weights_df = pd.DataFrame({'normalized': normalized_weights, 'truncated': truncated_weights},
+                                  index=normalized_weights.index)
+
+        positive_ratios = weights_df.apply(lambda row: (10 ** -self.decimal_place -
+                                                        (row['normalized'] - row['truncated'])) / row['normalized'],
+                                           axis=1)
+
+        negative_ratios = weights_df.apply(lambda row: (row['normalized'] - row['truncated']) / row['normalized'],
+                                           axis=1)
+
+        ratios = pd.DataFrame({'positive': positive_ratios, 'negative': negative_ratios},
+                              index=normalized_weights.index)
+
+        return ratios
+
+    def __calculate_size_of_upward_rounded_set(self, truncated_weights: pd.Series) -> NumericValue:
+        """
+        Calculate size of upward rounded set.
+        :param truncated_weights: List with truncated weights of criteria
+        :return: Size of upward rounded set
+        """
+        return (100 - sum(truncated_weights)) * 10 ** self.decimal_place
+
+    def __round_properly_weights(self, normalized_weights: pd.Series,
+                                 truncated_weights: pd.Series,
+                                 ) -> pd.Series:
+        """
+        Round weights with special algorithm to avoid rounding errors.
+        :param normalized_weights: Series with normalized weights of criteria
+        :param truncated_weights: Series with truncated weights of criteria
+        :return: Series with rounded weights of criteria, sorted by order of passed criteria
+        """
+        ratios = self.__calculate_correction_ratios(normalized_weights, truncated_weights)
+
+        positive_ratios_larger_than_negative_ratios = ratios[ratios['positive'] > ratios['negative']].index
+
+        size_of_upward_rounded_set = int(self.__calculate_size_of_upward_rounded_set(truncated_weights))
+
+        positive_ratios = ratios['positive'].sort_values(ascending=False)
+        negative_ratios = ratios['negative'].sort_values(ascending=False)
+
+        n_criteria = len(self.criteria_ranks)
+
+        if size_of_upward_rounded_set + len(positive_ratios_larger_than_negative_ratios) <= n_criteria:
+
+            round_downward_list = positive_ratios_larger_than_negative_ratios
+            to_add_to_downward_list = n_criteria - size_of_upward_rounded_set \
+                                      - len(positive_ratios_larger_than_negative_ratios)
+
+            if to_add_to_downward_list > 0:
+                for criterion in negative_ratios.index:
+                    if criterion not in positive_ratios_larger_than_negative_ratios:
+                        round_downward_list.append(criterion)
+                        to_add_to_downward_list -= 1
+                        if to_add_to_downward_list == 0:
+                            break
+
+        else:
+            round_downward_list = []
+            to_add_to_downward_list = n_criteria - size_of_upward_rounded_set
+
+            if to_add_to_downward_list > 0:
+                for criterion in positive_ratios.index:
+                    if criterion not in positive_ratios_larger_than_negative_ratios:
+                        round_downward_list.append(criterion)
+                        to_add_to_downward_list -= 1
+                        if to_add_to_downward_list == 0:
+                            break
+
+        round_upward_list = list(set(self.criteria_ranks.index).difference(set(round_downward_list)))
+
+        base = 10 ** self.decimal_place
+
+        rounded_downward = normalized_weights[normalized_weights.index.isin(round_downward_list)].map(
+            lambda weight: floor(weight * base) / base)
+        rounded_upward = normalized_weights[normalized_weights.index.isin(round_upward_list)].map(
+            lambda weight: ceil(weight * base) / base)
+
+        balanced_normalized_weights = pd.concat([rounded_downward, rounded_upward]).reindex(self.criteria_ranks.index)
+
+        return balanced_normalized_weights
+
+    def calculate_srf_weights(self) -> pd.Series:
+        """
+        Calculate weights of criteria with SRF method.
+        :return: Series with weights of criteria
+        """
+        spaces_between_criteria_ranks = self.__calculate_spaces_between_criteria_ranks()
+        non_normalized_weights = self.__calculate_non_normalized_weights(spaces_between_criteria_ranks)
+        normalized_weights = self.__normalize_weight_up_to_100(non_normalized_weights)
+        truncated_weights = self.__truncate_normalized_weights(normalized_weights)
+        balanced_normalized_weights = self.__round_properly_weights(normalized_weights, truncated_weights)
+
+        return balanced_normalized_weights

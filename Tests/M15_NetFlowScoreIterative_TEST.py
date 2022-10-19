@@ -1,6 +1,6 @@
 from ModularParts.M3_PrometheePreference import PrometheePreference
 from ModularParts.M15_NetFlowScoreIterative import NetFlowScoreIterative
-from core.net_flow_score import ScoringFunction, ScoringFunctionDirection
+from core.enums import ScoringFunction, ScoringFunctionDirection
 from DecisionProblemData import *
 
 ## M-3 Preferences

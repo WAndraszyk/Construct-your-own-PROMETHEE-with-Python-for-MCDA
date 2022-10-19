@@ -1,9 +1,10 @@
 from enum import Enum
 import copy
-from typing import List
+from typing import List, Union
 import core.generalized_criteria as gc
 
 import numpy as np
+import pandas as pd
 
 from core.aliases import NumericValue
 
@@ -19,8 +20,8 @@ class PreferenceFunction(Enum):
     GAUSSIAN = 6
 
 
-def directed_alternatives_performances(alternatives_performances: List[List[NumericValue]],
-                                       directions: List[NumericValue]) -> List[List[NumericValue]]:
+def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
+                                       directions: pd.Series) -> pd.DataFrame:
     """
     Changes value of alternative performance to the opposite value if the direction of preference is
     min (represented by 0)
@@ -29,73 +30,48 @@ def directed_alternatives_performances(alternatives_performances: List[List[Nume
     :param directions: directions of preference of criteria
     :return: 2D list of alternatives' value at every criterion
     """
-    copy_alternatives_performances = copy.deepcopy(alternatives_performances)
-    for i in range(len(directions)):
-        if directions[i] == 0:
-            for j in range(len(alternatives_performances)):
-                copy_alternatives_performances[j][i] = -alternatives_performances[j][i]
+    copy_alternatives_performances = alternatives_performances
+    for direction in directions.keys():
+        if directions[direction] == 0:
+            copy_alternatives_performances[direction] = copy_alternatives_performances[direction] * -1
 
     return copy_alternatives_performances
 
 
-def deviations(criteria, alternatives_performances, profile_performance_table=None):
+def deviations(criteria: List[str], alternatives_performances: pd.DataFrame,
+               profile_performance_table: pd.DataFrame = None):
     """
     Compares alternatives on criteria.
 
     :return: 3D matrix of deviations in evaluations on criteria
     """
 
-    def dev_calc(i_iter, j_iter, k):
-        for i in range(len(i_iter)):
+    def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, k):
+        for _, i in i_iter.iterrows():
             comparison_direct = []
-            for j in range(len(j_iter)):
-                comparison_direct.append(i_iter[i][k] - j_iter[j][k])
+            for _, j in j_iter.iterrows():
+                comparison_direct.append(i[k] - j[k])
             comparisons.append(comparison_direct)
         return comparisons
 
     deviations_list = []
     if profile_performance_table is None:
-        for k in range(len(criteria)):
+        for k in criteria:
             comparisons = []
             deviations_list.append(dev_calc(alternatives_performances, alternatives_performances, k))
     else:
         deviations_part = []
-        for k in range(len(criteria)):
+        for k in criteria:
             comparisons = []
             deviations_part.append(dev_calc(alternatives_performances, profile_performance_table, k))
         deviations_list.append(deviations_part)
         deviations_part = []
-        for k in range(len(criteria)):
+        for k in criteria:
             comparisons = []
             deviations_part.append(dev_calc(profile_performance_table, alternatives_performances, k))
         deviations_list.append(deviations_part)
 
     return deviations_list
-
-
-def overall_preference(preferences, discordances, profiles):
-    """
-    Combines preference and discordance/veto indices to compute overall preference
-
-    :param preferences: aggregated preference indices
-    :param discordances: aggregated discordance/veto indices
-    :param profiles: were the preferences and discordance/veto calculated with profiles
-    :returns: overall preference indices
-    """
-    if profiles:
-        for n in range(len(discordances)):
-            for i in range(len(discordances[n])):
-                for j in range(len(discordances[n][i])):
-                    discordances[n][i][j] = 1 - discordances[n][i][j]
-        overall_preferences = (np.multiply(preferences[0], discordances[0]).tolist(),
-                               np.multiply(preferences[1], discordances[1]).tolist())
-    else:
-        for n in range(len(discordances)):
-            for i in range(len(discordances[n])):
-                discordances[n][i] = 1 - discordances[n][i]
-        overall_preferences = np.multiply(preferences, discordances).tolist()
-
-    return overall_preferences
 
 
 def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, i_iter, j_iter):
@@ -106,9 +82,9 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
         p = p_list[k]
         s = s_list[k]
         criterionIndices = []
-        for i in range(len(i_iter)):
+        for i in range(i_iter.shape[0]):
             alternativeIndices = []
-            for j in range(len(j_iter)):
+            for j in range(j_iter.shape[0]):
                 if method is PreferenceFunction.USUAL:
                     alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
                 elif method is PreferenceFunction.U_SHAPE:
@@ -144,6 +120,12 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                     )
             criterionIndices.append(alternativeIndices)
         ppIndices.append(criterionIndices)
+    names = ['criteria'] + i_iter.index.names
+    ppIndices = pd.concat([pd.DataFrame(data=x, index=i_iter.index, columns=j_iter.index) for x in ppIndices],
+                          keys=criteria,
+                          names=names)
+
+
     return ppIndices
 
 
@@ -172,15 +154,41 @@ def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
                              i_iter=profile_performance_table, j_iter=alternatives_performances,
                              generalized_criteria=generalized_criteria)
                      ]
+
     return ppIndices
 
 
-def criteria_dict(criteria, weights):
+def overall_preference(preferences, discordances, profiles):
+    """
+    Combines preference and discordance/veto indices to compute overall preference
+
+    :param preferences: aggregated preference indices
+    :param discordances: aggregated discordance/veto indices
+    :param profiles: were the preferences and discordance/veto calculated with profiles
+    :returns: overall preference indices
+    """
+    if profiles:
+        for discordance in discordances:
+            for n in discordance.index:
+                for i in discordance.columns:
+                    discordance[n][i] = 1 - discordance[n][i]
+        overall_preferences = (preferences[0] * discordances[0], preferences[1], * discordances[1])
+    else:
+        for n in discordances.index:
+            for i in discordances.columns:
+                discordances[n][i] = 1 - discordances[n][i]
+        overall_preferences = preferences * discordances
+
+    return overall_preferences
+
+
+def criteria_series(criteria, weights):
     """
     Connect criterion name with its weight.
 
     :param criteria: criteria names as list of string.
     :param weights: criteria weights as list of Numeric Values.
-    Returns dictionary of connection.
+
+    :return: dictionary of connection.
     """
-    return {criteria[i]: weights[i] for i in range(len(criteria))}
+    return pd.Series(weights, criteria)

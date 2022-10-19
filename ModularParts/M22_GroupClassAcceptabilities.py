@@ -1,3 +1,4 @@
+import pandas as pd
 from core.aliases import NumericValue
 from typing import List, Tuple, Dict
 
@@ -8,73 +9,49 @@ class GroupClassAcceptabilities:
     """
 
     def __init__(self,
-                 alternatives: List[str],
                  categories: List[str],
-                 assignments: List[Dict[str, List[str]]]):
+                 assignments: List[pd.DataFrame]):
         """
-        :param alternatives: List of alternatives names (strings only)
         :param categories: List of categories names (strings only)
         :param assignments: List of imprecise alternatives assignments of each DM
         """
-        self.alternatives = alternatives
         self.categories = categories
         self.assignments = assignments
+        self.alternatives = list(assignments[0].index)
 
-    def __transform_assignments_to_upper_lower_bound_form(self) -> List[Dict[str, List[str]]]:
-        """
-        Transform assignments input to more preferable form in this method.
-
-        :return: List of Dictionaries for each DM with lower and upper bound for each alternative
-        """
-        alternatives_bounds = []
-
-        for DM_i, DM_assignments in enumerate(self.assignments):
-            DM_alternatives_bounds = {alternative: [] for alternative in self.alternatives}
-            for category_i, to_category_assignments in enumerate(DM_assignments.values()):
-                for alternative in to_category_assignments:
-                    DM_alternatives_bounds[alternative].append(self.categories[category_i])
-            for (alternative, alternative_assignments) in DM_alternatives_bounds.items():
-                if len(alternative_assignments) == 1:
-                    DM_alternatives_bounds[alternative].append(alternative_assignments[0])
-            alternatives_bounds.append(DM_alternatives_bounds)
-
-        return alternatives_bounds
-
-    def __calculate_votes(self, alternatives_bounds: List[Dict[str, List[str]]]) -> List[List[NumericValue]]:
+    def __calculate_votes(self) -> pd.DataFrame:
         """
         Calculate how many votes are for putting each alternative in each category.
 
-        :param alternatives_bounds: List of Dictionaries for each DM with lower and upper bound for each alternative
-
-        :return: 2D List with votes for each category for each alternative
+        :return: DataFrame with votes for each category for each alternative (index: alternatives, columns: categories)
         """
-        votes = [[0 for __ in self.categories] for _ in self.alternatives]
-        for DM_i, DM_alternative_bounds in enumerate(alternatives_bounds):
-            for alternative_i, alternative_bounds in enumerate(DM_alternative_bounds.values()):
-                if alternative_bounds[0] == alternative_bounds[1]:
-                    votes[alternative_i][self.categories.index(alternative_bounds[0])] += 1
+        votes = pd.DataFrame([[0 for __ in self.categories] for _ in self.alternatives], index=self.alternatives,
+                             columns=self.categories)
+        for DM_i, DM_assignments in enumerate(self.assignments):
+            for alternative, alternative_row in DM_assignments.iterrows():
+                if alternative_row['worse'] == alternative_row['better']:
+                    votes.loc[alternative, alternative_row['worse']] += 1
                 else:
-                    for category in alternative_bounds:
-                        votes[alternative_i][self.categories.index(category)] += 1
+                    votes.loc[alternative, alternative_row['worse']:alternative_row['better']] += 1
 
         return votes
 
-    def __calculate_alternatives_support(self, votes: List[List[NumericValue]]) -> List[List[NumericValue]]:
+    def __calculate_alternatives_support(self, votes: pd.DataFrame) -> pd.DataFrame:
         """
         Calculates alternatives support for each alternative and category (percentage).
 
-        :param votes: 2D List with votes for each category for each alternative
+        :param votes: DataFrame with votes for each category
+         for each alternative (index: alternatives, columns: categories)
 
-        :return: 2D List with alternative support for each category for each alternative
+        :return: DataFrame with alternative support for each category
+         for each alternative (index: alternatives, columns: categories)
         """
         n_DM = len(self.assignments)
+        alternatives_support = votes/n_DM * 100
 
-        alternatives_support = [[category_alternative_votes / n_DM * 100 for category_alternative_votes
-                                 in alternative_votes] for alternative_votes in votes]
         return alternatives_support
 
-    def __calculate_unimodal_alternatives_support(self, alternatives_support: List[List[NumericValue]]
-                                                  ) -> List[List[NumericValue]]:
+    def __calculate_unimodal_alternatives_support(self, alternatives_support: pd.DataFrame) -> pd.DataFrame:
         """
         Calculates unimodal alternatives support for each alternative and category (percentage).
 
@@ -82,33 +59,30 @@ class GroupClassAcceptabilities:
 
         :return: 2D List with unimodal alternative support for each category for each alternative
         """
-        n_categories = len(self.categories)
-        unimodal_alternatives_support = []
+        def unimodal_single_row(row: pd.Series) -> pd.Series:
+            row_len = len(row)
+            unimodal_row = pd.Series([0 for _ in range(row_len)], index=row.index)
 
-        for alternative_supports in alternatives_support:
-            unimodal_alternative_supports = []
-            for category_i, category_alternative_support in enumerate(alternative_supports):
-                if category_i == 0 or category_i == n_categories - 1:
-                    unimodal_alternative_supports.append(category_alternative_support)
+            for i, (category, support) in enumerate(row.items()):
+                if i == 0 or i == row_len - 1:
+                    unimodal_row[category] = support
                 else:
-                    unimodal_alternative_supports.append(max(category_alternative_support,
-                                                             min(max(alternative_supports[:category_i]),
-                                                                 max(alternative_supports[category_i + 1:]))))
-            unimodal_alternatives_support.append(unimodal_alternative_supports)
+                    unimodal_row[category] = max(support, min(max(row.iloc[:i]), max(row.iloc[i+1:])))
+            return unimodal_row
+
+        unimodal_alternatives_support = alternatives_support.apply(unimodal_single_row, axis=1)
 
         return unimodal_alternatives_support
 
-    def calculate_alternatives_support(self) -> Tuple[List[List[NumericValue]], List[List[NumericValue]]]:
+    def calculate_alternatives_support(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Transforms DM assignments, count votes and basing on them calculates alternatives support and
          unimodal alternatives support
 
-        :return: Tuple with alternatives support and unimodal alternatives support
+        :return: Tuple with DataFrames as alternatives support and unimodal alternatives support
         """
-        alternatives_bounds = self.__transform_assignments_to_upper_lower_bound_form()
-        votes = self.__calculate_votes(alternatives_bounds)
+        votes = self.__calculate_votes()
         alternatives_support = self.__calculate_alternatives_support(votes)
         unimodal_alternatives_support = self.__calculate_unimodal_alternatives_support(alternatives_support)
 
         return alternatives_support, unimodal_alternatives_support
-

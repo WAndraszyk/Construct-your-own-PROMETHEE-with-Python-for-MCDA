@@ -1,3 +1,4 @@
+import pandas as pd
 from core.preference_commons import PreferenceFunction
 from core.Interactions_between_criteria import *
 
@@ -63,10 +64,14 @@ reinforcement_factors = [1.2, 1.2, 1.2, 1.3, 1.1, 1.1, 1.1]
 srf_criteria_rank = ['g6', None, 'g7', None, None, None, 'g1', ['g4', 'g5'], None, 'g3', 'g2']
 srf_criteria_weight_ratio = 2
 standard_deviations = [None, None, None, None, None, None, None]
-interactions = Interactions(['g6', 'g1', 'g4', 'g2'],
-                ['g7', 'g3', 'g5', 'g3'],
-                [Interaction_type.STN, Interaction_type.STN, Interaction_type.WKN, Interaction_type.ANT],
-                [0.03, 0.02, -0.05, 0.08])
+
+interactions = pd.DataFrame(data=(
+    ['g6', 'g7', Interaction_type.STN, 0.03],
+    ['g1', 'g3', Interaction_type.STN, 0.03],
+    ['g4', 'g5', Interaction_type.WKN, 0.03],
+    ['g2', 'g3', Interaction_type.ANT, 0.03]),
+    columns=['criterion_1', 'criterion_2', 'type', 'coefficient'])
+print(interactions)
 # cost -> 0
 # gain -> 1
 
@@ -74,7 +79,20 @@ criteria_directions = [1, 1, 0, 0, 0, 1, 1]
 
 criteria_ranks = [5, 1, 2, 4, 3, 7, 6]
 
+veto_thr = [None, 4, None, 4, None, None, 4]
+
 generalized_criteria = [PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.U_SHAPE,
                         PreferenceFunction.LEVEL, PreferenceFunction.V_SHAPE,
                         PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.USUAL, PreferenceFunction.USUAL]
 
+df_alternatives = pd.DataFrame(alternatives_performances, index=alternatives, columns=criteria)
+
+df_criteria = pd.DataFrame(list(zip(criteria_weights, preference_thresholds, indifference_thresholds,
+                                    reinforced_preferences, reinforcement_factors, standard_deviations,
+                                    criteria_directions, criteria_ranks, generalized_criteria)),
+                           index=criteria,
+                           columns=['criteria_weights', 'preference_thresholds', 'indifference_thresholds',
+                                    'reinforced_preferences', 'reinforcement_factors', 'standard_deviations',
+                                    'criteria_directions', 'criteria_ranks', 'generalized_criteria'])
+
+df_category_profiles = pd.DataFrame(profiles_performances, index=profiles, columns=criteria)

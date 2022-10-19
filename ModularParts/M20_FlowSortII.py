@@ -1,16 +1,8 @@
-from enum import Enum
-from typing import List, Tuple, Dict
-
-from core.aliases import NumericValue
-from core.preference_commons import directed_alternatives_performances
-
-
-class CompareProfiles(Enum):
-    """Enumeration of the compare profiles types."""
-
-    CENTRAL_PROFILES = 1
-    BOUNDARY_PROFILES = 2
-    LIMITING_PROFILES = 3
+import pandas as pd
+from typing import List
+from core.enums import CompareProfiles
+from core.aliases import PerformanceTable
+from core.sorting import pandas_check_dominance_condition
 
 
 class FlowSortII:
@@ -20,107 +12,95 @@ class FlowSortII:
     """
 
     def __init__(self,
-                 alternatives: List[str],
                  categories: List[str],
-                 category_profiles: List[str],
-                 profiles_performances: List[List[NumericValue]],
-                 criteria: Tuple[List[NumericValue], List[NumericValue]],
-                 flows: Tuple[List[NumericValue], List[NumericValue]],
+                 category_profiles: PerformanceTable,
+                 criteria_directions: pd.Series,
+                 alternatives_flows: pd.Series,
+                 category_profiles_flows: pd.Series,
                  comparison_with_profiles: CompareProfiles):
         """
-        :param alternatives: List of alternatives names (strings only)
         :param categories: List of categories names (strings only)
-        :param category_profiles: List of central, limiting or boundary profiles names which divide alternatives
-        to proper categories (strings only)
-        :param profiles_performances: 2D List of performances of each boundary profile in each criterion
-        :param criteria: List of scales of each criterion and List of preference direction (0 for 'min' and 1 for 'max')
-        :param flows: List of net flows of each alternative and List of net flows of each boundary profile
+        :param category_profiles: DataFrame with category profiles performances
+        :param criteria_directions: Series with criteria directions (max or min)
+        :param alternatives_flows: Series with alternatives names as index and net flows as values
+        :param category_profiles_flows: Series with categories names as index and net flows as values
         :param comparison_with_profiles: Enum CompareProfiles - indicate information of profiles types used
         in calculation.
         """
 
-        self.alternatives = alternatives
         self.categories = categories
         self.category_profiles = category_profiles
-        self.profiles_performances = directed_alternatives_performances(profiles_performances, criteria[1])
-        self.criteria = criteria
-        self.flows = flows
+        self.criteria_directions = criteria_directions
+        self.alternatives_flows = alternatives_flows
+        self.category_profiles_flows = category_profiles_flows
         self.comparison_with_profiles = comparison_with_profiles
-        self.__check_dominance_condition()
+        pandas_check_dominance_condition(self.criteria_directions, self.category_profiles)
 
-    def __check_dominance_condition(self):
-        """
-        Check if each boundary profile is strictly worse in each criterion than betters profiles
-
-        :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
-        """
-        for criteria_i in range(len(self.criteria[0])):
-            for i, profile_i in enumerate(self.profiles_performances):
-                for j, profile_j in enumerate(self.profiles_performances[i:]):
-                    if profile_j[criteria_i] < profile_i[criteria_i]:
-                        raise ValueError("Profiles don't fulfill the dominance condition")
-
-    def __limiting_profiles_sorting(self) -> Dict[str, List[str]]:
+    def __limiting_profiles_sorting(self) -> pd.Series:
         """
         Comparing positive and negative flows of each alternative with all limiting profiles and assign them to
         correctly class.
 
-        :return: Dictionary with alternatives classification
+        :return: Series with alternatives classification
         """
-        classification = {category: [] for category in self.categories}
+        classification = pd.Series(['None' for _ in self.alternatives_flows.index], index=self.alternatives_flows.index)
 
-        for alternative_name, alternative_net_flow in zip(self.alternatives, self.flows[0]):
-            for i, profile_i in enumerate(self.profiles_performances[:-1]):
-                if self.flows[1][i] < alternative_net_flow <= self.flows[1][i + 1]:
-                    classification[self.categories[i]].append(alternative_name)
+        for alternative, alternative_net_flow in self.alternatives_flows.items():
+            for i, category, category_net_flow in enumerate(list(self.category_profiles_flows.items())[:-1]):
+                if category_net_flow < alternative_net_flow <= self.category_profiles[i+1]:
+                    classification[alternative] = self.categories[i]
         return classification
 
-    def __boundary_profiles_sorting(self) -> Dict[str, List[str]]:
+    def __boundary_profiles_sorting(self) -> pd.Series:
         """
         Comparing positive and negative flows of each alternative with all boundary profiles and assign them to
         correctly class.
 
-        :return: Dictionary with alternatives classification
+        :return: Series with alternatives classification
         """
-        classification = {category: [] for category in self.categories}
+        classification = pd.Series(['None' for _ in self.alternatives_flows.index], index=self.alternatives_flows.index)
 
-        for alternative_name, alternative_net_flow in zip(self.alternatives, self.flows[0]):
-            for i, profile_i in enumerate(self.profiles_performances):
+        for alternative, alternative_net_flow in self.alternatives_flows.items():
+            for i, category, category_net_flow in enumerate(self.category_profiles_flows.items()):
                 if i == 0:
-                    if alternative_net_flow <= self.flows[1][i]:
-                        classification[self.categories[i]].append(alternative_name)
-                elif i == len(self.category_profiles) - 1:
-                    if self.flows[1][i - 1] < alternative_net_flow:
-                        classification[self.categories[i]].append(alternative_name)
+                    if alternative_net_flow <= category_net_flow:
+                        classification[alternative] = self.categories[i]
+                        break
+                elif i == self.category_profiles.shape[0] - 1:
+                    if self.category_profiles_flows[i-1] < alternative_net_flow:
+                        classification[alternative] = self.categories[i]
                 else:
-                    if self.flows[1][i - 1] < alternative_net_flow <= self.flows[1][i]:
-                        classification[self.categories[i]].append(alternative_name)
+                    if self.category_profiles_flows[i-1] < alternative_net_flow <= category_net_flow:
+                        classification[alternative] = self.categories[i]
+                        break
         return classification
 
-    def __central_profiles_sorting(self) -> Dict[str, List[str]]:
+    def __central_profiles_sorting(self) -> pd.Series:
         """
         Comparing positive and negative flows of each alternative with all central profiles and assign them to
         correctly class.
 
-        :return: Dictionary with alternatives classification
+        :return: Series with alternatives classification
         """
-        classification = {category: [] for category in self.categories}
+        classification = pd.Series(['None' for _ in self.alternatives_flows.index], index=self.alternatives_flows.index)
 
-        for alternative_name, alternative_net_flow in zip(self.alternatives, self.flows[0]):
-            for i, profile_i in enumerate(self.profiles_performances):
+        for alternative, alternative_net_flow in self.alternatives_flows.items():
+            for i, category, category_net_flow in enumerate(self.category_profiles_flows.items()):
                 if i == 0:
-                    if alternative_net_flow <= (self.flows[1][i] + self.flows[1][i + 1]) / 2:
-                        classification[self.categories[i]].append(alternative_name)
-                elif i == len(self.category_profiles) - 1:
-                    if (self.flows[1][i - 1] + self.flows[1][i]) / 2 < alternative_net_flow:
-                        classification[self.categories[i]].append(alternative_name)
+                    if alternative_net_flow <= (category_net_flow + self.category_profiles_flows[i+1]) / 2:
+                        classification[alternative] = self.categories[i]
+                        break
+                elif i == self.category_profiles.shape[0] - 1:
+                    if (self.category_profiles_flows[i-1] + category_net_flow) / 2 < alternative_net_flow:
+                        classification[alternative] = self.categories[i]
                 else:
-                    if (self.flows[1][i - 1] + self.flows[1][i]) / 2 < alternative_net_flow \
-                            <= (self.flows[1][i] + self.flows[1][i + 1]) / 2:
-                        classification[self.categories[i]].append(alternative_name)
+                    if (self.category_profiles_flows[i-1] + category_net_flow) / 2 < alternative_net_flow \
+                            <= (category_net_flow + self.category_profiles_flows[i+1]) / 2:
+                        classification[alternative] = self.categories[i]
+                        break
         return classification
 
-    def calculate_sorted_alternatives(self) -> Dict[str, List[str]]:
+    def calculate_sorted_alternatives(self) -> pd.Series:
         """
         Sort alternatives to proper categories.
 

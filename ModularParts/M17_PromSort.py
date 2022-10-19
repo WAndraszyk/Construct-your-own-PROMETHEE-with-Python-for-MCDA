@@ -1,5 +1,7 @@
-from core.aliases import NumericValue
-from typing import List, Tuple, Dict
+import pandas as pd
+
+from core.aliases import NumericValue, PerformanceTable, FlowsTable
+from typing import List, Tuple
 from core.preference_commons import directed_alternatives_performances
 
 
@@ -9,41 +11,34 @@ class PromSort:
     """
 
     def __init__(self,
-                 alternatives: List[str],
                  categories: List[str],
-                 category_profiles: List[str],
-                 profiles_performances: List[List[NumericValue]],
-                 criteria: Tuple[List[NumericValue], List[NumericValue]],
-                 # in pdf: description, importance etc. in code: thresholds and preference directions (0 or 1)
-                 negative_flows: Tuple[List[NumericValue], List[NumericValue]],
-                 positive_flows: Tuple[List[NumericValue], List[NumericValue]],
+                 category_profiles: PerformanceTable,
+                 criteria_directions: pd.Series,
+                 criteria_thresholds: pd.Series,
+                 alternatives_flows: FlowsTable,
+                 category_profiles_flows: FlowsTable,
                  cut_point: NumericValue,  # <-1, 1>, used in second phase
                  assign_to_better_class: bool = True):
         """
-        :param alternatives: List of alternatives names (strings only)
-        :param categories: List of categories names (strings only)
-        :param category_profiles: List of boundary profiles names which divide alternatives
-        to proper categories (strings only)
-        :param profiles_performances: 2D List of performances of each boundary profile in each criterion
-        :param criteria: List of threshold of each criterion
-        and List of preference direction (0 for 'min' and 1 for 'max')
-        :param negative_flows: List of negative flows of each alternative
-        and List of negative flows of each boundary profile
-        :param positive_flows: List of positive flows of each alternative
-        and List of positive flows of each boundary profile
+        :param categories: List of categories names
+        :param category_profiles: Performance table with category profiles performances
+        :param criteria_directions: Series with criteria directions
+        :param criteria_thresholds: Series with criteria thresholds
+        :param alternatives_flows: Flows table with alternatives flows
+        :param category_profiles_flows: Flows table with category profiles flows
         :param cut_point: Numeric Value in range <-1, 1> which define DM preference of classifying alternative to worse
         or better class in final alternative assignment
         (-1 means 'always worse category', 1 means 'always better category')
         :param assign_to_better_class: Boolean which describe preference of the DM in final alternative assignment if
         total distance is equal cut_point value.
         """
-        self.alternatives = alternatives
         self.categories = categories
-        self.category_profiles = category_profiles
-        self.profiles_performances = directed_alternatives_performances(profiles_performances, criteria[1])
-        self.criteria = criteria
-        self.negative_flows = negative_flows
-        self.positive_flows = positive_flows
+        self.category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles.values,
+                                                                                 criteria_directions.to_list()),
+                                              index=category_profiles.columns, columns=category_profiles.columns)
+        self.criteria_thresholds = criteria_thresholds
+        self.alternatives_flows = alternatives_flows
+        self.category_profiles_flows = category_profiles_flows
         self.cut_point = cut_point
         self.assign_to_better_class = assign_to_better_class
         self.__check_if_profiles_are_strictly_worse()
@@ -54,10 +49,10 @@ class PromSort:
 
         :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
         """
-        for criteria_i, threshold in enumerate(self.criteria[0]):
-            for i, profile_i in enumerate(self.profiles_performances[:-1]):
-                profile_j = self.profiles_performances[i + 1]
-                if profile_i[criteria_i] + threshold > profile_j[criteria_i]:
+        for criterion, threshold in self.criteria_thresholds.items():
+            for i, (_, profile_i) in enumerate(self.category_profiles.iloc[:-1].iterrows()):
+                profile_j = self.category_profiles.iloc[i + 1]
+                if profile_i[criterion] + threshold > profile_j[criterion]:
                     raise ValueError("Each profile needs to be preferred over profiles which are worse than it")
 
     @staticmethod
@@ -95,15 +90,12 @@ class PromSort:
 
         :return: True if all profiles are preferred to alternative, else False
         """
-        outranking_relations = []
-        for profile_positive_flow, profile_negative_flow in zip(self.positive_flows[1], self.negative_flows[1]):
-            outranking_relations.append(
-                PromSort.__define_outranking_relation(profile_positive_flow, profile_negative_flow,
-                                                      alternative_positive_flow, alternative_negative_flow))
-        return set(outranking_relations) == {"P"}
+        outranking_relations = self.category_profiles_flows.apply(
+            lambda row: self.__define_outranking_relation(row['positive_flow'], row['negative_flow'],
+                                                          alternative_positive_flow, alternative_negative_flow), axis=1)
+        return outranking_relations.str.contains('P').all()
 
-    def __calculate_first_step_assignments(self) -> Tuple[Dict[str, List[str]],
-                                                          List[Tuple[str, Tuple[str, str]]]]:
+    def __calculate_first_step_assignments(self) -> pd.DataFrame:
         """
         Calculates first step of assignments alternatives to categories.
         This function calculates outranking relations alternative to each boundary profile, then:
@@ -112,119 +104,105 @@ class PromSort:
         preferred to alternative then assign alternative to the worst category
         - if first incomparable or indifference appeared to the worse profile than first preference then assign
         alternative to first preference index + 1 category
-        - else mark alternative as 'not_classified'. This alternative will be assigned to first incomparable
-        or indifference index or first incomparable or indifference +1 category
+        - else alternative is "not fully classified". This alternative will have assigned first incomparable
+        or indifference index category as worse class and first incomparable or indifference index +1 category
+         as better class.
 
         :return: Dictionary with classifications and List of Tuples of alternative, worse and better class to
         which can be alternative assigned in final assignments step
         """
 
-        classification = {category: [] for category in self.categories}
-        not_classified = []
+        classification = {alternative: [] for alternative in self.alternatives_flows.index}
 
-        for alternative_name, alternative_positive_flow, alternative_negative_flow in zip(
-                self.alternatives, self.positive_flows[0], self.negative_flows[0]):
-            outranking_relations = []
-            for profile_positive_flow, profile_negative_flow in zip(self.positive_flows[1], self.negative_flows[1]):
-                outranking_relations.append(
-                    PromSort.__define_outranking_relation(alternative_positive_flow, alternative_negative_flow,
-                                                          profile_positive_flow, profile_negative_flow))
+        for alternative, alternative_row in self.alternatives_flows.iterrows():
+            outranking_relations = self.category_profiles_flows.apply(
+                lambda category_profile_row: self.__define_outranking_relation(
+                    alternative_row['positive'], alternative_row['negative'],
+                    category_profile_row['positive'], category_profile_row['negative']), axis=1)
 
-            # Mistake in paper !!!
-            first_P_occurrence = outranking_relations.index("P") if "P" in outranking_relations else float("inf")
-            first_R_occurrence = outranking_relations.index("?") if "?" in outranking_relations else float("inf")
-            first_I_occurrence = outranking_relations.index("I") if "I" in outranking_relations else float("inf")
+            first_i_occurrence = outranking_relations.str.contains('I').idxmax() if outranking_relations.str.contains(
+                'I').any() else float('inf')
+            first_r_occurrence = outranking_relations.str.contains('?').idxmax() if outranking_relations.str.contains(
+                '?').any() else float('inf')
+            last_p_occurrence = outranking_relations.str.contains('P').idxmin() if outranking_relations.str.contains(
+                'P').any() else float('inf')
 
-            last_P_occurrence = len(outranking_relations) - 1 - outranking_relations[::-1].index("P")\
-                if "P" in outranking_relations else float("inf")
-
-            if outranking_relations[-1] == "P":
-                classification[self.categories[-1]].append(alternative_name)
-            elif self.__check_if_all_profiles_are_preferred_to_alternative(
-                    alternative_positive_flow, alternative_negative_flow):
-                classification[self.categories[0]].append(alternative_name)
-            elif min(first_R_occurrence, first_I_occurrence) > last_P_occurrence:
-                classification[self.categories[last_P_occurrence + 1]].append(alternative_name)
+            if outranking_relations[-1] == 'P':
+                classification[alternative] = [self.categories[-1], self.categories[-1]]
+            elif self.__check_if_all_profiles_are_preferred_to_alternative(alternative_row['positive'],
+                                                                           alternative_row['negative']):
+                classification[alternative] = [self.categories[0], self.categories[0]]
+            elif min(first_r_occurrence, first_i_occurrence) > last_p_occurrence:
+                classification[alternative] = \
+                    [self.categories[last_p_occurrence + 1], self.categories[last_p_occurrence + 1]]
             else:
-                s = min(first_R_occurrence, first_I_occurrence)
-                not_classified.append((alternative_name, (self.categories[s], self.categories[s + 1])))
+                min_idx = min(first_r_occurrence, first_i_occurrence)
+                classification[alternative] = [self.categories[min_idx], self.categories[min_idx + 1]]
 
-        return classification, not_classified
+        return pd.DataFrame.from_dict(classification, orient='index', columns=['worse', 'better'])
 
-    def __calculate_final_assignments(self, classification: Dict[str, List[str]],
-                                      not_classified: List[Tuple[str, Tuple[str, str]]]) -> Dict[str, List[str]]:
+    def __calculate_final_assignments(self, classification: pd.DataFrame) -> pd.Series:
         """
         Used assigned categories to assign the unassigned ones. Based on positive and negative distance,
         that is calculated for each alternative, basing on calculated in first step categories (s and s+1).
         After calculating positive and negative distances a total distance is determining.
         After computing the total distance for all alternatives and profiles it is compared with cut point parameter.
 
-        :param classification: Dictionary with classifications from first step assignments
-        :param not_classified: List of Tuples of alternative, worse and better class to
-        which can be alternative assigned in this step.
+        :param classification: DataFrame with classifications of alternatives (worse and better class)
 
-        :return: Dictionary with final alternatives classification
+        :return: DataFrame with final classifications of alternatives (only one class)
         """
 
-        new_classification = classification.copy()
+        new_classification = classification.apply(lambda row: row['worse'] if row['worse'] == row['better'] else None)
+        not_classified = classification[new_classification.isnull()]
+        classified = classification[~new_classification.isnull()]
 
-        for alternative, (worse_category, better_category) in not_classified:
-            print(alternative, worse_category, better_category)
-            alternative_index = self.alternatives.index(alternative)
-            worse_category_alternatives = classification[worse_category]
-            better_category_alternatives = classification[better_category]
-            worse_category_alternatives_indices = \
-                [self.alternatives.index(alternative_i) for alternative_i in worse_category_alternatives]
-            better_category_alternatives_indices = \
-                [self.alternatives.index(alternative_i) for alternative_i in better_category_alternatives]
+        for alternative, alternative_row in not_classified.iterrows():
+            worse_category_alternatives = self.alternatives_flows.loc[
+                classified[classified['worse'] == alternative_row['worse']].index]
+            better_category_alternatives = self.alternatives_flows.loc[
+                classified[classified['worse'] == alternative_row['better']].index]
 
             alternative_net_outranking_flow = \
-                self.positive_flows[0][alternative_index] - self.negative_flows[0][alternative_index]
-            worse_category_alternatives_net_outranking_flows = \
-                [self.positive_flows[0][alternative_index_i] - self.negative_flows[0][alternative_index_i]
-                 for alternative_index_i in worse_category_alternatives_indices]
-            better_category_alternatives_net_outranking_flows = \
-                [self.positive_flows[0][alternative_index_i] - self.negative_flows[0][alternative_index_i]
-                 for alternative_index_i in better_category_alternatives_indices]
+                self.alternatives_flows[alternative]['positive'] - self.alternatives_flows[alternative]['negative']
 
-            positive_distance = \
-                sum([alternative_net_outranking_flow - worse_category_alternative_net_outranking_flow
-                     for worse_category_alternative_net_outranking_flow
-                     in worse_category_alternatives_net_outranking_flows])
+            worse_category_net_outranking_flow = worse_category_alternatives.apply(lambda row:
+                                                                                   row['positive'] - row['negative'],
+                                                                                   axis=1)
 
-            negative_distance = \
-                sum([better_category_alternative_net_outranking_flow - alternative_net_outranking_flow
-                     for better_category_alternative_net_outranking_flow
-                     in better_category_alternatives_net_outranking_flows])
+            better_category_net_outranking_flow = better_category_alternatives.apply(lambda row:
+                                                                                     row['positive'] - row['negative'],
+                                                                                     axis=1)
 
-            total_distance = 1 / len(worse_category_alternatives) * positive_distance \
-                             - 1 / len(better_category_alternatives) * negative_distance
+            positive_distance = worse_category_net_outranking_flow.map(lambda x:
+                                                                       alternative_net_outranking_flow - x).sum()
+            negative_distance = better_category_net_outranking_flow.map(lambda x:
+                                                                        x - alternative_net_outranking_flow).sum()
+
+            total_distance = \
+                1 / worse_category_alternatives.shape[0] * positive_distance - 1 / \
+                better_category_alternatives.shape[0] * negative_distance
 
             if total_distance > self.cut_point:
-                new_classification[better_category].append(alternative)
+                new_classification[alternative] = alternative_row['better']
             elif total_distance < self.cut_point:
-                new_classification[worse_category].append(alternative)
+                new_classification[alternative] = alternative_row['worse']
             else:
                 if self.assign_to_better_class:
-                    new_classification[better_category].append(alternative)
+                    new_classification[alternative] = alternative_row['better']
                 else:
-                    new_classification[worse_category].append(alternative)
+                    new_classification[alternative] = alternative_row['worse']
 
         return new_classification
 
-    def calculate_sorted_alternatives(self) -> Tuple[Dict[str, List[str]], Dict[str, List[str]]]:
+    def calculate_sorted_alternatives(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
         Sort alternatives to proper categories.
 
-        :return: Dictionary with first step assignment classification
-        and Dictionary with final step assignment classification.
+        :return: DataFrame with imprecise category assignments(worse and better class)
+        and Series with precise assignments
         """
-        first_step_assignments, not_classified = self.__calculate_first_step_assignments()
-        final_step_assignments = self.__calculate_final_assignments(first_step_assignments, not_classified)
+        first_step_assignments = self.__calculate_first_step_assignments()
+        final_step_assignments = self.__calculate_final_assignments(first_step_assignments)
 
-        first_step_full_assignments = first_step_assignments
-        for alternative_name, (worse_category, better_category) in not_classified:
-            first_step_full_assignments[worse_category].append(alternative_name)
-            first_step_full_assignments[better_category].append(alternative_name)
-
-        return first_step_full_assignments, final_step_assignments
+        return first_step_assignments, final_step_assignments

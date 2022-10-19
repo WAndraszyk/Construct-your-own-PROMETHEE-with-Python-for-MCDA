@@ -21,3 +21,11 @@ class ScoringFunctionDirection(Enum):
     IN_FAVOR = 1
     AGAINST = 2
     DIFFERENCE = 3
+
+
+class CompareProfiles(Enum):
+    """Enumeration of the compare profiles types."""
+
+    CENTRAL_PROFILES = 1
+    BOUNDARY_PROFILES = 2
+    LIMITING_PROFILES = 3

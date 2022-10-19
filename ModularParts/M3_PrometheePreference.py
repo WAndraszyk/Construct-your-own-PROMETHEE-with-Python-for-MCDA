@@ -1,7 +1,8 @@
 from enum import Enum
-from core.aliases import NumericValue
+from core.aliases import NumericValue, PerformanceTable
 from typing import List
 import core.preference_commons as pc
+import pandas as pd
 
 
 class PreferenceFunction(Enum):
@@ -16,49 +17,38 @@ class PreferenceFunction(Enum):
 
 
 class PrometheePreference:
-    def __init__(self,
-                 alternatives,
-                 criteria,
-                 alternatives_performances: List[List[NumericValue]],
-                 weights: List[NumericValue],
-                 p_list: List[NumericValue],
-                 q_list: List[NumericValue],
-                 s_list: List[NumericValue],
-                 generalized_criteria,
-                 directions: List[NumericValue],
-                 categories_profiles: List[str] = None,
-                 profile_performance_table: List[List[NumericValue]] = None,
+    def __init__(self, alternatives_performances: PerformanceTable, preference_thresholds: pd.Series,
+                 indifference_thresholds: pd.Series, standard_deviations: pd.Series, generalized_criteria: pd.Series,
+                 directions: pd.Series, weights: pd.Series,
+                 profiles_performance: PerformanceTable = None,
                  decimal_place: NumericValue = 3):
         """
-        :param alternatives: list of alternatives (rozumiemy to jako liste samych nazw)
-        :param criteria: list of criteria
-        :param alternatives_performances: 2D list of alternatives' value at every criterion
-        :param weights: list of weights
-        :param p_list: list of preference threshold for each criteria
-        :param q_list: list of indifference threshold for each criteria
-        :param s_list: list of standard deviation for each criteria
+        :param alternatives_performances: Dataframe of alternatives' value at every criterion
+        :param preference_thresholds: preference threshold for each criterion
+        :param indifference_thresholds: indifference threshold for each criterion
+        :param standard_deviations: standard deviation for each criterion
         :param generalized_criteria: list of preference functions
         :param directions: directions of preference of criteria
+        :param weights: criteria with weights
+        :param profiles_performance: Dataframe of profiles performance (value) at every criterion
         :param decimal_place: with this you can choose the decimal_place of the output numbers
-        :param categories_profiles: list of profiles (names, strings)
-        :param profile_performance_table: 2D list of profiles performance (value) at every criterion
         """
 
-        self.alternatives = alternatives
-        self.criteria = criteria
+        self.alternatives = alternatives_performances.index
+        self.criteria = weights.keys()
         self.alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
         self.weights = weights
         self.decimal_place = decimal_place
         self.generalized_criteria = generalized_criteria
-        self.p_list = p_list
-        self.q_list = q_list
-        self.s_list = s_list
-        self.categories_profiles = categories_profiles
-        if profile_performance_table is not None:
-            self.profile_performance_table = pc.directed_alternatives_performances(profile_performance_table,
-                                                                                   directions)
+        self.preference_thresholds = preference_thresholds
+        self.indifference_thresholds = indifference_thresholds
+        self.standard_deviations = standard_deviations
+        if profiles_performance is not None:
+            self.categories_profiles = profiles_performance.keys()
+            self.profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
         else:
-            self.profile_performance_table = profile_performance_table
+            self.categories_profiles = None
+            self.profile_performance_table = None
 
     def computePreferenceIndices(self):
         """
@@ -68,34 +58,33 @@ class PrometheePreference:
         :return: preferences
         :return: partial preferences
         """
-        partialPref = pc.partial_preference(criteria=self.criteria, p_list=self.p_list,
-                                            q_list=self.q_list, s_list=self.s_list,
+        partialPref = pc.partial_preference(criteria=self.criteria, p_list=self.preference_thresholds,
+                                            q_list=self.indifference_thresholds, s_list=self.standard_deviations,
                                             generalized_criteria=self.generalized_criteria,
                                             categories_profiles=self.categories_profiles,
                                             alternatives_performances=self.alternatives_performances,
                                             profile_performance_table=self.profile_performance_table)
         if self.categories_profiles is None:
-            return self.__preferences(partialPref, self.alternatives_performances), partialPref
+            return self.__preferences(partialPref, self.alternatives), partialPref
         else:
-            return (self.__preferences(partialPref[0], self.alternatives_performances, self.profile_performance_table),
-                    self.__preferences(partialPref[1], self.profile_performance_table, self.alternatives_performances)
+            return (self.__preferences(partialPref[0], self.alternatives, self.categories_profiles),
+                    self.__preferences(partialPref[1], self.categories_profiles, self.alternatives)
                     ), partialPref
 
     def __preferences(self, partialPref, i_iter, j_iter=None):
-        weight_sum = 0
-        for i in self.weights:
-            weight_sum += i
+        weight_sum = sum(self.weights.values)
         if j_iter is None:
             j_iter = i_iter
         preferences = []
-        for i in range(len(i_iter)):
+        for i in i_iter:
             aggregatedPI = []
-            for j in range(len(j_iter)):
+            for j in j_iter:
                 Pi_A_B = 0
-                for k in range(len(self.criteria)):
-                    Pi_A_B += partialPref[k][i][j] * self.weights[k]
-                Pi_A_B = Pi_A_B/weight_sum
+                for k in self.criteria:
+                    Pi_A_B += partialPref.loc[k, i][j] * self.weights[k]
+                Pi_A_B = Pi_A_B / weight_sum
                 aggregatedPI.append(round(Pi_A_B, self.decimal_place))
             preferences.append(aggregatedPI)
 
+        preferences = pd.DataFrame(data=preferences, columns=j_iter, index=i_iter)
         return preferences
