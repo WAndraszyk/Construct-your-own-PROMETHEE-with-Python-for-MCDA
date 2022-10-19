@@ -71,14 +71,14 @@ class PrometheePreference:
                     self.__preferences(partialPref[1], self.categories_profiles, self.alternatives)
                     ), partialPref
 
-    def __preferences(self, partialPref, alternatives, categories_profiles=None):
+    def __preferences(self, partialPref, i_iter, j_iter=None):
         weight_sum = sum(self.weights.values)
-        if categories_profiles is None:
-            categories_profiles = alternatives
+        if j_iter is None:
+            j_iter = i_iter
         preferences = []
-        for i in alternatives:
+        for i in i_iter:
             aggregatedPI = []
-            for j in categories_profiles:
+            for j in j_iter:
                 Pi_A_B = 0
                 for k in self.criteria:
                     Pi_A_B += partialPref.loc[k, i][j] * self.weights[k]
@@ -86,5 +86,5 @@ class PrometheePreference:
                 aggregatedPI.append(round(Pi_A_B, self.decimal_place))
             preferences.append(aggregatedPI)
 
-        preferences = pd.DataFrame(data=preferences, columns=categories_profiles, index=alternatives)
+        preferences = pd.DataFrame(data=preferences, columns=j_iter, index=i_iter)
         return preferences
