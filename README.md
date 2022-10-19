@@ -17,7 +17,7 @@ Wykonane moduły (pandas refactor):
 - M7  :heavy_check_mark: (:heavy_check_mark:)
 - M8  :heavy_check_mark: (:heavy_check_mark:)
 - M9  :heavy_check_mark: (:heavy_check_mark:)
-- M10 :heavy_check_mark: (:x: - partial preferences)
+- M10 :heavy_check_mark: (:heavy_check_mark:)
 - M11 :heavy_check_mark: (:heavy_check_mark:)
 - M12 :heavy_check_mark: (:heavy_check_mark:)
 - M13 :heavy_check_mark: (:heavy_check_mark:)
@@ -25,10 +25,10 @@ Wykonane moduły (pandas refactor):
 - M15 :heavy_check_mark: (:heavy_check_mark:)
 - M16 :heavy_check_mark: (:heavy_check_mark:)
 - M17 :heavy_check_mark: (:heavy_check_mark:)
-- M18 :heavy_check_mark: (:x: - partial preferences)
+- M18 :heavy_check_mark: (:heavy_check_mark:)
 - M19 :heavy_check_mark: (:heavy_check_mark:)
 - M20 :heavy_check_mark: (:heavy_check_mark:)
-- M21 :heavy_check_mark: (:x: - partial preferences)
+- M21 :heavy_check_mark: (:heavy_check_mark:)
 - M22 :heavy_check_mark: (:heavy_check_mark:)
 - M23 :heavy_check_mark: (:heavy_check_mark:)
 - M24 :heavy_check_mark: (:heavy_check_mark:)
@@ -36,3 +36,4 @@ Wykonane moduły (pandas refactor):
 - M26
 - M27
 - M28 :heavy_check_mark: (Tabela w pliku PDF ale nie LaTeX)
+- M29 (:heavy_check_mark:)
