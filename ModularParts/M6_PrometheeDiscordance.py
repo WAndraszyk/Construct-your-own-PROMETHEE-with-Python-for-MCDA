@@ -1,19 +1,21 @@
 import copy
-
+import pandas as pd
+from typing import List
 from core.aliases import NumericValue
 from core.preference_commons import overall_preference
 
 
 class PrometheeDiscordance:
-    def __init__(self, k: int, partial_preferences, categories_profiles=False):
+    def __init__(self, criteria: List[str], partial_preferences: pd.DataFrame, categories_profiles=False):
         """
-        :param k: number of criteria
+        :param criteria: list of criteria names
         :param partial_preferences: partial preference of every alternative over other alternatives
         or profiles
         :param categories_profiles: were the preferences calculated for profiles
         """
 
-        self.k = k
+        self.alternatives = partial_preferences.keys()
+        self.criteria = criteria
         self.categories_profiles = categories_profiles
         self.partial_preferences = partial_preferences
 
@@ -23,15 +25,19 @@ class PrometheeDiscordance:
 
         :param partial_preferences: partial preference of every alternative over other alternatives
         or profiles
-        :return: 3D matrix of partial discordance indices
+
+        :returns: 3D matrix of partial discordance indices
         """
-        partial_discordance = copy.deepcopy(partial_preferences)
         if other_partial_preferences is None:
             other_partial_preferences = partial_preferences
-        for n in range(self.k):
-            for j in range(len(partial_preferences[n])):
-                for i in range(len(partial_preferences[n][j])):
-                    partial_discordance[n][j][i] = other_partial_preferences[n][i][j]
+
+        partial_discordance_data = []
+
+        for criterion in self.criteria:
+            partial_discordance_on_criterion = other_partial_preferences.loc[criterion].T
+            partial_discordance_data.append(partial_discordance_on_criterion)
+
+        partial_discordance = pd.concat(partial_discordance_data, axis=0, keys=self.criteria)
 
         return partial_discordance
 
@@ -44,17 +50,20 @@ class PrometheeDiscordance:
         :return: matrix of overall discordance
         """
         discordance = []
-        for i in range(len(partial_discordance[0])):
+        k = len(self.criteria)
+        index = partial_discordance.loc[self.criteria[0]].index
+        columns = partial_discordance.loc[self.criteria[0]].columns
+        for i in index:
             aggregated_discordance = []
-            for j in range(len(partial_discordance[0][0])):
+            for column in columns:
                 D_a_b = 1
-                for n in range(self.k):
-                    D_a_b *= pow(1 - partial_discordance[n][i][j], tau / self.k)
+                for criterion in self.criteria:
+                    D_a_b *= pow(1 - partial_discordance.loc[criterion, i][column], tau / k)
                 D_a_b = 1 - D_a_b
                 aggregated_discordance.append(D_a_b)
             discordance.append(aggregated_discordance)
 
-        return discordance
+        return pd.DataFrame(data=discordance, index=index, columns=columns)
 
     def compute_discordance(self, tau: NumericValue, preferences=None):
         """
@@ -64,7 +73,7 @@ class PrometheeDiscordance:
         :param preferences: if not empty function returns already calculated preference instead of just discordance
         :return: matrix of overall discordance and matrix of partial discordance indices. Alternatively: preference
         """
-        if tau < 1 or tau > self.k:
+        if tau < 1 or tau > len(self.criteria):
             raise Exception("Tau needs to be a number from 1 to k, where k is the number of criteria.")
 
         if not self.categories_profiles:

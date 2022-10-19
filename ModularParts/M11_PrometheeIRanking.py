@@ -1,5 +1,5 @@
-from core.aliases import NumericValue
-from typing import List
+from core.aliases import FlowsTable, Alternative
+from typing import List, Tuple
 
 
 class PrometheeIRanking:
@@ -7,17 +7,13 @@ class PrometheeIRanking:
     This class compute PrometheeIRanking based on positive and negative flows.
     Implemented method is generalized to relation of the weak preference.
     """
-    def __init__(self, alternatives: List[str], positive_flow: List[NumericValue], negative_flow: List[NumericValue]):
+    def __init__(self, flows: FlowsTable):
         """
-        :param alternatives: List of alternatives names (strings only)
-        :param positive_flow: List of positive flow values
-        :param negative_flow: List of negative flow values
+        :param flows: FlowsTable with positive and negative flows
         """
-        self.alternatives = alternatives
-        self.positive_flow = positive_flow
-        self.negative_flow = negative_flow
+        self.flows = flows
 
-    def calculate_ranking(self, weak_preference=True) -> List[List[str]]:
+    def calculate_ranking(self, weak_preference=True) -> List[Tuple[Alternative, str, Alternative]]:
         """
         Calculate outranking pairs - 1st alternative in pair | relation between variants | 2nd alternative in pair.
         Relationship types:
@@ -28,27 +24,32 @@ class PrometheeIRanking:
 
         :param weak_preference: If True the general method of computing the ranking is  generalized to the relation of
                                 the weak preference
-        :return: List of preference ranking pairs
+        :return: List of preference ranking pairs (alternative, relation, alternative)
         """
+        alternatives = self.flows.index
+        positive_flow = self.flows['positive']
+        negative_flow = self.flows['negative']
+
         pairs = []
-        for num_a, alternative_a in enumerate(self.alternatives):
-            for num_b, alternative_b in enumerate(self.alternatives):
+
+        for alternative_a in alternatives:
+            for alternative_b in alternatives:
                 if alternative_a == alternative_b:
                     continue
                 if weak_preference:
-                    if self.positive_flow[num_a] >= self.positive_flow[num_b] \
-                            and self.negative_flow[num_a] <= self.negative_flow[num_b]:
-                        pairs.append([alternative_a, ' S ', alternative_b])
+                    if positive_flow[alternative_a] >= positive_flow[alternative_b] \
+                            and negative_flow[alternative_a] <= negative_flow[alternative_b]:
+                        pairs.append((alternative_a, ' S ', alternative_b))
                     else:
-                        pairs.append([alternative_a, ' ? ', alternative_b])
+                        pairs.append((alternative_a, ' ? ', alternative_b))
                 else:
-                    if self.positive_flow[num_a] == self.positive_flow[num_b] \
-                            and self.negative_flow[num_a] == self.negative_flow[num_b]:
-                        pairs.append([alternative_a, ' I ', alternative_b])
-                    elif self.positive_flow[num_a] >= self.positive_flow[num_b] \
-                            and self.negative_flow[num_a] <= self.negative_flow[num_b]:
-                        pairs.append([alternative_a, ' P ', alternative_b])
+                    if positive_flow[alternative_a] == positive_flow[alternative_b] \
+                            and negative_flow[alternative_a] == negative_flow[alternative_b]:
+                        pairs.append((alternative_a, ' I ', alternative_b))
+                    elif positive_flow[alternative_a] >= positive_flow[alternative_b] \
+                            and negative_flow[alternative_a] <= negative_flow[alternative_b]:
+                        pairs.append((alternative_a, ' P ', alternative_b))
                     else:
-                        pairs.append([alternative_a, ' ? ', alternative_b])
+                        pairs.append((alternative_a, ' ? ', alternative_b))
 
         return pairs

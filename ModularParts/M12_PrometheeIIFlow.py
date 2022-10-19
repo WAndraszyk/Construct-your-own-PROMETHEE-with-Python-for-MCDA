@@ -1,5 +1,6 @@
-from core.aliases import NumericValue
-from typing import List
+import pandas as pd
+
+from core.aliases import FlowsTable, NetOutrankingFlows
 
 
 class PrometheeIIFlow:
@@ -8,20 +9,20 @@ class PrometheeIIFlow:
     'Net outranking flow' is a difference between positive and negative flow for each alternative.
     """
 
-    def __init__(self,  positive_flow: List[NumericValue], negative_flow: List[NumericValue]):
+    def __init__(self, flows: FlowsTable):
         """
-        :param positive_flow: List of positive flow values
-        :param negative_flow: List of negative flow values
+        :param flows: FlowsTable of both positive and negative outranking flows.
         """
-        self.positive_flow = positive_flow
-        self.negative_flow = negative_flow
+        self.positive_flow = flows['positive'].values
+        self.negative_flow = flows['negative'].values
+        self.alternatives = flows.index
 
-    def calculate_PrometheeIIFlow(self):
+    def calculate_PrometheeIIFlow(self) -> NetOutrankingFlows:
         """
         Calculates net outranking flow.
-        :return: net outranking flow as a list.
+        :return: net outranking flow Series.
         """
-        flow = []
+        flow_data = []
         for num_a, alternative_a in enumerate(self.positive_flow):
-            flow.append(self.positive_flow[num_a] - self.negative_flow[num_a])
-        return flow
+            flow_data.append(self.positive_flow[num_a] - self.negative_flow[num_a])
+        return pd.Series(data=flow_data, index=self.alternatives, name='Net outranking flow')

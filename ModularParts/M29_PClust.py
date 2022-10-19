@@ -2,8 +2,8 @@ import pandas as pd
 import random
 import core.preference_commons as pc
 from typing import List, Tuple, Dict
-from PandasModularParts.pd_M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from PandasModularParts.pd_M3_PrometheePreference import PrometheePreference
+from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.M3_PrometheePreference import PrometheePreference
 
 
 class PClust:

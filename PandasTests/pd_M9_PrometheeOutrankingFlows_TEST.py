@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from PandasModularParts.pd_M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
 
 # for alternatives vs alternatives
 n = 5

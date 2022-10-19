@@ -1,4 +1,5 @@
-from core.aliases import NumericValue
+import pandas as pd
+
 from typing import List, Tuple, Dict
 from enum import Enum
 from core.preference_commons import directed_alternatives_performances
@@ -17,42 +18,39 @@ class FlowSortGDSS:
     This module computes the assignments of given alternatives to categories using FlowSort GDSS procedure.
     """
 
-    def __init__(self, alternatives: List[str],  # string
-                 categories: List[str],  # list of string
-                 category_profiles: List[str],  # list of string (at least 2)
-                 criteria: List[NumericValue],  # list of directions
-                 alternative_global_net_flows: List[NumericValue],  # M21x
-                 category_profiles_global_net_flows: List[List[List[NumericValue]]],  # M21x
-                 profiles_performances: List[List[List[NumericValue]]],  # at least 2
-                 weights_dms: List[NumericValue],  # at least 2
+    def __init__(self,
+                 alternatives_general_net_flows: pd.Series,  # M21x
+                 profiles_general_net_flows: pd.DataFrame,  # M21x
+                 categories: List[str],
+                 criteria_directions: pd.Series,
+                 profiles_performances: List[pd.DataFrame],  # at least 2
+                 DMs_weights: pd.Series,  # at least 2
                  comparison_with_profiles: CompareProfiles,
                  assign_to_better_class: bool = True
                  ):
         """
-        :param alternatives: List of alternatives names (strings only)
+        :param alternatives_general_net_flows: Series with alternatives general net flows
+        :param profiles_general_net_flows: DataFrame with profiles general net flows (index: (DM, profile),
+         columns: alternatives)
         :param categories: List of categories names (strings only)
-        :param category_profiles: List of central or boundary profiles names which divide alternatives
-        to proper categories (strings only)
-        :param criteria: List of scales of each criterion and List of preference direction (0 for 'min' and 1 for 'max')
-        :param alternative_global_net_flows: List of global net flow for each alternative (module M21x)
-        :param category_profiles_global_net_flows: 3D List of global net flow for each
-        alternative, DM and category profile
-        :param profiles_performances: 2D List of performances of each boundary profile in each criterion
-        :param weights_dms: List of weight of each DM
+        :param profiles_performances: List with DataFrames with profiles performances for each DM
+        :param DMs_weights: Series with weight of each DM
         :param comparison_with_profiles: Enum CompareProfiles - indicate information of profiles types used
         in calculation.
         :param assign_to_better_class: Boolean which describe preference of the DMs in final alternative assignment when
         distances to worse and better class are equal.
         """
-        self.alternatives = alternatives
+        self.alternatives = alternatives_general_net_flows.index
         self.categories = categories
-        self.category_profiles = category_profiles
-        self.criteria = criteria
-        self.alternative_global_net_flows = alternative_global_net_flows
-        self.category_profiles_global_net_flows = category_profiles_global_net_flows
-        self.profiles_performances = [directed_alternatives_performances(single_DM_profiles_performances, criteria)
-                                      for single_DM_profiles_performances in profiles_performances]
-        self.weights_DMs = weights_dms
+        self.profiles = profiles_performances[0].index
+        self.DMs = profiles_general_net_flows.index.get_level_values(0)
+        self.criteria_directions = criteria_directions
+        self.alternatives_general_net_flows = alternatives_general_net_flows  # M21x
+        self.profiles_general_net_flows = profiles_general_net_flows  # M21x
+        self.profiles_performances = [directed_alternatives_performances(
+            single_DM_profiles_performances, criteria_directions)
+            for single_DM_profiles_performances in profiles_performances]
+        self.DMs_weights = DMs_weights
         self.comparison_with_profiles = comparison_with_profiles
         self.assign_to_better_class = assign_to_better_class
 
@@ -64,168 +62,159 @@ class FlowSortGDSS:
 
         :raise ValueError: if any profile is not strictly worse in any criterion than any better profile
         """
-        for criteria_i, _ in enumerate(self.criteria):
-            for DM_i, DM_i_profiles_performances in enumerate(self.profiles_performances):
-                for i, profile_i in enumerate(DM_i_profiles_performances[:-1]):
-                    for DM_j, DM_j_profiles_performances in enumerate(self.profiles_performances):
-                        profile_j = DM_j_profiles_performances[i + 1]
-                        if profile_i[criteria_i] >= profile_j[criteria_i]:
+        for criterion in self.criteria_directions.index:
+            for DM_i_profiles_performances in self.profiles_performances:
+                for i in range(len(self.profiles) - 1):
+                    profile_i = DM_i_profiles_performances.iloc[i]
+                    for DM_j_profiles_performances in self.profiles_performances:
+                        profile_j = DM_j_profiles_performances.iloc[i + 1]
+                        if profile_i[criterion] >= profile_j[criterion]:
                             raise ValueError("Each profile needs to be preferred over profiles which are worse than it,"
                                              " even they are from different DMs")
 
-    def __classify_alternative(self, classification: Dict[str, List[str]],
-                               not_classified: List[Tuple[str, Tuple[str, str],
-                                                          List[NumericValue], List[NumericValue]]],
-                               alternative_assignments: List[str], alternative_name: str
-                               ) -> Tuple[Dict[str, List[str]], List[Tuple[str, Tuple[str, str],
-                                                                           List[NumericValue], List[NumericValue]]]]:
+    def __classify_alternative(self, classification: pd.DataFrame,
+                               not_classified: Dict[str, Dict[str, List[str]]],
+                               alternative_assignment: pd.Series):
         """
         Classify (or no) alternative to proper category. Used in first step of assignment.
 
-        :param classification: Dictionary with categories and already classified alternatives
-        :param not_classified: List of Tuples with all necessary data
-        (alternative name, Tuple with worse and better category, List with DM indices which vote for worse category
-        and List with DM indices which vote for better category) to assign those alternatives to single class
-         in final step of assignment.
-        :param alternative_assignments: List of categories to which DMs assigned this alternative
-        :param alternative_name: Name of alternative to assign
+        :param classification: DataFrame with already done imprecise assignments (columns: 'worse', 'better')
+        :param not_classified: Dictionary with alternatives which are not precisely classified yet
+        :param alternative_assignment: Series with alternative assignment of each DM
 
-        :return: Tuple with updated classification Dictionary and not_classified List
+        :return: Tuple with updated classification(DataFrame) and not_classified Dictionary
         """
-        if len(set(alternative_assignments)) > 1:
-            assignments_category_indices = sorted(
-                [self.categories.index(category) for category in set(alternative_assignments)])
-            worse_category = self.categories[assignments_category_indices[0]]
-            better_category = self.categories[assignments_category_indices[1]]
+        if alternative_assignment.nunique() > 1:
+            worse_category, better_category = sorted(alternative_assignment.unique(),
+                                                     key=lambda x: self.categories.index(x))
 
-            dms_chose_worse_category = [i for i, category in enumerate(alternative_assignments) if
-                                        category == worse_category]
-            dms_chose_better_category = [i for i, category in enumerate(alternative_assignments) if
-                                         category == better_category]
-            not_classified.append((alternative_name, (worse_category, better_category), dms_chose_worse_category,
-                                   dms_chose_better_category))
+            DMs_that_chose_worse_category = alternative_assignment[alternative_assignment == worse_category].index
+            DMs_that_chose_better_category = alternative_assignment[alternative_assignment == better_category].index
+
+            not_classified[str(alternative_assignment.name)] = {'worse_category_voters': DMs_that_chose_worse_category,
+                                                                'better_category_voters': DMs_that_chose_better_category}
+
+            classification.loc[alternative_assignment.name, 'worse'] = worse_category
+            classification.loc[alternative_assignment.name, 'better'] = better_category
         else:
-            classification[alternative_assignments[0]].append(alternative_name)
+            classification.loc[alternative_assignment.name, 'worse'] = alternative_assignment.unique()[0]
+            classification.loc[alternative_assignment.name, 'better'] = alternative_assignment.unique()[0]
 
         return classification, not_classified
 
-    def __calculate_first_step_assignments(self) -> Tuple[Dict[str, List[str]], List[Tuple[str, Tuple[str, str],
-                                                                                           List[NumericValue], List[
-                                                                                               NumericValue]]]]:
+    def __calculate_first_step_assignments(self) -> Tuple[pd.DataFrame, Dict[str, Dict[str, List[str]]]]:
         """
         Use first step of assignment of FlowSort GDSS method to classify alternatives.
         Calculate assignment of each DM for each alternative. If alternative assignment is not unanimous adds this
         alternative to not_classified list.
 
-        :return: Tuple with classification Dictionary and not_classified List of Tuples of alternative name, Tuple with
-         worse and better category, List with DM indices which vote for worse category and List with DM indices
-         which vote for better category.
+        :return: Tuple with imprecise classification DataFrame and not_classified Dictionary
         """
 
-        classification = {category: [] for category in self.categories}
-        not_classified = []
+        classification = pd.DataFrame(index=self.alternatives, columns=['better', 'worse'], dtype=str)
+        not_classified = {}
 
-        for alternative_name, alternative_global_net_flow, alternative_profile_global_net_flows in zip(
-                self.alternatives, self.alternative_global_net_flows, self.category_profiles_global_net_flows):
-            alternative_assignments = []
-            for DM_i, alternative_profile_DM_global_net_flows in enumerate(alternative_profile_global_net_flows):
+        for alternative, alternative_general_net_flow, (_, profiles_general_net_flows_for_alternative) in zip(
+                self.alternatives_general_net_flows.items(), self.profiles_general_net_flows.items()):
+            alternative_assignments = pd.Series(index=self.DMs, dtype=str, name=alternative)
+            for DM, DM_profiles_general_net_flows_for_alternative in \
+                    profiles_general_net_flows_for_alternative.groupby(level=0):
+
                 if self.comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
-                    for profile_category_i, profile_net_flow in enumerate(alternative_profile_DM_global_net_flows):
-                        if profile_category_i == 0 and alternative_global_net_flow <= profile_net_flow:
-                            alternative_assignments.append(self.categories[0])
+                    for profile_i, profile_net_flow in enumerate(DM_profiles_general_net_flows_for_alternative.values):
+                        if profile_i == 0 and alternative_general_net_flow <= profile_net_flow:
+                            alternative_assignments[DM] = self.categories[0]
                             break
-                        elif profile_category_i == len(
-                                self.category_profiles) - 1 and alternative_global_net_flow > profile_net_flow:
-                            alternative_assignments.append(self.categories[-1])
+                        elif profile_i == len(self.profiles) - 1 and alternative_general_net_flow > profile_net_flow:
+                            alternative_assignments[DM] = self.categories[-1]
                             break
-                        elif alternative_global_net_flow <= profile_net_flow:
-                            alternative_assignments.append(self.categories[profile_category_i])
+                        elif alternative_general_net_flow <= profile_net_flow:
+                            alternative_assignments[DM] = self.categories[profile_i]
                             break
                 else:
-                    profile_distances = [abs(profile_net_flow - alternative_global_net_flow) for profile_net_flow in
-                                         alternative_profile_DM_global_net_flows]
+                    profile_distances = [abs(profile_net_flow - alternative_general_net_flow) for profile_net_flow in
+                                         DM_profiles_general_net_flows_for_alternative.values]
                     category_index = np.argmin(profile_distances)
-                    alternative_assignments.append(self.categories[category_index])
+                    alternative_assignments[DM] = self.categories[category_index]
 
             classification, not_classified = self.__classify_alternative(classification, not_classified,
-                                                                         alternative_assignments, alternative_name)
+                                                                         alternative_assignments)
 
         return classification, not_classified
 
-    def __calculate_final_assignments(self, classification: Dict[str, List[str]],
-                                      not_classified: List[Tuple[str, Tuple[str, str], List[NumericValue],
-                                                                 List[NumericValue]]]) -> Dict[str, List[str]]:
+    def __calculate_final_assignments(self, classification: pd.DataFrame,
+                                      not_classified: Dict[str, Dict[str, List[str]]]):
         """
         Use final step of assignment to classify alternatives which could not be classified in first step of assignment.
         Calculates distance to worse and better category based on DM's decision and DM's alternative profile net flows.
         Then classifies alternative to category which has smaller distance to it. If distances are the same,
          alternative is classified by using class param 'assign_to_better_class'.
 
-        :param classification: Dictionary with categories and already classified alternatives
-        :param not_classified: List of Tuples with all necessary data
-        (alternative name, Tuple with worse and better category, List with DM indices which vote for worse category
-        and List with DM indices which vote for better category) to assign those alternatives to single class
-         in final step of assignment.
+        :param classification: DataFrame with imprecise assignments (columns: 'worse', 'better')
+        :param not_classified: Dictionary with alternatives which are not precisely classified yet
 
-        :return: classification Dictionary with final classification.
+        :return: Series with precise classification.
         """
         final_classification = classification.copy()
 
-        for alternative_name, (worse_category, better_category), DMs_chose_worse_category, DMs_chose_better_category \
-                in not_classified:
+        for alternative, voters in not_classified.items():
 
-            alternative_index = self.alternatives.index(alternative_name)
-            worse_category_index = self.categories.index(worse_category)
-            better_category_index = self.categories.index(better_category)
+            worse_category_voters = voters['worse_category_voters']
+            better_category_voters = voters['better_category_voters']
+
+            worse_category = classification.loc[alternative, 'worse']
+            better_category = classification.loc[alternative, 'better']
+
+            worse_category_voters_weights = self.DMs_weights[worse_category_voters]
+            worse_category_profile = self.profiles[self.categories.index(worse_category)]
+            worse_category_profiles_general_net_flows = \
+                self.profiles_general_net_flows.loc[(worse_category_voters, worse_category_profile), alternative]
+
+            better_category_voters_weights = self.DMs_weights[better_category_voters]
+            better_category_profile = self.profiles[min(self.categories.index(
+                better_category), len(self.profiles) - 1)]
+            better_category_profiles_general_net_flows = \
+                self.profiles_general_net_flows.loc[(better_category_voters, better_category_profile), alternative]
 
             if self.comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
-                worse_distance = sum([DM_weight *
-                                      (self.alternative_global_net_flows[alternative_index] -
-                                       self.category_profiles_global_net_flows[alternative_index][DM_index][
-                                           worse_category_index])
-                                      for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_worse_category)])
-                better_distance = sum([DM_weight *
-                                       (self.category_profiles_global_net_flows[alternative_index][DM_index][
-                                            better_category_index] -
-                                        self.alternative_global_net_flows[alternative_index])
-                                       for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_better_category)])
-            else:
-                worse_distance = sum([DM_weight *
-                                      abs(self.category_profiles_global_net_flows[alternative_index][DM_index][
-                                              worse_category_index] -
-                                          self.alternative_global_net_flows[alternative_index])
-                                      for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_worse_category)])
-                better_distance = sum([DM_weight *
-                                       abs(self.category_profiles_global_net_flows[alternative_index][DM_index][
-                                               better_category_index] -
-                                           self.alternative_global_net_flows[alternative_index])
-                                       for DM_weight, DM_index in zip(self.weights_DMs, DMs_chose_better_category)])
+                worse_category_distance = np.sum(
+                    (self.alternatives_general_net_flows[alternative] - worse_category_voters_weights) *
+                    worse_category_profiles_general_net_flows)
 
-            if better_distance > worse_distance:
-                final_classification[worse_category].append(alternative_name)
-            elif better_distance < worse_distance:
-                final_classification[better_category].append(alternative_name)
+                better_category_distance = np.sum(
+                    (better_category_voters_weights - self.alternatives_general_net_flows[alternative]) *
+                    better_category_profiles_general_net_flows)
+
+            else:
+                worse_category_distance = np.sum(
+                    (worse_category_voters_weights - self.alternatives_general_net_flows[alternative]).abs() *
+                    worse_category_profiles_general_net_flows)
+
+                better_category_distance = np.sum(
+                    (better_category_voters_weights - self.alternatives_general_net_flows[alternative]).abs() *
+                    better_category_profiles_general_net_flows)
+
+            if better_category_distance > worse_category_distance:
+                final_classification.loc[alternative, 'better'] = worse_category
+            elif better_category_distance < worse_category_distance:
+                final_classification.loc[alternative, 'worse'] = better_category
             else:
                 if self.assign_to_better_class:
-                    final_classification[better_category].append(alternative_name)
+                    final_classification.loc[alternative, 'worse'] = better_category
                 else:
-                    final_classification[worse_category].append(alternative_name)
+                    final_classification.loc[alternative, 'better'] = worse_category
+
+        final_classification = final_classification['better']
 
         return final_classification
 
-    def calculate_sorted_alternatives(self) -> Tuple[Dict[str, List[str]], Dict[str, List[str]]]:
+    def calculate_sorted_alternatives(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
         Sort alternatives to proper categories.
 
-        :return: Dictionary with first step assignment classification
-        and Dictionary with final step assignment classification.
+        :return: DataFrame with imprecise assignments (columns: 'worse', 'better') and Series with precise assignments.
         """
         first_step_assignments, not_classified = self.__calculate_first_step_assignments()
         final_step_assignments = self.__calculate_final_assignments(first_step_assignments, not_classified)
 
-        first_step_full_assignments = first_step_assignments
-        for alternative_name, (worse_category, better_category), _, _ in not_classified:
-            first_step_full_assignments[worse_category].append(alternative_name)
-            first_step_full_assignments[better_category].append(alternative_name)
-
-        return first_step_full_assignments, final_step_assignments
+        return first_step_assignments, final_step_assignments

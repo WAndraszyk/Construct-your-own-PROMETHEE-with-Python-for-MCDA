@@ -1,16 +1,17 @@
-from typing import List
-from core.aliases import NumericValue
+from core.aliases import PreferencesTable
 from core.Graph import Graph
 import numpy as np
+import pandas as pd
 
 
 class OrderedClustering:
-    def __init__(self, alternatives: List[str], preference_matrix: List[List[NumericValue]]):
-        self.alternatives = alternatives
-        self.preferences = preference_matrix
+    def __init__(self, preferences: PreferencesTable):
+        self.alternatives = preferences.index
+        self.shape = np.shape(preferences)
+        self.preferences = preferences.values.tolist()
 
     def group_alternatives(self, clusters_no: int):
-        graph = np.zeros(np.shape(self.preferences))
+        graph = np.zeros(self.shape)
         clusters = []
         deleted_nodes = []
         while True:
@@ -33,7 +34,7 @@ class OrderedClustering:
                     self.__delete_node__(graph, i)
                     deleted_nodes.append(i)
             clusters.append(cluster)
-        return clusters
+        return pd.Series(clusters, name='Alternatives in clusters')
 
     def __search_max__(self):
         max_pi = 0

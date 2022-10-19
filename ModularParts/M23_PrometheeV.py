@@ -1,13 +1,14 @@
-from typing import List
-from core.aliases import NumericValue
+from core.aliases import NetOutrankingFlows
 from core.constraint import Constraint
 from core.linear_solver import solve_linear_problem
+from typing import List
+import pandas as pd
 
 
 class PrometheeV:
-    def __init__(self, alternatives: List[str], flows: List[NumericValue], constraints: List[Constraint]):
-        self.alternatives = alternatives
-        self.flows = flows
+    def __init__(self, flows: NetOutrankingFlows, constraints: List[Constraint]):
+        self.alternatives = flows.index
+        self.flows = flows.values
         self.constraints = constraints
 
     def compute_decision(self):
@@ -21,4 +22,5 @@ class PrometheeV:
         for i in range(len(decision_tuple)):
             if decision_tuple[i] == 1:
                 chosen_alternatives.append(self.alternatives[i])
-        return chosen_alternatives
+
+        return pd.Series(data=chosen_alternatives, name='chosen alternatives')

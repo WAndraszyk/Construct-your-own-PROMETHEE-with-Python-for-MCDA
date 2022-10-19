@@ -1,6 +1,9 @@
-from core.aliases import NumericValue
+from pandas import Series
+
+from core.aliases import NumericValue, RankedCriteria
 from typing import List
 from core.preference_commons import criteria_series
+import pandas as pd
 
 
 class SurrogateWeights:
@@ -8,75 +11,70 @@ class SurrogateWeights:
     criteria ranking. In this ranking each criterion is associated with a unique position.
     The ranking should list the criteria from the most to least important."""
 
-    def __init__(self, criteria_rank,
-                 criteria: List[str],
+    def __init__(self, ranked_criteria: RankedCriteria,
                  decimal_place: NumericValue = 3):
-        self.criteria = criteria
+        self.ranked_criteria = ranked_criteria
         self.decimal_place = decimal_place
-        self.criteria_rank = criteria_rank
 
-    def __weightOrder(self,
-                      weights: List[NumericValue]) -> List[NumericValue]:
-        weightsOut = []
-        for num_a, crit in enumerate(self.criteria):
-            for num_b, critOrderd in enumerate(self.criteria_rank):
-                if crit == critOrderd:
-                    weightsOut.append(weights[num_b])
-                    break
-        return criteria_series(self.criteria, weightsOut)
+    def __weight_order(self,
+                       weights: List[NumericValue]) -> Series:
+        """
+        This method assigns weights to according criteria.
 
-    def equalWeights(self) -> List[NumericValue]:
+        :return: Criteria with weights
+        """
+        rank_summed = self.ranked_criteria.replace([i + 1 for i in range(len(weights))], weights)
+        return rank_summed
+
+    def equal_weights(self) -> pd.Series:
         """
         In this method all weights are computed with the same value and sum up to 1.
 
-        :return: List of weights of the criteria.
+        :return: Criteria with weights
         """
-        n = len(self.criteria_rank)
+        n = self.ranked_criteria.size
         weights = []
         wi = round(1 / n, self.decimal_place)
         for i in range(1, n + 1):
             weights.append(wi)
-        weightsOrdered = self.__weightOrder(weights)
-        return criteria_series(self.criteria, weightsOrdered)
+        return criteria_series(self.ranked_criteria.keys(), weights)
 
-    def rankSum(self) -> List[NumericValue]:
+    def rank_sum(self) -> Series:
         """
-        In this method the more important the criterion is, the higher its weight.
+        In this method the more important the criterion is, the greater its weight.
 
-        :return: List of weights of the criteria.
+        :return: Criteria with weights
         """
-        n = len(self.criteria_rank)
+        n = self.ranked_criteria.size
         weights = []
         for i in range(1, n + 1):
             weights.append(round(2 * (n + 1 - i) / (n * (n + 1)), self.decimal_place))
-        weightsOrdered = self.__weightOrder(weights)
-        return criteria_series(self.criteria, weightsOrdered)
+        return self.__weight_order(weights)
 
-    def reciprocalOfRanks(self) -> List[NumericValue]:
+    def reciprocal_of_ranks(self) -> Series:
         """
         This method computes weights by dividing each reciprocal of rank by the sum of these
         reciprocals for all criteria.
 
-        :return: List of weights of the criteria.
+        :return: Criteria with weights
         """
-        n = len(self.criteria_rank)
+        n = self.ranked_criteria.size
         weights = []
         sigma = 0
         for j in range(1, n + 1):
             sigma += 1 / j
         for i in range(1, n + 1):
             weights.append(round((1 / i) / sigma, self.decimal_place))
-        weightsOrdered = self.__weightOrder(weights)
-        return weightsOrdered
+        return self.__weight_order(weights)
 
-    def rankOrderCentroid(self) -> List[NumericValue]:
+    def rank_order_centroid(self) -> Series:
         """
         The weights in this method reflect the centroid of the simplex defined by ranking of
         the criteria.
 
-        :return: List of weights of the criteria.
+        :return: Criteria with weights
         """
-        n = len(self.criteria_rank)
+        n = self.ranked_criteria.size
         weights = []
         for j in range(1, n + 1):
             sigma = 0
@@ -84,5 +82,4 @@ class SurrogateWeights:
                 sigma += 1 / i
             wi = round((1 / n) * sigma, self.decimal_place)
             weights.append(wi)
-        weightsOrdered = self.__weightOrder(weights)
-        return weightsOrdered
+        return self.__weight_order(weights)

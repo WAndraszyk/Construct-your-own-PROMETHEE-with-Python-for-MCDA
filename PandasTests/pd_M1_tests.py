@@ -1,4 +1,4 @@
-from PandasModularParts.pd_M1_SurrogateWeights import SurrogateWeights
+from ModularParts.M1_SurrogateWeights import SurrogateWeights
 import pandas as pd
 from ModularParts.M5_PrometheePreferenceWithInteractions import PrometheePreferenceWithInteractions
 
