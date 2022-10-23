@@ -43,5 +43,3 @@ def test_srf_weights(criteria_ranks, criteria_weight_ratio, decimal_place):
 
 if __name__ == '__main__':
     test_srf_weights(criteria_ranks, criteria_weight_ratio, decimal_place)
-
-

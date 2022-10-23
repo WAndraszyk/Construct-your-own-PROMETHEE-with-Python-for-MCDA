@@ -26,8 +26,7 @@ def _calculate_spaces_between_criteria_ranks(criteria_ranks: pd.Series) -> pd.Se
 
 def _calculate_non_normalized_weights(criteria_ranks: pd.Series,
                                       criteria_weight_ratio: NumericValue,
-                                      spaces_between_criteria_ranks: pd.Series,
-                                      decimal_place: int) -> pd.Series:
+                                      spaces_between_criteria_ranks: pd.Series) -> pd.Series:
     """
     Calculate non-normalized weights of criteria.
     :param spaces_between_criteria_ranks: Series with amount of spaces between criteria ranks
@@ -40,8 +39,8 @@ def _calculate_non_normalized_weights(criteria_ranks: pd.Series,
         ranks_without_white_cards[criterion] = rank - sum((spaces_between_criteria_ranks - 1)[:i])
 
     for i, (criterion, rank) in enumerate(ranks_without_white_cards.items()):
-        non_normalized_weights[criterion] = round(1 + (criteria_weight_ratio - 1) \
-                                                  * sum(spaces_between_criteria_ranks[:i]) / \
+        non_normalized_weights[criterion] = round(1 + (criteria_weight_ratio - 1)
+                                                  * sum(spaces_between_criteria_ranks[:i]) /
                                                   sum(spaces_between_criteria_ranks), 2)
 
     return non_normalized_weights
@@ -82,7 +81,6 @@ def _calculate_correction_ratios(normalized_weights: pd.Series,
     """
     weights_df = pd.DataFrame({'normalized': normalized_weights, 'truncated': truncated_weights},
                               index=normalized_weights.index)
-    print(weights_df)
 
     positive_ratios = weights_df.apply(lambda row: (10 ** - decimal_place -
                                                     (row['normalized'] - row['truncated'])) / row['normalized'],
@@ -120,14 +118,12 @@ def _round_properly_weights(criteria_ranks: pd.Series,
     """
     ratios = _calculate_correction_ratios(normalized_weights, truncated_weights, decimal_place)
 
-    print(ratios)
-
     positive_ratios_larger_than_negative_ratios = ratios[ratios['positive'] > ratios['negative']].index
 
     size_of_upward_rounded_set = int(_calculate_size_of_upward_rounded_set(truncated_weights, decimal_place))
 
     positive_ratios = ratios['positive'].sort_values(ascending=False)
-    negative_ratios = ratios['negative'].sort_values(ascending=False)
+    negative_ratios = ratios['negative'].sort_values(ascending=True)
 
     n_criteria = len(criteria_ranks)
 
@@ -152,7 +148,7 @@ def _round_properly_weights(criteria_ranks: pd.Series,
         if to_add_to_downward_list > 0:
             for criterion in positive_ratios.index:
                 if criterion not in positive_ratios_larger_than_negative_ratios:
-                    round_downward_list.append(criterion)
+                    round_downward_list = round_downward_list.append(pd.Index([criterion]))
                     to_add_to_downward_list -= 1
                     if to_add_to_downward_list == 0:
                         break
@@ -182,8 +178,7 @@ def calculate_srf_weights(criteria_ranks: pd.Series, criteria_weight_ratio: Nume
 
     spaces_between_criteria_ranks = _calculate_spaces_between_criteria_ranks(criteria_ranks)
     non_normalized_weights = _calculate_non_normalized_weights(criteria_ranks, criteria_weight_ratio,
-                                                               spaces_between_criteria_ranks, decimal_place)
-    print(non_normalized_weights)
+                                                               spaces_between_criteria_ranks)
     normalized_weights = _normalize_weight_up_to_100(non_normalized_weights)
     truncated_weights = _truncate_normalized_weights(normalized_weights, decimal_place)
     balanced_normalized_weights = _round_properly_weights(normalized_weights, normalized_weights, truncated_weights,
