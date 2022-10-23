@@ -1,7 +1,7 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M2_SRFWeights import SRFWeights
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.weights.M2_SRFWeights import SRFWeights
+from ModularParts.flows.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.ranking.M11_PrometheeIRanking import PrometheeIRanking
 from DecisionProblemData import *
 
 srf_weights = SRFWeights(criteria=criteria,

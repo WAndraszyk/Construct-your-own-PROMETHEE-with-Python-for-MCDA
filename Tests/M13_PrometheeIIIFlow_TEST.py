@@ -1,4 +1,4 @@
-from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
+from ModularParts.ranking.M13_PrometheeIIIFlow import PrometheeIIIFlow
 from M9_PrometheeOutrankingFlows_TEST import *
 from M7_PrometheeVeto_TEST import overall_preference
 

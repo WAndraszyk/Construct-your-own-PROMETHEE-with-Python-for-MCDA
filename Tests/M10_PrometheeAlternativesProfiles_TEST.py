@@ -1,5 +1,5 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M10_PrometheeAlternativesProfiles import PrometheeAlternativesProfiles
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.alternatives_profiles.M10_PrometheeAlternativesProfiles import PrometheeAlternativesProfiles
 from DecisionProblemData import *
 
 ## M-3 Preferences

@@ -1,11 +1,11 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
 from core.preference_commons import PreferenceFunction
-from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
-from ModularParts.M13_PrometheeIIIFlow import PrometheeIIIFlow
-from ModularParts.M12_PrometheeIIFlow import PrometheeIIFlow
-from ModularParts.M23_PrometheeV import PrometheeV
+from ModularParts.weights.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.flows.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.ranking.M11_PrometheeIRanking import PrometheeIRanking
+from ModularParts.ranking.M13_PrometheeIIIFlow import PrometheeIIIFlow
+from ModularParts.flows.M12_PrometheeIIFlow import PrometheeIIFlow
+from ModularParts.choice.M23_PrometheeV import PrometheeV
 from core.constraint import Constraint, Relation
 
 kryteria = ['G1', 'G2']

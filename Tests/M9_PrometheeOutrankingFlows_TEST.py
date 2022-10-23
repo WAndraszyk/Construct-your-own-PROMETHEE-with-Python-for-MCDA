@@ -1,4 +1,4 @@
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.flows.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
 from Example1Data import *
 from M7_PrometheeVeto_TEST import overall_preference
 

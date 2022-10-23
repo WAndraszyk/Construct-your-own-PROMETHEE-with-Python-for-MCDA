@@ -1,7 +1,6 @@
-from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M6_PrometheeDiscordance import PrometheeDiscordance
-from ModularParts.M7_PrometheeVeto import PrometheeVeto
+from ModularParts.weights.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.preference.M7_PrometheeVeto import PrometheeVeto
 from Tests.DecisionProblemData import *
 
 alternatives_performances = pd.DataFrame(data=alternatives_performances, index=alternatives, columns=criteria)

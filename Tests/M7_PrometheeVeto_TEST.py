@@ -1,4 +1,4 @@
-from ModularParts.M7_PrometheeVeto import PrometheeVeto
+from ModularParts.preference.M7_PrometheeVeto import PrometheeVeto
 from M3_PrometheePreference_TEST import preference
 from Example1Data import *
 

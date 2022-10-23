@@ -6,6 +6,8 @@ from core.preference_commons import criteria_series
 import pandas as pd
 
 
+__all__ = []
+
 class SurrogateWeights:
     """This class computes weights of criteria. It requires the user to specify the
     criteria ranking. In this ranking each criterion is associated with a unique position.

@@ -1,6 +1,6 @@
-from ModularParts.M5_PrometheePreferenceWithInteractions import PrometheePreferenceWithInteractions
+from ModularParts.preference.M5_PrometheePreferenceWithInteractions import PrometheePreferenceWithInteractions
 from DecisionProblemData import *
-from ModularParts.M3_PrometheePreference import PrometheePreference
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
 
 ## M-3 Preferences
 pro_pref = PrometheePreferenceWithInteractions(alternatives=alternatives, criteria=criteria,

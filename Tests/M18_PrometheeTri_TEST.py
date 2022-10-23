@@ -1,5 +1,5 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M18_PrometheeTri import PrometheeTri
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.sorting.M18_PrometheeTri import PrometheeTri
 from DecisionProblemData import *
 
 ## M-3 Preferences

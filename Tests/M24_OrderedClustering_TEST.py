@@ -1,5 +1,5 @@
-from ModularParts.M5_PrometheePreferenceWithInteractions import PrometheePreferenceWithInteractions
-from ModularParts.M24_OrderedClustering import OrderedClustering
+from ModularParts.preference.M5_PrometheePreferenceWithInteractions import PrometheePreferenceWithInteractions
+from ModularParts.clustering.M24_OrderedClustering import OrderedClustering
 from Tests.DecisionProblemData import *
 
 # M5 Preferences

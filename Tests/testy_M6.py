@@ -1,7 +1,7 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
 from core.preference_commons import PreferenceFunction
-from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M6_PrometheeDiscordance import PrometheeDiscordance
+from ModularParts.weights.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.preference.M6_PrometheeDiscordance import PrometheeDiscordance
 
 kryteria = ['G1', 'G2']
 rankingKryteriow = ['G2', 'G1']

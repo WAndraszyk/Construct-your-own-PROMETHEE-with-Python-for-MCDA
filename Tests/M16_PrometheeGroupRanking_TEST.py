@@ -1,9 +1,7 @@
-import math
-
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M16_PrometheeGroupRanking import PrometheeGroupRanking
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.weights.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.flows.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.flows.M16_PrometheeGroupRanking import PrometheeGroupRanking
 from DecisionProblemData import *
 
 

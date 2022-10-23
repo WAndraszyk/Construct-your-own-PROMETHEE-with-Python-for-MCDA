@@ -1,8 +1,8 @@
-from ModularParts.M4_PrometheePreferenceReinforcedPreference \
+from ModularParts.preference.M4_PrometheePreferenceReinforcedPreference \
     import (PrometheePreferenceReinforcedPreference, PreferenceFunction)
-from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M11_PrometheeIRanking import PrometheeIRanking
+from ModularParts.weights.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.flows.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.ranking.M11_PrometheeIRanking import PrometheeIRanking
 
 kryteria = ['G1', 'G2']
 rankingKryteriow = ['G2', 'G1']

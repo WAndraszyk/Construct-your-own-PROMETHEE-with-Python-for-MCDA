@@ -1,8 +1,8 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M1_SurrogateWeights import SurrogateWeights
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M17_PromSort import PromSort
-from ModularParts.M22_GroupClassAcceptabilities import GroupClassAcceptabilities
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.weights.M1_SurrogateWeights import SurrogateWeights
+from ModularParts.flows.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.sorting.M17_PromSort import PromSort
+from ModularParts.sorting.M22_GroupClassAcceptabilities import GroupClassAcceptabilities
 from DecisionProblemData import *
 
 

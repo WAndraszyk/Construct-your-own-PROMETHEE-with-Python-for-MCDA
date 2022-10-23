@@ -1,7 +1,7 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M4_PrometheePreferenceReinforcedPreference import PrometheePreferenceReinforcedPreference
-from ModularParts.M21x_MultipleDMCriteriaNetFlows import MultipleDMUniNetFlows
-from ModularParts.M21_FlowSortGDSS import FlowSortGDSS, CompareProfiles
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.preference.M4_PrometheePreferenceReinforcedPreference import PrometheePreferenceReinforcedPreference
+from ModularParts.sorting.M21x_MultipleDMCriteriaNetFlows import MultipleDMUniNetFlows
+from ModularParts.sorting.M21_FlowSortGDSS import FlowSortGDSS, CompareProfiles
 from DecisionProblemData import *
 
 # 1st DM

@@ -1,4 +1,4 @@
-from ModularParts.M23_PrometheeV import PrometheeV
+from ModularParts.choice.M23_PrometheeV import PrometheeV
 from core.constraint import Constraint, Relation
 from M12_PrometheeIIFlow_TEST import *
 

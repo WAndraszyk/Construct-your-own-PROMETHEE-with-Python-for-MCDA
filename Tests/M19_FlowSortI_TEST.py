@@ -1,6 +1,6 @@
-from ModularParts.M3_PrometheePreference import PrometheePreference
-from ModularParts.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
-from ModularParts.M19_FlowSortI import FlowSortI, CompareProfiles
+from ModularParts.preference.M3_PrometheePreference import PrometheePreference
+from ModularParts.flows.M9_PrometheeOutrankingFlows import PrometheeOutrankingFlows
+from ModularParts.sorting.M19_FlowSortI import FlowSortI, CompareProfiles
 from DecisionProblemData import *
 
 proper_criteria_ranks = [x for _, x in sorted(zip(criteria_ranks, criteria), reverse=True)]
