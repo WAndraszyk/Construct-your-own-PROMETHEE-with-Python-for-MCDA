@@ -2,7 +2,7 @@ from core.aliases import NumericValue
 
 
 # GENERALIZED_CRITERIA:
-def usualCriterion(d: NumericValue):
+def usual_criterion(d: NumericValue) -> NumericValue:
     """
     Returns 0 if difference is less or equal to 0, if not it returns 1.
 
@@ -11,7 +11,7 @@ def usualCriterion(d: NumericValue):
     return 1 if d > 0 else 0
 
 
-def uShapeCriterion(d: NumericValue, q: NumericValue):
+def u_shape_criterion(d: NumericValue, q: NumericValue) -> NumericValue:
     """
     Returns 0 if difference is less or equal to q, if not it returns 1.
 
@@ -24,13 +24,13 @@ def uShapeCriterion(d: NumericValue, q: NumericValue):
         return 1
 
 
-def vShapeCriterion(d: NumericValue, p: NumericValue):
+def v_shape_criterion(d: NumericValue, p: NumericValue) -> NumericValue:
     """
-    Returns 0 if difference is less or equal to p, 1 if it is greater then p.
+    Returns 0 if difference is less or equal to p, 1 if it is greater than p.
     Else it calculates the number between 0 and 1 based on the difference.
 
     :param d: difference between two alternatives on a specified criterion
-    :param p: threshold of strict prefference
+    :param p: threshold of strict preference
     """
     if d <= 0:
         return 0
@@ -40,14 +40,14 @@ def vShapeCriterion(d: NumericValue, p: NumericValue):
         return 1
 
 
-def levelCriterion(d: NumericValue, p: NumericValue, q: NumericValue):
+def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue) -> NumericValue:
     """
     Returns: 0 for d<=q
              0.5 for q<d<=p
              1 for d>p
 
     :param d: difference between two alternatives on a specified criterion
-    :param p: threshold of strict prefference
+    :param p: threshold of strict preference
     :param q: threshold of indifference
     """
     if d <= q:
@@ -58,13 +58,13 @@ def levelCriterion(d: NumericValue, p: NumericValue, q: NumericValue):
         return 1
 
 
-def vShapeIndifferenceCriterion(d: NumericValue, p: NumericValue, q: NumericValue):
+def v_shape_indifference_criterion(d: NumericValue, p: NumericValue, q: NumericValue) -> NumericValue:
     """
-    Returns 0 if difference is less or equal to q, 1 if it is greater then p.
+    Returns 0 if difference is less or equal to q, 1 if it is greater than p.
     Else it calculates the number between 0 and 1 based on the difference.
 
     :param d: difference between two alternatives on a specified criterion
-    :param p: threshold of strict prefference
+    :param p: threshold of strict preference
     :param q: threshold of indifference
     """
     if d <= q:
@@ -75,7 +75,7 @@ def vShapeIndifferenceCriterion(d: NumericValue, p: NumericValue, q: NumericValu
         return 1
 
 
-def gaussianCriterion(d: NumericValue, s: NumericValue):
+def gaussianCriterion(d: NumericValue, s: NumericValue) -> NumericValue:
     """
     Calculates preference based on nonlinear gaussian function.
 

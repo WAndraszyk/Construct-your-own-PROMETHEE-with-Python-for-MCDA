@@ -53,10 +53,10 @@ class OrderedClustering:
         for i in range(len(graph)):
             for j in range(len(graph[0])):
                 if graph[i][j] == 1:
-                    g.addEdge(i, j)
-        is_cyclic = g.isCyclic()
+                    g.add_edge(i, j)
+        is_cyclic = g.is_cyclic()
         if not is_cyclic:
-            return g.findLongestPath() > K-1
+            return g.find_longest_path() > K - 1
         else:
             return True
 

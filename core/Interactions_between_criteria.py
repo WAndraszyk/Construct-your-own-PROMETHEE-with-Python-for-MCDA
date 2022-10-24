@@ -3,7 +3,7 @@ from typing import List
 from core.aliases import NumericValue
 
 
-class Interaction_type(Enum):
+class InteractionType(Enum):
     # STN = 1  # strengthening
     # WKN = 2  # weakening
     # ANT = 3  # antagonistic
@@ -14,7 +14,7 @@ class Interaction_type(Enum):
 
 class Interactions:
     def __init__(self, Criterion_A: List[str], Criterion_B: List[str],
-                 Types: list[Interaction_type], Coefficient: List[NumericValue]
+                 Types: list[InteractionType], Coefficient: List[NumericValue]
                  ):
         """
         :param Criterion_A: List of criterion indexes

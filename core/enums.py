@@ -29,3 +29,14 @@ class CompareProfiles(Enum):
     CENTRAL_PROFILES = 1
     BOUNDARY_PROFILES = 2
     LIMITING_PROFILES = 3
+
+
+class PreferenceFunction(Enum):
+    """Enumeration of the preference functions."""
+
+    USUAL = 1
+    U_SHAPE = 2
+    V_SHAPE = 3
+    LEVEL = 4
+    V_SHAPE_INDIFFERENCE = 5
+    GAUSSIAN = 6

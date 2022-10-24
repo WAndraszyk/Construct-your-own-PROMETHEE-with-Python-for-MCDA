@@ -66,10 +66,10 @@ srf_criteria_weight_ratio = 2
 standard_deviations = [None, None, None, None, None, None, None]
 
 interactions = pd.DataFrame(data=(
-    ['g6', 'g7', Interaction_type.STN, 0.03],
-    ['g1', 'g3', Interaction_type.STN, 0.03],
-    ['g4', 'g5', Interaction_type.WKN, 0.03],
-    ['g2', 'g3', Interaction_type.ANT, 0.03]),
+    ['g6', 'g7', InteractionType.STN, 0.03],
+    ['g1', 'g3', InteractionType.STN, 0.03],
+    ['g4', 'g5', InteractionType.WKN, 0.03],
+    ['g2', 'g3', InteractionType.ANT, 0.03]),
     columns=['criterion_1', 'criterion_2', 'type', 'coefficient'])
 print(interactions)
 # cost -> 0

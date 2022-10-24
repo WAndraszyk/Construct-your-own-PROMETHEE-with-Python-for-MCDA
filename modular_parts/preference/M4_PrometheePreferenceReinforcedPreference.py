@@ -110,11 +110,11 @@ class PrometheePreferenceReinforcedPreference:
                     else:
                         Frp = 0
                         if method is PreferenceFunction.USUAL:
-                            alternativeIndex = gc.usualCriterion(deviations[k][i][j])
+                            alternativeIndex = gc.usual_criterion(deviations[k][i][j])
                         elif method is PreferenceFunction.U_SHAPE:
-                            alternativeIndex = gc.uShapeCriterion(deviations[k][i][j], q)
+                            alternativeIndex = gc.u_shape_criterion(deviations[k][i][j], q)
                         elif method is PreferenceFunction.V_SHAPE:
-                            alternativeIndex = gc.vShapeCriterion(deviations[k][i][j], p)
+                            alternativeIndex = gc.v_shape_criterion(deviations[k][i][j], p)
                         elif method is PreferenceFunction.LEVEL:
                             if q > p:
                                 raise ValueError(
@@ -123,7 +123,7 @@ class PrometheePreferenceReinforcedPreference:
                                     + " greater than p "
                                     + str(p)
                                 )
-                            alternativeIndex = gc.levelCriterion(deviations[k][i][j], p, q)
+                            alternativeIndex = gc.level_criterion(deviations[k][i][j], p, q)
                         elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
                             if q > p:
                                 raise ValueError(
@@ -132,7 +132,7 @@ class PrometheePreferenceReinforcedPreference:
                                     + " greater than p "
                                     + str(p)
                                 )
-                            alternativeIndex = gc.vShapeIndifferenceCriterion(deviations[k][i][j], p, q)
+                            alternativeIndex = gc.v_shape_indifference_criterion(deviations[k][i][j], p, q)
                         else:
                             raise ValueError(
                                 "pref_func "
