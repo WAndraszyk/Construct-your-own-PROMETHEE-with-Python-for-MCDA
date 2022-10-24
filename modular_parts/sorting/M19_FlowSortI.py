@@ -10,7 +10,7 @@ from core.aliases import PerformanceTable, FlowsTable
 from core.preference_commons import directed_alternatives_performances
 from core.sorting import pandas_check_dominance_condition
 
-__all__ = ["calculate_flowsort1__sorted_alternatives"]
+__all__ = ["calculate_flowsort1_sorted_alternatives"]
 
 
 def _append_to_classification(categories: List[str], classification: pd.DataFrame, pessimistic_category: str,
@@ -166,7 +166,7 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
     return classification
 
 
-def calculate_flowsort1__sorted_alternatives(categories: List[str],
+def calculate_flowsort1_sorted_alternatives(categories: List[str],
                                              category_profiles: PerformanceTable,
                                              criteria_directions: pd.Series,
                                              alternatives_flows: FlowsTable,
