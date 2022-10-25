@@ -8,9 +8,9 @@ from typing import List, Hashable
 from core.enums import CompareProfiles
 from core.aliases import PerformanceTable, FlowsTable
 from core.preference_commons import directed_alternatives_performances
-from core.sorting import pandas_check_dominance_condition
+from core.promethee_check_dominance import check_dominance_condition
 
-__all__ = ["calculate_flowsort1_sorted_alternatives"]
+__all__ = ["calculate_flowsortI_sorted_alternatives"]
 
 
 def _append_to_classification(categories: List[str], classification: pd.DataFrame, pessimistic_category: str,
@@ -166,12 +166,12 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
     return classification
 
 
-def calculate_flowsort1_sorted_alternatives(categories: List[str],
-                                             category_profiles: PerformanceTable,
-                                             criteria_directions: pd.Series,
-                                             alternatives_flows: FlowsTable,
-                                             category_profiles_flows: FlowsTable,
-                                             comparison_with_profiles: CompareProfiles) -> pd.DataFrame:
+def calculate_flowsortI_sorted_alternatives(categories: List[str],
+                                            category_profiles: PerformanceTable,
+                                            criteria_directions: pd.Series,
+                                            alternatives_flows: FlowsTable,
+                                            category_profiles_flows: FlowsTable,
+                                            comparison_with_profiles: CompareProfiles) -> pd.DataFrame:
     """
     Sort alternatives to proper categories.
 
@@ -184,7 +184,7 @@ def calculate_flowsort1_sorted_alternatives(categories: List[str],
 
     :return: DataFrame with alternatives assigned to proper classes
     """
-    pandas_check_dominance_condition(criteria_directions, category_profiles)
+    check_dominance_condition(criteria_directions, category_profiles)
 
     category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles, criteria_directions),
                                      index=category_profiles.columns, columns=category_profiles.columns)
