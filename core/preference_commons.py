@@ -1,4 +1,6 @@
 from typing import List
+
+from core.aliases import NumericValue
 from enums import PreferenceFunction
 import core.generalized_criteria as gc
 
@@ -23,8 +25,9 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
     return copy_alternatives_performances
 
 
-def deviations(criteria: List[str], alternatives_performances: pd.DataFrame,
-               profile_performance_table: pd.DataFrame = None):
+def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
+               profile_performance_table: pd.DataFrame = None
+               ) -> List[List[List[NumericValue]]] | List[List[List[List[NumericValue]]]]:
     """
     Compares alternatives on criteria.
 
@@ -142,7 +145,8 @@ def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
     return ppIndices
 
 
-def overall_preference(preferences, discordances, profiles):
+def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | List[pd.DataFrame],
+                       profiles) -> pd.DataFrame | tuple[pd.DataFrame]:
     """
     Combines preference and discordance/veto indices to compute overall preference
 
