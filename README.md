@@ -8,7 +8,7 @@ Założenia implementacyjne:
 ![alt text](https://github.com/WAndraszyk/Construct-your-own-PROMETHEE-with-Python-for-MCDA/blob/main/schemat.png "Schemat modułów")
 
 Wykonane moduły (pandas refactor):
-- M1  :heavy_check_mark: 
+- M1  :heavy_check_mark: :heavy_check_mark: 
 - M2  :heavy_check_mark: :heavy_check_mark:
 - M3  :heavy_check_mark: :heavy_check_mark:
 - M4  :heavy_check_mark:
