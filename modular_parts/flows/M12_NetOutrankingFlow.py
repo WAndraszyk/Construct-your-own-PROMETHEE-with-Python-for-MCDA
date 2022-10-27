@@ -4,9 +4,10 @@ from core.aliases import FlowsTable, NetOutrankingFlows
 
 __all__ = []
 
-class PrometheeIIFlow:
+
+class NetOutrankingFlow:
     """
-    This class compute net outranking flow for PrometheeII based on positive and negative flows.
+    This class compute net outranking flow for net outranking flow based on positive and negative flows.
     'Net outranking flow' is a difference between positive and negative flow for each alternative.
     """
 
@@ -18,7 +19,7 @@ class PrometheeIIFlow:
         self.negative_flow = flows['negative'].values
         self.alternatives = flows.index
 
-    def calculate_PrometheeIIFlow(self) -> NetOutrankingFlows:
+    def calculate_net_outranking_flows(self) -> NetOutrankingFlows:
         """
         Calculates net outranking flow.
         :return: net outranking flow Series.
