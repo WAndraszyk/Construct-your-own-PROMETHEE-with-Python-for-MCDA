@@ -8,7 +8,8 @@ __all__ = ["compute_discordance"]
 
 def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
                         preferences: pd.DataFrame = None,
-                        categories_profiles=False):
+                        categories_profiles=False) -> tuple[pd.DataFrame | List[pd.DataFrame], pd.DataFrame |
+                                                            List[pd.DataFrame]] | pd.DataFrame | tuple[pd.DataFrame]:
     """
     Calculates overall discordance by aggregating partial discordance indices.
 
@@ -21,7 +22,6 @@ def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, 
     :return: matrix of overall discordance and matrix of partial discordance indices. Alternatively: preference
     """
 
-    alternatives = partial_preferences.keys()
     criteria = criteria
     categories_profiles = categories_profiles
     partial_preferences = partial_preferences
@@ -46,7 +46,7 @@ def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, 
 
 
 def _calculate_partial_discordance(criteria: List[str], partial_preferences: pd.DataFrame,
-                                   other_partial_preferences: pd.DataFrame = None):
+                                   other_partial_preferences: pd.DataFrame = None) -> pd.DataFrame:
     """
     Calculates partial discordance indices based on partial preference indices
 
@@ -69,7 +69,7 @@ def _calculate_partial_discordance(criteria: List[str], partial_preferences: pd.
     return partial_discordance
 
 
-def _overall_discordance(criteria: List[str], partial_discordance: pd.DataFrame, tau: NumericValue):
+def _overall_discordance(criteria: List[str], partial_discordance: pd.DataFrame, tau: NumericValue) -> pd.DataFrame:
     """
     Calculates overall discordance by aggregating partial discordance indices.
 
