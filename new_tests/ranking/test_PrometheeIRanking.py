@@ -1,6 +1,7 @@
 import pytest
 import sys
 import pandas as pd
+from pandas.testing import assert_frame_equal
 from modular_parts.ranking import calculate_prometheeI_ranking
 
 sys.path.append('../..')
@@ -15,16 +16,15 @@ def outranking_flows():
 
 
 def test_prometheeI_ranking(outranking_flows):
-    expected = [('a1', ' ? ', 'a2'), ('a1', ' ? ', 'a3'), ('a1', ' ? ', 'a4'), ('a1', ' ? ', 'a5'), ('a1', ' ? ', 'a6'),
-                ('a2', ' P ', 'a1'), ('a2', ' ? ', 'a3'), ('a2', ' ? ', 'a4'), ('a2', ' ? ', 'a5'), ('a2', ' P ', 'a6'),
-                ('a3', ' P ', 'a1'), ('a3', ' P ', 'a2'), ('a3', ' ? ', 'a4'), ('a3', ' P ', 'a5'), ('a3', ' P ', 'a6'),
-                ('a4', ' P ', 'a1'), ('a4', ' P ', 'a2'), ('a4', ' P ', 'a3'), ('a4', ' P ', 'a5'), ('a4', ' P ', 'a6'),
-                ('a5', ' P ', 'a1'), ('a5', ' P ', 'a2'), ('a5', ' ? ', 'a3'), ('a5', ' ? ', 'a4'), ('a5', ' P ', 'a6'),
-                ('a6', ' ? ', 'a1'), ('a6', ' ? ', 'a2'), ('a6', ' ? ', 'a3'), ('a6', ' ? ', 'a4'), ('a6', ' ? ', 'a5')]
+    alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
+    expected = pd.DataFrame([[None, '?', '?', '?', '?', '?'], ['P', None, '?', '?', '?', 'P'],
+                             ['P', 'P', None, '?', 'P', 'P'], ['P', 'P', 'P', None, 'P', 'P'],
+                             ['P', 'P', '?', '?', None, 'P'], ['?', '?', '?', '?', '?', None,]],
+                            index=alternatives, columns=alternatives)
 
     actual = calculate_prometheeI_ranking(outranking_flows, weak_preference=False)
 
-    assert all([e == a for e, a in zip(expected, actual)])
+    assert_frame_equal(expected, actual, atol=0.006)
 
 
 if __name__ == '__main__':
