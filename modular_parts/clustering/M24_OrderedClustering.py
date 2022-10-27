@@ -7,7 +7,7 @@ import pandas as pd
 __all__ = ["group_into_ordered_clusters"]
 
 
-def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int):
+def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int) -> pd.Series:
     alternatives = preferences.index
     shape = np.shape(preferences)
     preferences = preferences.values.tolist()
@@ -38,7 +38,7 @@ def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int)
     return pd.Series(clusters, name='Alternatives in clusters')
 
 
-def _search_max(preferences: List[List[NumericValue]]):
+def _search_max(preferences: List[List[NumericValue]]) -> tuple[NumericValue, int, int]:
     max_pi = 0
     pi_i = 0
     pi_j = 0
@@ -51,7 +51,7 @@ def _search_max(preferences: List[List[NumericValue]]):
     return max_pi, pi_i, pi_j
 
 
-def _check_graph(graph: np.ndarray, K: int):
+def _check_graph(graph: np.ndarray, K: int) -> bool:
     g = Graph(len(graph))
     for i in range(len(graph)):
         for j in range(len(graph[0])):
@@ -64,7 +64,7 @@ def _check_graph(graph: np.ndarray, K: int):
         return True
 
 
-def _calculate_degrees(graph: np.ndarray):
+def _calculate_degrees(graph: np.ndarray) -> tuple[list[int], bool]:
     degrees = []
     no_nodes = True
     for j in range(len(graph)):
@@ -77,7 +77,7 @@ def _calculate_degrees(graph: np.ndarray):
     return degrees, no_nodes
 
 
-def _delete_node(graph: np.ndarray, row: int):
+def _delete_node(graph: np.ndarray, row: int) -> None:
     for i in range(len(graph[row])):
         graph[row][i] = 0
         graph[i][row] = 0

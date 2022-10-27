@@ -5,7 +5,7 @@ from typing import List
 import pandas as pd
 
 
-def compute_decision(flows: NetOutrankingFlows, constraints: List[Constraint]):
+def compute_decision(flows: NetOutrankingFlows, constraints: List[Constraint]) -> pd.Series:
     """
     Computes decision by solving a linear problem.
 

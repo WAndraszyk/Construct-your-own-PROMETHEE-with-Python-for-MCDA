@@ -2,6 +2,8 @@
 This class computes Promethee III intervals and ranking based on positive and negative flows,
 and preferences.
 """
+from typing import List
+
 import pandas as pd
 from core.aliases import FlowsTable, PreferencesTable, NumericValue
 import numpy as np
@@ -48,7 +50,8 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
     return intervals, pairs
 
 
-def _calculate_intervals(alternatives, flow: FlowsTable, preferences: PreferencesTable, alpha: NumericValue):
+def _calculate_intervals(alternatives, flow: FlowsTable, preferences: PreferencesTable, alpha: NumericValue
+                         ) -> tuple[List[List[NumericValue]], pd.DataFrame]:
     """
     Calculates intervals used in alternatives comparison.
 
