@@ -5,11 +5,11 @@ import pandas as pd
 from core.aliases import PreferencesTable, FlowsTable
 from typing import Tuple, Union
 
-__all__ = ["calculate_promethee_outranking_flows"]
+__all__ = ["calculate_prometheeI_outranking_flows", "calculate_prometheeII_outranking_flows"]
 
 
 def _calculate_flow(preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable],
-                    positive: bool = True) -> pd.Series:
+                    positive: bool = True, prometheeII: bool = True) -> pd.Series:
     """
     Calculate positive or negative outranking flow.
 
@@ -22,19 +22,35 @@ def _calculate_flow(preferences: Union[Tuple[PreferencesTable, PreferencesTable]
         else:
             flows = preferences[1].mean(axis=0)
     else:
-        n = preferences.shape[0]
-
         axis = 1 if positive else 0
         aggregated_preferences = preferences.sum(axis=axis)
-        flows = aggregated_preferences / (n - 1)
+
+        if prometheeII:
+            n = preferences.shape[0]
+            flows = aggregated_preferences / (n - 1)
+        else:
+            return aggregated_preferences
 
     return flows
 
 
-def calculate_promethee_outranking_flows(
+def calculate_prometheeI_outranking_flows(
         preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable]) -> FlowsTable:
     """
-    Calculate both positive and negative outranking flows.
+    Calculate both positive and negative outranking flows for Promethee I method.
+
+    :return: FlowTable of both positive and negative outranking flows.
+    """
+    index = preferences[0].index if isinstance(preferences, tuple) else preferences.index
+    return pd.DataFrame({'positive': _calculate_flow(preferences, prometheeII=False),
+                         'negative': _calculate_flow(preferences, positive=False, prometheeII=False)
+                         }, index=index)
+
+
+def calculate_prometheeII_outranking_flows(
+        preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable]) -> FlowsTable:
+    """
+    Calculate both positive and negative outranking flows for Promethee II method.
 
     :return: FlowTable of both positive and negative outranking flows.
     """

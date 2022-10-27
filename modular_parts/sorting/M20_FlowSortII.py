@@ -7,9 +7,9 @@ import pandas as pd
 from typing import List
 from core.enums import CompareProfiles
 from core.aliases import PerformanceTable
-from core.sorting import pandas_check_dominance_condition
+from core.promethee_check_dominance import check_dominance_condition
 
-__all__ = ["calculate_flowsort2_sorted_alternatives"]
+__all__ = ["calculate_flowsortII_sorted_alternatives"]
 
 
 def _limiting_profiles_sorting(categories: List[str], category_profiles: PerformanceTable,
@@ -97,7 +97,7 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
     return classification
 
 
-def calculate_flowsort2_sorted_alternatives(categories: List[str],
+def calculate_flowsortII_sorted_alternatives(categories: List[str],
                                             category_profiles: PerformanceTable,
                                             criteria_directions: pd.Series,
                                             alternatives_flows: pd.Series,
@@ -116,7 +116,7 @@ def calculate_flowsort2_sorted_alternatives(categories: List[str],
 
     :return: Dictionary with alternatives assigned to proper classes
     """
-    pandas_check_dominance_condition(criteria_directions, category_profiles)
+    check_dominance_condition(criteria_directions, category_profiles)
 
     if comparison_with_profiles == CompareProfiles.LIMITING_PROFILES:
         return _limiting_profiles_sorting(categories, category_profiles, alternatives_flows, category_profiles_flows)

@@ -6,24 +6,9 @@ import pandas as pd
 from core.aliases import NumericValue, PerformanceTable, FlowsTable
 from typing import List, Tuple
 from core.preference_commons import directed_alternatives_performances
+from core.promethee_check_dominance import check_if_profiles_are_strictly_worse
 
 __all__ = ["calculate_promsort_sorted_alternatives"]
-
-
-def _check_if_profiles_are_strictly_worse(criteria_thresholds: pd.Series, category_profiles: PerformanceTable):
-    """
-    Check if each boundary profile is strictly worse in each criterion by specified threshold than betters profiles
-
-    :param criteria_thresholds: Series with criteria thresholds
-    :param category_profiles: Performance table with category profiles performances
-
-    :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
-    """
-    for criterion, threshold in criteria_thresholds.items():
-        for i, (_, profile_i) in enumerate(category_profiles.iloc[:-1].iterrows()):
-            profile_j = category_profiles.iloc[i + 1]
-            if profile_i[criterion] + threshold > profile_j[criterion]:
-                raise ValueError("Each profile needs to be preferred over profiles which are worse than it")
 
 
 def _define_outranking_relation(positive_flow_a: NumericValue, negative_flow_a: NumericValue,
@@ -211,7 +196,7 @@ def calculate_promsort_sorted_alternatives(categories: List[str],
     """
     category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles, criteria_directions),
                                      index=category_profiles.columns, columns=category_profiles.columns)
-    _check_if_profiles_are_strictly_worse(criteria_thresholds, category_profiles)
+    check_if_profiles_are_strictly_worse(criteria_thresholds, category_profiles)
     first_step_assignments = _calculate_first_step_assignments(categories, alternatives_flows, category_profiles_flows)
     final_step_assignments = _calculate_final_assignments(alternatives_flows, first_step_assignments, cut_point,
                                                           assign_to_better_class)

@@ -8,30 +8,9 @@ import numpy as np
 from typing import List, Tuple, Dict
 from core.enums import CompareProfiles
 from core.preference_commons import directed_alternatives_performances
+from core.promethee_check_dominance import check_dominance_condition_GDSS
 
 __all__ = ["calculate_flowsort_gdss_sorted_alternatives"]
-
-
-def _check_dominance_condition(profiles: pd.Index, profiles_performances: list[pd.DataFrame],
-                               criteria_directions: pd.Series):
-    """
-    Check if each boundary profile is strictly worse in each criterion than betters profiles (even from other DM's)
-
-    :param profiles: Index with profiles names
-    :param profiles_performances: List with DataFrames with profiles performances for each DM
-    :param criteria_directions: Series with criteria directions (max or min)
-
-    :raise ValueError: if any profile is not strictly worse in any criterion than any better profile
-    """
-    for criterion in criteria_directions.index:
-        for DM_i_profiles_performances in profiles_performances:
-            for i in range(len(profiles) - 1):
-                profile_i = DM_i_profiles_performances.iloc[i]
-                for DM_j_profiles_performances in profiles_performances:
-                    profile_j = DM_j_profiles_performances.iloc[i + 1]
-                    if profile_i[criterion] >= profile_j[criterion]:
-                        raise ValueError("Each profile needs to be preferred over profiles which are worse than it,"
-                                         " even they are from different DMs")
 
 
 def _classify_alternative(categories: List[str], classification: pd.DataFrame,
@@ -236,7 +215,7 @@ def calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows: 
         single_DM_profiles_performances, criteria_directions)
         for single_DM_profiles_performances in profiles_performances]
 
-    _check_dominance_condition(profiles, profiles_performances, criteria_directions)
+    check_dominance_condition_GDSS(profiles, profiles_performances, criteria_directions)
 
     first_step_assignments, not_classified = \
         _calculate_first_step_assignments(alternatives, dms, alternatives_general_net_flows, profiles,
