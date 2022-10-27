@@ -52,7 +52,8 @@ def compute_preference_indices(alternatives_performances: PerformanceTable, pref
                 ), partialPref
 
 
-def _preferences(weights, criteria, decimal_place, partialPref, i_iter, j_iter=None):
+def _preferences(weights: pd.Series, criteria: pd.Index, decimal_place: NumericValue, partialPref: pd.DataFrame,
+                 i_iter: pd.Index, j_iter: pd.Index = None):
     weight_sum = sum(weights.values)
     if j_iter is None:
         j_iter = i_iter
