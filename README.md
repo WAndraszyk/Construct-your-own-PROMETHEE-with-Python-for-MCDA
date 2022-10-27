@@ -20,7 +20,7 @@ Wykonane moduły (pandas refactor):
 - M10 :heavy_check_mark: :heavy_check_mark:
 - M11 :heavy_check_mark: :heavy_check_mark:
 - M12 :heavy_check_mark:
-- M13 :heavy_check_mark:
+- M13 :heavy_check_mark: :heavy_check_mark:
 - M14 :heavy_check_mark: :heavy_check_mark:
 - M15 :heavy_check_mark: :heavy_check_mark:
 - M16 :heavy_check_mark: :heavy_check_mark:
