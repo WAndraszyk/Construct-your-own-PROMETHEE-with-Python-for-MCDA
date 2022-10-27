@@ -3,6 +3,7 @@ import pandas as pd
 from core.aliases import FlowsTable, PreferencesTable, NumericValue
 import numpy as np
 
+__all__ = []
 
 class PrometheeIIIFlow:
     """
