@@ -7,7 +7,7 @@ __all__ = []
 
 class NetOutrankingFlow:
     """
-    This class compute net outranking flow for net outranking flow based on positive and negative flows.
+    This class compute net outranking flow based on positive and negative flows.
     'Net outranking flow' is a difference between positive and negative flow for each alternative.
     """
 
