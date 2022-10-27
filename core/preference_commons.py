@@ -27,7 +27,7 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
 
 def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
                profile_performance_table: pd.DataFrame = None
-               ) -> List[List[List[NumericValue]]] | List[List[List[List[NumericValue]]]]:
+               ) -> List[List[List[NumericValue]] | List[List[List[NumericValue]]]]:
     """
     Compares alternatives on criteria.
 
