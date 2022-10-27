@@ -2,6 +2,7 @@ import pandas as pd
 
 from core.aliases import FlowsTable, NetOutrankingFlows
 
+__all__ = []
 
 class PrometheeIIFlow:
     """
