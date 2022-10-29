@@ -2,7 +2,6 @@ import pytest
 import sys
 import pandas as pd
 from pandas.testing import assert_series_equal
-from core.enums import ScoringFunction, ScoringFunctionDirection
 from core.enums import CompareProfiles
 from modular_parts.sorting import calculate_flowsort_gdss_sorted_alternatives
 
@@ -34,8 +33,8 @@ def profiles_general_net_flows():
          -0.136, -0.136, -0.136, -0.136, -0.184, -0.142, -0.157, -0.142, -0.148,
          -0.147, -0.164, -0.138, -0.144, -0.143, -0.148, -0.156, -0.166, -0.149,
          -0.172, -0.16, -0.159, -0.159, -0.159, -0.176, -0.183, -0.178, -0.203,
-         -0.195, -0.195, -0.185, -0.191, -0.207, -0.19, -0.196, -0.198, -0.198, -0.222]]
-        , index=profiles, columns=alternatives)
+         -0.195, -0.195, -0.185, -0.191, -0.207, -0.19, -0.196, -0.198, -0.198, -0.222]],
+        index=profiles, columns=alternatives)
 
     DM2 = pd.DataFrame([
         [0.218, 0.218, 0.204, 0.198, 0.163, 0.196, 0.199, 0.163, 0.201, 0.192,
@@ -72,59 +71,65 @@ def categories():
 
 @pytest.fixture
 def criteria_directions():
-    return [0, 0, 0]
+    criteria = [f"g{i}" for i in range(1, 4)]
+
+    return pd.Series([0, 0, 0], index=criteria)
 
 
+# TODO Find correct dataset
 @pytest.fixture
 def profiles_performances():
     alternatives = [f"a{i}" for i in range(1, 47)]
     criteria = [f"g{i}" for i in range(1, 4)]
-    return pd.DataFrame([[2, 2, 1],
-                         [10, 2, 1],
-                         [3, 4, 1],
-                         [2, 4, 2],
-                         [2, 2, 10],
-                         [15, 5, 1],
-                         [15, 2, 4],
-                         [3, 2, 10],
-                         [42, 3, 2],
-                         [9, 4, 3],
-                         [14, 4, 3],
-                         [13, 4, 3],
-                         [12, 4, 3],
-                         [604, 4, 2],
-                         [17, 4, 4],
-                         [14, 8, 2],
-                         [14, 4, 4],
-                         [8, 4, 5],
-                         [6, 4, 5],
-                         [6, 2, 10],
-                         [40, 4, 3],
-                         [24, 5, 3],
-                         [26, 4, 4],
-                         [151, 4, 3],
-                         [45, 2, 8],
-                         [27, 2, 10],
-                         [35, 3, 6],
-                         [12, 3, 10],
-                         [72, 4, 6],
-                         [63, 4, 6],
-                         [58, 4, 6],
-                         [53, 6, 4],
-                         [41, 8, 6],
-                         [191, 4, 8],
-                         [137, 4, 8],
-                         [412, 4, 8],
-                         [31, 7, 9],
-                         [28, 7, 9],
-                         [62, 6, 8],
-                         [49, 7, 8],
-                         [19, 8, 10],
-                         [107, 7, 7],
-                         [37, 7, 9],
-                         [62, 7, 9],
-                         [54, 8, 8],
-                         [26, 10, 10]], index=alternatives, columns=criteria)
+
+    DM1 = pd.DataFrame([[2, 2, 1],
+                        [10, 2, 1],
+                        [3, 4, 1],
+                        [2, 4, 2],
+                        [2, 2, 10],
+                        [15, 5, 1],
+                        [15, 2, 4],
+                        [3, 2, 10],
+                        [42, 3, 2],
+                        [9, 4, 3],
+                        [14, 4, 3],
+                        [13, 4, 3],
+                        [12, 4, 3],
+                        [604, 4, 2],
+                        [17, 4, 4],
+                        [14, 8, 2],
+                        [14, 4, 4],
+                        [8, 4, 5],
+                        [6, 4, 5],
+                        [6, 2, 10],
+                        [40, 4, 3],
+                        [24, 5, 3],
+                        [26, 4, 4],
+                        [151, 4, 3],
+                        [45, 2, 8],
+                        [27, 2, 10],
+                        [35, 3, 6],
+                        [12, 3, 10],
+                        [72, 4, 6],
+                        [63, 4, 6],
+                        [58, 4, 6],
+                        [53, 6, 4],
+                        [41, 8, 6],
+                        [191, 4, 8],
+                        [137, 4, 8],
+                        [412, 4, 8],
+                        [31, 7, 9],
+                        [28, 7, 9],
+                        [62, 6, 8],
+                        [49, 7, 8],
+                        [19, 8, 10],
+                        [107, 7, 7],
+                        [37, 7, 9],
+                        [62, 7, 9],
+                        [54, 8, 8],
+                        [26, 10, 10]], index=alternatives, columns=criteria)
+
+    return [DM1, DM1, DM1]
 
 
 @pytest.fixture
@@ -142,12 +147,16 @@ def assign_to_better_class():
     return True
 
 
-def test_net_flow_score_sum_favor(alternatives_preferences):
-    
-
+def test_calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
+                                                     categories, criteria_directions, profiles_performances,
+                                                     dms_weights, comparison_with_profiles, assign_to_better_class):
+    first_step_assignments, final_step_assignments = \
+        calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
+                                                    categories, criteria_directions, profiles_performances,
+                                                    dms_weights, comparison_with_profiles, assign_to_better_class)
 
 
 if __name__ == '__main__':
-    test_net_flow_score_sum_favor(alternatives_preferences)
-    test_net_flow_score_min_against(alternatives_preferences)
-    test_net_flow_score_max_difference(alternatives_preferences)
+    test_calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
+                                                     categories, criteria_directions, profiles_performances,
+                                                     dms_weights, comparison_with_profiles, assign_to_better_class)
