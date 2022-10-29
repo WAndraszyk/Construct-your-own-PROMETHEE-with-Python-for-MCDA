@@ -69,7 +69,7 @@ def _calculate_first_step_assignments(alternatives: pd.Index, dms: pd.Index, alt
     classification = pd.DataFrame(index=alternatives, columns=['better', 'worse'], dtype=str)
     not_classified = {}
 
-    for alternative, alternative_general_net_flow, (_, profiles_general_net_flows_for_alternative) in zip(
+    for (alternative, alternative_general_net_flow), (_, profiles_general_net_flows_for_alternative) in zip(
             alternatives_general_net_flows.items(), profiles_general_net_flows.items()):
         alternative_assignments = pd.Series(index=dms, dtype=str, name=alternative)
         for DM, DM_profiles_general_net_flows_for_alternative in \
@@ -138,12 +138,12 @@ def _calculate_final_assignments(alternatives_general_net_flows: pd.Series,
         worse_category = classification.loc[alternative, 'worse']
         better_category = classification.loc[alternative, 'better']
 
-        worse_category_voters_weights = dms_weights[worse_category_voters]
+        worse_category_voters_weights = dms_weights[worse_category_voters].unique()
         worse_category_profile = profiles[categories.index(worse_category)]
         worse_category_profiles_general_net_flows = \
             profiles_general_net_flows.loc[(worse_category_voters, worse_category_profile), alternative]
 
-        better_category_voters_weights = dms_weights[better_category_voters]
+        better_category_voters_weights = dms_weights[better_category_voters].unique()
         better_category_profile = profiles[min(categories.index(
             better_category), len(profiles) - 1)]
         better_category_profiles_general_net_flows = \
@@ -160,11 +160,11 @@ def _calculate_final_assignments(alternatives_general_net_flows: pd.Series,
 
         else:
             worse_category_distance = np.sum(
-                (worse_category_voters_weights - alternatives_general_net_flows[alternative]).abs() *
+                abs(worse_category_voters_weights - alternatives_general_net_flows[alternative]) *
                 worse_category_profiles_general_net_flows)
 
             better_category_distance = np.sum(
-                (better_category_voters_weights - alternatives_general_net_flows[alternative]).abs() *
+                abs(better_category_voters_weights - alternatives_general_net_flows[alternative]) *
                 better_category_profiles_general_net_flows)
 
         if better_category_distance > worse_category_distance:

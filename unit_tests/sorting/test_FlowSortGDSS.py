@@ -76,60 +76,21 @@ def criteria_directions():
     return pd.Series([0, 0, 0], index=criteria)
 
 
-# TODO Find correct dataset
 @pytest.fixture
 def profiles_performances():
-    alternatives = [f"a{i}" for i in range(1, 47)]
+    profiles = [f"p{i}" for i in range(1, 3)]
     criteria = [f"g{i}" for i in range(1, 4)]
 
-    DM1 = pd.DataFrame([[2, 2, 1],
-                        [10, 2, 1],
-                        [3, 4, 1],
-                        [2, 4, 2],
-                        [2, 2, 10],
-                        [15, 5, 1],
-                        [15, 2, 4],
-                        [3, 2, 10],
-                        [42, 3, 2],
-                        [9, 4, 3],
-                        [14, 4, 3],
-                        [13, 4, 3],
-                        [12, 4, 3],
-                        [604, 4, 2],
-                        [17, 4, 4],
-                        [14, 8, 2],
-                        [14, 4, 4],
-                        [8, 4, 5],
-                        [6, 4, 5],
-                        [6, 2, 10],
-                        [40, 4, 3],
-                        [24, 5, 3],
-                        [26, 4, 4],
-                        [151, 4, 3],
-                        [45, 2, 8],
-                        [27, 2, 10],
-                        [35, 3, 6],
-                        [12, 3, 10],
-                        [72, 4, 6],
-                        [63, 4, 6],
-                        [58, 4, 6],
-                        [53, 6, 4],
-                        [41, 8, 6],
-                        [191, 4, 8],
-                        [137, 4, 8],
-                        [412, 4, 8],
-                        [31, 7, 9],
-                        [28, 7, 9],
-                        [62, 6, 8],
-                        [49, 7, 8],
-                        [19, 8, 10],
-                        [107, 7, 7],
-                        [37, 7, 9],
-                        [62, 7, 9],
-                        [54, 8, 8],
-                        [26, 10, 10]], index=alternatives, columns=criteria)
+    DM1 = pd.DataFrame([[98, 8, 7],
+                        [30, 5, 3]], index=profiles, columns=criteria)
 
-    return [DM1, DM1, DM1]
+    DM2 = pd.DataFrame([[110, 8, 6],
+                        [55, 5, 4]], index=profiles, columns=criteria)
+
+    DM3 = pd.DataFrame([[80, 7, 6],
+                        [25, 6, 2]], index=profiles, columns=criteria)
+
+    return [DM1, DM2, DM3]
 
 
 @pytest.fixture
@@ -147,13 +108,23 @@ def assign_to_better_class():
     return True
 
 
+# TODO Test implemented but failed
 def test_calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
                                                      categories, criteria_directions, profiles_performances,
                                                      dms_weights, comparison_with_profiles, assign_to_better_class):
-    first_step_assignments, final_step_assignments = \
-        calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
-                                                    categories, criteria_directions, profiles_performances,
-                                                    dms_weights, comparison_with_profiles, assign_to_better_class)
+    alternatives = [f"a{i}" for i in range(1, 47)]
+    expected = pd.Series(['C3', 'C3', 'C3', 'C3', 'C2', 'C3', 'C3', 'C2', 'C3', 'C3',
+                          'C3', 'C3', 'C3', 'C2', 'C3', 'C2', 'C3', 'C2', 'C2', 'C2',
+                          'C3', 'C3', 'C3', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2',
+                          'C2', 'C2', 'C2', 'C2', 'C2', 'C1', 'C1', 'C1', 'C2', 'C1',
+                          'C1', 'C1', 'C1', 'C1', 'C1', 'C1'], index=alternatives)
+
+    _, actual = calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
+                                                            categories, criteria_directions, profiles_performances,
+                                                            dms_weights, comparison_with_profiles,
+                                                            assign_to_better_class)
+
+    assert_series_equal(expected, actual, atol=0.006)
 
 
 if __name__ == '__main__':
