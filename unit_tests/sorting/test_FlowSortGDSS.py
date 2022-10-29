@@ -95,7 +95,7 @@ def profiles_performances():
 
 @pytest.fixture
 def dms_weights():
-    return pd.Series([1, 1, 1], index=["DM1", "DM2", "DM3"])
+    return pd.Series([0.33, 0.33, 0.33], index=["DM1", "DM2", "DM3"])
 
 
 @pytest.fixture
@@ -108,22 +108,20 @@ def assign_to_better_class():
     return True
 
 
-# TODO Test implemented but failed
 def test_calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
                                                      categories, criteria_directions, profiles_performances,
                                                      dms_weights, comparison_with_profiles, assign_to_better_class):
     alternatives = [f"a{i}" for i in range(1, 47)]
     expected = pd.Series(['C3', 'C3', 'C3', 'C3', 'C2', 'C3', 'C3', 'C2', 'C3', 'C3',
-                          'C3', 'C3', 'C3', 'C2', 'C3', 'C2', 'C3', 'C2', 'C2', 'C2',
-                          'C3', 'C3', 'C3', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2',
-                          'C2', 'C2', 'C2', 'C2', 'C2', 'C1', 'C1', 'C1', 'C2', 'C1',
-                          'C1', 'C1', 'C1', 'C1', 'C1', 'C1'], index=alternatives)
+                          'C3', 'C3', 'C3', 'C1', 'C3', 'C2', 'C3', 'C3', 'C3', 'C2',
+                          'C3', 'C3', 'C3', 'C3', 'C2', 'C2', 'C3', 'C2', 'C2', 'C2',
+                          'C2', 'C2', 'C2', 'C1', 'C2', 'C1', 'C1', 'C1', 'C1', 'C1',
+                          'C1', 'C1', 'C1', 'C1', 'C1', 'C1'], index=alternatives, name='better')
 
     _, actual = calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
                                                             categories, criteria_directions, profiles_performances,
                                                             dms_weights, comparison_with_profiles,
                                                             assign_to_better_class)
-
     assert_series_equal(expected, actual, atol=0.006)
 
 

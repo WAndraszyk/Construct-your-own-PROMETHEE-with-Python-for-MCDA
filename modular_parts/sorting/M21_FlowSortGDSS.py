@@ -87,14 +87,21 @@ def _calculate_first_step_assignments(alternatives: pd.Index, dms: pd.Index, alt
                         alternative_assignments[DM] = categories[profile_i]
                         break
             else:
-                profile_distances = [abs(profile_net_flow - alternative_general_net_flow) for profile_net_flow in
+                # profile_distances = [abs(profile_net_flow - alternative_general_net_flow) for profile_net_flow in
+                #                      DM_profiles_general_net_flows_for_alternative.values]
+                profile_distances = [profile_net_flow > alternative_general_net_flow for profile_net_flow in
                                      DM_profiles_general_net_flows_for_alternative.values]
-                category_index = np.argmin(profile_distances)
-                alternative_assignments[DM] = categories[category_index]
+
+                if profile_distances[-1]:
+                    alternative_assignments[DM] = categories[-1]
+                elif True in profile_distances:
+                    category_index = profile_distances.index(True)+1
+                    alternative_assignments[DM] = categories[category_index]
+                else:
+                    alternative_assignments[DM] = categories[0]
 
         classification, not_classified = _classify_alternative(categories, classification,
                                                                not_classified, alternative_assignments)
-
     return classification, not_classified
 
 
@@ -151,29 +158,29 @@ def _calculate_final_assignments(alternatives_general_net_flows: pd.Series,
 
         if comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
             worse_category_distance = np.sum(
-                (alternatives_general_net_flows[alternative] - worse_category_voters_weights) *
-                worse_category_profiles_general_net_flows)
+                (alternatives_general_net_flows[alternative] - worse_category_profiles_general_net_flows) *
+                worse_category_voters_weights)
 
             better_category_distance = np.sum(
-                (better_category_voters_weights - alternatives_general_net_flows[alternative]) *
-                better_category_profiles_general_net_flows)
+                (better_category_profiles_general_net_flows - alternatives_general_net_flows[alternative]) *
+                better_category_voters_weights)
 
         else:
             worse_category_distance = np.sum(
-                abs(worse_category_voters_weights - alternatives_general_net_flows[alternative]) *
-                worse_category_profiles_general_net_flows)
+                abs(worse_category_profiles_general_net_flows - alternatives_general_net_flows[alternative]) *
+                worse_category_voters_weights)
 
             better_category_distance = np.sum(
-                abs(better_category_voters_weights - alternatives_general_net_flows[alternative]) *
-                better_category_profiles_general_net_flows)
+                abs(better_category_profiles_general_net_flows - alternatives_general_net_flows[alternative]) *
+                better_category_voters_weights)
 
         if better_category_distance > worse_category_distance:
             final_classification.loc[alternative, 'better'] = worse_category
         elif better_category_distance < worse_category_distance:
-            final_classification.loc[alternative, 'worse'] = better_category
+            final_classification.loc[alternative, 'better'] = better_category
         else:
             if assign_to_better_class:
-                final_classification.loc[alternative, 'worse'] = better_category
+                final_classification.loc[alternative, 'better'] = better_category
             else:
                 final_classification.loc[alternative, 'better'] = worse_category
 
