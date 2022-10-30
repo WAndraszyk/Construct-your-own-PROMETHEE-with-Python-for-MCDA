@@ -1,5 +1,7 @@
-from core.preference_commons import PreferenceFunction
+import pandas as pd
 
+from core.preference_commons import PreferenceFunction
+from modular_parts.weights.M2_SRFWeights import  calculate_srf_weights
 alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'a10', 'a11',
                 'a12', 'a13', 'a14', 'a15', 'a16', 'a17', 'a18', 'a19', 'a20']
 
@@ -31,8 +33,7 @@ budget = [27, 29, 20, 34, 32, 22, 34, 30, 28, 21, 32, 37, 26, 16, 13, 32, 35, 20
 srf_criteria_rank = ['g1', None, ['g3', 'g6'], None, None, 'g2', 'g5', None, 'g4']
 
 ratio = 5
-
-weights = SRFWeights(criteria, srf_criteria_rank, ratio, 0).calculate_srf_weights()
+weights = pd.Series(data=[0.06,0.2,0.11,0.29,0.23,0.11], index=criteria)
 
 generalized_criterion = [PreferenceFunction.V_SHAPE, PreferenceFunction.GAUSSIAN, PreferenceFunction.U_SHAPE,
                          PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.U_SHAPE,
@@ -53,3 +54,12 @@ veto_thr = [None, 40, None, 4, None, None]
 reinforced_preference_thr = [None, None, 2, 3, 3, None]
 
 reinforced_factor = [None, None, 1.2, 1.5, 1.3, None]
+
+
+alternatives_performances = pd.DataFrame(data=alternatives_performances, index=alternatives, columns=criteria)
+preference_thresholds = pd.Series(data=preference_thr, index=criteria)
+indifference_thresholds = pd.Series(data=indifference_thr, index=criteria)
+standard_deviations = pd.Series(data=sigma_thr, index=criteria)
+generalized_criteria = pd.Series(data=generalized_criterion, index=criteria)
+criteria_directions = pd.Series(data=criteria_directions, index=criteria)
+
