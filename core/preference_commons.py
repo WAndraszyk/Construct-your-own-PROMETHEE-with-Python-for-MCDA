@@ -1,7 +1,7 @@
 from typing import List
 
 from core.aliases import NumericValue
-from enums import PreferenceFunction
+from core.enums import PreferenceFunction
 import core.generalized_criteria as gc
 
 import pandas as pd
