@@ -1,6 +1,6 @@
 from typing import List
 
-from core.aliases import NumericValue
+from core.aliases import NumericValue, PerformanceTable, PreferencePartialTable, DeviationsTable
 from core.enums import PreferenceFunction
 import core.generalized_criteria as gc
 
@@ -27,7 +27,7 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
 
 def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
                profile_performance_table: pd.DataFrame = None
-               ) -> List[List[List[NumericValue]] | List[List[List[NumericValue]]]]:
+               ) -> DeviationsTable:
     """
     Compares alternatives on criteria.
 
@@ -62,7 +62,9 @@ def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
     return deviations_list
 
 
-def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, i_iter, j_iter):
+def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd.Series,
+            generalized_criteria: pd.Series, deviations: DeviationsTable, i_iter: PerformanceTable,
+            j_iter: PerformanceTable) -> pd.DataFrame:
     ppIndices = []
     for k in range(len(criteria)):
         method = generalized_criteria[k]
@@ -116,8 +118,10 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
     return ppIndices
 
 
-def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
-                       categories_profiles, alternatives_performances, profile_performance_table):
+def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd.Series,
+                       generalized_criteria: pd.Series, categories_profiles: pd.Index,
+                       alternatives_performances: PerformanceTable,
+                       profile_performance_table: PerformanceTable) -> PreferencePartialTable:
     """
     Calculates partial preference of every alternative over other alternatives
     or profiles at every criterion based on deviations using a method chosen by user.
@@ -170,7 +174,7 @@ def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | L
     return overall_preferences
 
 
-def criteria_series(criteria, weights):
+def criteria_series(criteria: pd.Index, weights: list[float]) -> pd.Series:
     """
     Connect criterion name with its weight.
 

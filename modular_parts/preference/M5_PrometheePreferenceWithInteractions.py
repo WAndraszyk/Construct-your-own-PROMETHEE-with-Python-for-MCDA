@@ -1,6 +1,4 @@
-from enum import Enum
 from core.aliases import NumericValue, PerformanceTable
-from typing import List
 import core.preference_commons as pc
 import pandas as pd
 
@@ -19,7 +17,7 @@ def compute_preference_indices_with_integrations(
         interaction_effects_fuction: int = 0,
         profiles_performance: PerformanceTable = None,
         decimal_place: NumericValue = 3,
-        z_function: NumericValue = 0):
+        z_function: NumericValue = 0) -> tuple:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences
@@ -65,8 +63,9 @@ def compute_preference_indices_with_integrations(
                 ), partialPref
 
 
-def _preferences(z_function, interactions, weights, criteria, partialPref, alternatives, decimal_place,
-                 categories_profiles=None):
+def _preferences(z_function: NumericValue, interactions: PerformanceTable, weights: pd.Series, criteria: pd.Index,
+                 partialPref: pd.Series, alternatives: pd.Index, decimal_place: NumericValue,
+                 categories_profiles: pd.Index = None) -> pd.DataFrame:
     if categories_profiles is None:
         categories_profiles = alternatives
     preferences = []
@@ -90,7 +89,7 @@ def _preferences(z_function, interactions, weights, criteria, partialPref, alter
     return preferences
 
 
-def _z_function(z_function, pi, pj):
+def _z_function(z_function: NumericValue, pi: NumericValue, pj: NumericValue) -> NumericValue:
     if z_function != 0:
         return pi * pj
     else:

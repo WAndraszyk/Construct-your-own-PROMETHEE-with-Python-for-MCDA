@@ -1,4 +1,4 @@
-from core.aliases import NumericValue, PerformanceTable
+from core.aliases import NumericValue, PerformanceTable, PreferencePartialTable, DeviationsTable
 import core.preference_commons as pc
 import pandas as pd
 
@@ -13,7 +13,7 @@ def compute_veto(
         profiles_performance: PerformanceTable = None,
         decimal_place: NumericValue = 3,
         full_veto: bool = True,
-        preferences=None):
+        preferences=None) -> tuple:
     """
     Calculates veto of every alternative over other alternatives
     or profiles based on partial veto
@@ -57,7 +57,8 @@ def compute_veto(
         return veto, partial_veto
 
 
-def _vetoes(criteria, weights, full_veto, partial_veto, i_iter, j_iter=None):
+def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool, partial_veto: PreferencePartialTable,
+            i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
     if j_iter is None:
         j_iter = i_iter
     Vetoes = []
@@ -81,7 +82,8 @@ def _vetoes(criteria, weights, full_veto, partial_veto, i_iter, j_iter=None):
     return pd.DataFrame(data=Vetoes, index=index, columns=columns)
 
 
-def _partial_veto(v_list, criteria, alternatives_performances, profile_performance_table, categories_profiles):
+def _partial_veto(v_list: pd.Series, criteria: pd.Index, alternatives_performances: PerformanceTable,
+                  profile_performance_table: PerformanceTable, categories_profiles: pd.Index) -> PreferencePartialTable:
     """
     Calculates partial veto of every alternative over other alternatives
     or profiles at every criterion based on deviations.
@@ -103,7 +105,8 @@ def _partial_veto(v_list, criteria, alternatives_performances, profile_performan
     return pvetos
 
 
-def _veto_deep(v_list, criteria, deviations, i_iter, j_iter):
+def _veto_deep(v_list: pd.Series, criteria: pd.Index, deviations: DeviationsTable, i_iter: PerformanceTable,
+               j_iter: PerformanceTable) -> pd.DataFrame:
     pvetos = []
     for k in range(criteria.size):
         v = v_list[k]

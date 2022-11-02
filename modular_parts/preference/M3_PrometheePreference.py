@@ -10,7 +10,7 @@ def compute_preference_indices(alternatives_performances: PerformanceTable, pref
                                generalized_criteria: pd.Series,
                                directions: pd.Series, weights: pd.Series,
                                profiles_performance: PerformanceTable = None,
-                               decimal_place: NumericValue = 3):
+                               decimal_place: NumericValue = 3) -> tuple:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences
@@ -53,7 +53,7 @@ def compute_preference_indices(alternatives_performances: PerformanceTable, pref
 
 
 def _preferences(weights: pd.Series, criteria: pd.Index, decimal_place: NumericValue, partialPref: pd.DataFrame,
-                 i_iter: pd.Index, j_iter: pd.Index = None):
+                 i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
     weight_sum = sum(weights.values)
     if j_iter is None:
         j_iter = i_iter
