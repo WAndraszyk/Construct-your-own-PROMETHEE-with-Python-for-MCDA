@@ -1,7 +1,7 @@
 import pandas as pd
 from core.preference_commons import PreferenceFunction
-from core.Interactions_between_criteria import *
-
+# from core.Interactions_between_criteria import *
+from core.enums import  *
 alternatives_performances = [[35.8, 67.0, 19.7, 0.0, 0.0, 5.0, 4.0],
                              [16.4, 14.5, 59.8, 7.5, 5.2, 5.0, 3.0],
                              [35.8, 24.0, 64.9, 2.1, 4.5, 5.0, 4.0],
@@ -71,10 +71,6 @@ interactions = pd.DataFrame(data=(
     ['g4', 'g5', InteractionType.WKN, 0.03],
     ['g2', 'g3', InteractionType.ANT, 0.03]),
     columns=['criterion_1', 'criterion_2', 'type', 'coefficient'])
-print(interactions)
-# cost -> 0
-# gain -> 1
-
 criteria_directions = [1, 1, 0, 0, 0, 1, 1]
 
 criteria_ranks = [5, 1, 2, 4, 3, 7, 6]

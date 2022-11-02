@@ -40,3 +40,11 @@ class PreferenceFunction(Enum):
     LEVEL = 4
     V_SHAPE_INDIFFERENCE = 5
     GAUSSIAN = 6
+
+class InteractionType(Enum):
+    # STN = 1  # strengthening
+    # WKN = 2  # weakening
+    # ANT = 3  # antagonistic
+    STN = 1  # strengthening
+    WKN = 1  # weakening
+    ANT = -1  # antagonistic
