@@ -4,7 +4,7 @@ from core.aliases import NumericValue, PerformanceTable
 import core.generalized_criteria as gc
 import core.preference_commons as pc
 import pandas as pd
-
+__all__ = ['compute_reinforced_preference']
 
 def compute_reinforced_preference(alternatives_performances: PerformanceTable,
                                   preference_thresholds: pd.Series,
