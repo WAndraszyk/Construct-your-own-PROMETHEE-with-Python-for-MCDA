@@ -5,18 +5,7 @@ from core.constraint import Constraint, Relation
 from core.aliases import NumericValue
 
 
-def check_constraint(constraint: Constraint, combination):
-    if constraint.relation == Relation.EQ:
-        return np.dot(combination, constraint.A) == constraint.b
-    elif constraint.relation == Relation.MT:
-        return np.dot(combination, constraint.A) >= constraint.b
-    elif constraint.relation == Relation.LT:
-        return np.dot(combination, constraint.A) <= constraint.b
-    else:
-        raise ValueError("Wrong relation operator")
-
-
-def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue], n: int):
+def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue], n: int) -> tuple[int]:
     """
     Solves given linear problem. Component value can be either 1 or 0.
 
@@ -43,3 +32,14 @@ def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue], n
                 decision = combination
 
     return decision
+
+
+def check_constraint(constraint: Constraint, combination: tuple[int]) -> bool:
+    if constraint.relation == Relation.EQ:
+        return np.dot(combination, constraint.A) == constraint.b
+    elif constraint.relation == Relation.MT:
+        return np.dot(combination, constraint.A) >= constraint.b
+    elif constraint.relation == Relation.LT:
+        return np.dot(combination, constraint.A) <= constraint.b
+    else:
+        raise ValueError("Wrong relation operator")

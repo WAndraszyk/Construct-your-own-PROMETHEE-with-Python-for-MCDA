@@ -1,23 +1,10 @@
-from enum import Enum
-import copy
-from typing import List, Union
+from typing import List
+
+from core.aliases import NumericValue, PerformanceTable, PreferencePartialTable, DeviationsTable
+from core.enums import PreferenceFunction
 import core.generalized_criteria as gc
 
-import numpy as np
 import pandas as pd
-
-from core.aliases import NumericValue
-
-
-class PreferenceFunction(Enum):
-    """Enumeration of the preference functions."""
-
-    USUAL = 1
-    U_SHAPE = 2
-    V_SHAPE = 3
-    LEVEL = 4
-    V_SHAPE_INDIFFERENCE = 5
-    GAUSSIAN = 6
 
 
 def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
@@ -38,19 +25,20 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
     return copy_alternatives_performances
 
 
-def deviations(criteria: List[str], alternatives_performances: pd.DataFrame,
-               profile_performance_table: pd.DataFrame = None):
+def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
+               profile_performance_table: pd.DataFrame = None
+               ) -> DeviationsTable:
     """
     Compares alternatives on criteria.
 
     :return: 3D matrix of deviations in evaluations on criteria
     """
 
-    def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, k):
+    def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, n):
         for _, i in i_iter.iterrows():
             comparison_direct = []
             for _, j in j_iter.iterrows():
-                comparison_direct.append(i[k] - j[k])
+                comparison_direct.append(i[n] - j[n])
             comparisons.append(comparison_direct)
         return comparisons
 
@@ -74,7 +62,9 @@ def deviations(criteria: List[str], alternatives_performances: pd.DataFrame,
     return deviations_list
 
 
-def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, i_iter, j_iter):
+def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd.Series,
+            generalized_criteria: pd.Series, deviations: DeviationsTable, i_iter: PerformanceTable,
+            j_iter: PerformanceTable) -> pd.DataFrame:
     ppIndices = []
     for k in range(len(criteria)):
         method = generalized_criteria[k]
@@ -86,11 +76,11 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
             alternativeIndices = []
             for j in range(j_iter.shape[0]):
                 if method is PreferenceFunction.USUAL:
-                    alternativeIndices.append(gc.usualCriterion(deviations[k][i][j]))
+                    alternativeIndices.append(gc.usual_criterion(deviations[k][i][j]))
                 elif method is PreferenceFunction.U_SHAPE:
-                    alternativeIndices.append(gc.uShapeCriterion(deviations[k][i][j], q))
+                    alternativeIndices.append(gc.u_shape_criterion(deviations[k][i][j], q))
                 elif method is PreferenceFunction.V_SHAPE:
-                    alternativeIndices.append(gc.vShapeCriterion(deviations[k][i][j], p))
+                    alternativeIndices.append(gc.v_shape_criterion(deviations[k][i][j], p))
                 elif method is PreferenceFunction.LEVEL:
                     if q > p:
                         raise ValueError(
@@ -99,7 +89,7 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                             + " greater than p "
                             + str(p)
                         )
-                    alternativeIndices.append(gc.levelCriterion(deviations[k][i][j], p, q))
+                    alternativeIndices.append(gc.level_criterion(deviations[k][i][j], p, q))
                 elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
                     if q > p:
                         raise ValueError(
@@ -108,8 +98,8 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                             + " greater than p "
                             + str(p)
                         )
-                    alternativeIndices.append(gc.vShapeIndifferenceCriterion(deviations[k][i][j],
-                                                                             p, q))
+                    alternativeIndices.append(gc.v_shape_indifference_criterion(deviations[k][i][j],
+                                                                                p, q))
                 elif method is PreferenceFunction.GAUSSIAN:
                     alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
                 else:
@@ -125,12 +115,13 @@ def pp_deep(criteria, p_list, q_list, s_list, generalized_criteria, deviations, 
                           keys=criteria,
                           names=names)
 
-
     return ppIndices
 
 
-def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
-                       categories_profiles, alternatives_performances, profile_performance_table):
+def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd.Series,
+                       generalized_criteria: pd.Series, categories_profiles: pd.Index,
+                       alternatives_performances: PerformanceTable,
+                       profile_performance_table: PerformanceTable) -> PreferencePartialTable:
     """
     Calculates partial preference of every alternative over other alternatives
     or profiles at every criterion based on deviations using a method chosen by user.
@@ -158,7 +149,8 @@ def partial_preference(criteria, p_list, q_list, s_list, generalized_criteria,
     return ppIndices
 
 
-def overall_preference(preferences, discordances, profiles):
+def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | List[pd.DataFrame],
+                       profiles) -> pd.DataFrame | tuple[pd.DataFrame]:
     """
     Combines preference and discordance/veto indices to compute overall preference
 
@@ -172,7 +164,7 @@ def overall_preference(preferences, discordances, profiles):
             for n in discordance.index:
                 for i in discordance.columns:
                     discordance[n][i] = 1 - discordance[n][i]
-        overall_preferences = (preferences[0] * discordances[0], preferences[1], * discordances[1])
+        overall_preferences = (preferences[0] * discordances[0], preferences[1], *discordances[1])
     else:
         for n in discordances.index:
             for i in discordances.columns:
@@ -182,7 +174,7 @@ def overall_preference(preferences, discordances, profiles):
     return overall_preferences
 
 
-def criteria_series(criteria, weights):
+def criteria_series(criteria: pd.Index, weights: list[float]) -> pd.Series:
     """
     Connect criterion name with its weight.
 
