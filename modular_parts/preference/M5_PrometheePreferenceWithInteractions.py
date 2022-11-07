@@ -79,8 +79,9 @@ def _preferences(z_function: NumericValue, interactions: PerformanceTable, weigh
             for key in interactions.index.values:
                 k1 = interactions['criterion_1'].loc[key]
                 k2 = interactions['criterion_2'].loc[key]
-                interaction_ab += _z_function(z_function, partialPref.loc[k1, i][j], partialPref.loc[k2, i][j]) * \
-                                  interactions['coefficient'].loc[key] * interactions['type'].loc[key].value
+                coefficient = interactions['coefficient'].loc[key] * interactions['type'].loc[key].value
+                interaction_ab += _z_function(z_function, partialPref.loc[k1, i][j],
+                                              partialPref.loc[k2, i][j]) * coefficient
 
             aggregatedPI.append(
                 round((Pi_A_B + interaction_ab) / (sum(weights.values) + interaction_ab), decimal_place))
