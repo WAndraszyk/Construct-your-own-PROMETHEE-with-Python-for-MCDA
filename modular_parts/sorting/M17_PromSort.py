@@ -190,7 +190,6 @@ def calculate_promsort_sorted_alternatives(categories: List[str],
     (-1 means 'always worse category', 1 means 'always better category')
     :param assign_to_better_class: Boolean which describe preference of the DM in final alternative assignment if
     total distance is equal cut_point value.
-
     :return: DataFrame with imprecise category assignments(worse and better class)
     and Series with precise assignments
     """
