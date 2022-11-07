@@ -17,10 +17,10 @@ def compute_single_criterion_net_flows(partial_preferences: Union[pd.DataFrame, 
         object_names = partial_preferences[1].columns.tolist()
         n = len(object_names)
 
-        for (criterion, criterion_preferences1, criterion, criterion_preferences2) \
+        for (criterion, criterion_preferences1), (criterion, criterion_preferences2) \
                 in zip(partial_preferences[0].groupby(level=0),
                        partial_preferences[1].groupby(level=0)):
-            for object_i, object_i_row, object_j, object_j_col \
+            for (object_i, object_i_row), (object_j, object_j_col) \
                     in zip(criterion_preferences1.droplevel(0).iterrows(),
                            criterion_preferences2.droplevel(0).T.iterrows()):
                 single_criterion_net_flows[object_i] = (object_i_row - object_j_col) / n
@@ -33,13 +33,13 @@ def compute_single_criterion_net_flows(partial_preferences: Union[pd.DataFrame, 
         n = len(object_names)
 
         for criterion, criterion_preferences in partial_preferences.groupby(level=0):
-            for object_i, object_i_row, object_j, object_j_col \
+            criterion_flows = []
+            for (object_i, object_i_row), (object_j, object_j_col) \
                     in zip(criterion_preferences.droplevel(0).iterrows(),
                            criterion_preferences.droplevel(0).T.iterrows()):
-                single_criterion_net_flows[object_i] = (object_i_row - object_j_col) / (n - 1)
+                criterion_flows.append((object_i_row - object_j_col).sum() / (n-1))
+            single_criterion_net_flows[criterion] = criterion_flows
 
-        single_criterion_net_flows = single_criterion_net_flows.T
-        single_criterion_net_flows.columns = partial_preferences.index.get_level_values(0)
         single_criterion_net_flows.index = object_names
 
     return single_criterion_net_flows

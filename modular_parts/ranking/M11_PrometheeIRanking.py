@@ -3,15 +3,15 @@
     Implemented method is generalized to relation of the weak preference.
 """
 
-from core.aliases import FlowsTable, Alternative
-from typing import List, Tuple
+import pandas as pd
+from core.aliases import FlowsTable
 
 __all__ = ["calculate_prometheeI_ranking"]
 
 
 def calculate_prometheeI_ranking(flows: FlowsTable,
                                  weak_preference=True
-                                 ) -> List[Tuple[Alternative, str, Alternative]]:
+                                 ) -> pd.DataFrame:
     """
     Calculate outranking pairs - 1st alternative in pair | relation between variants | 2nd alternative in pair.
     Relationship types:
@@ -29,26 +29,27 @@ def calculate_prometheeI_ranking(flows: FlowsTable,
     positive_flow = flows['positive']
     negative_flow = flows['negative']
 
-    pairs = []
+    pairs = pd.DataFrame(index=alternatives, columns=alternatives)
 
     for alternative_a in alternatives:
         for alternative_b in alternatives:
             if alternative_a == alternative_b:
+                pairs[alternative_b][alternative_a] = None
                 continue
             if weak_preference:
                 if positive_flow[alternative_a] >= positive_flow[alternative_b] \
                         and negative_flow[alternative_a] <= negative_flow[alternative_b]:
-                    pairs.append((alternative_a, ' S ', alternative_b))
+                    pairs[alternative_b][alternative_a] = 'S'
                 else:
-                    pairs.append((alternative_a, ' ? ', alternative_b))
+                    pairs[alternative_b][alternative_a] = '?'
             else:
                 if positive_flow[alternative_a] == positive_flow[alternative_b] \
                         and negative_flow[alternative_a] == negative_flow[alternative_b]:
-                    pairs.append((alternative_a, ' I ', alternative_b))
+                    pairs[alternative_b][alternative_a] = 'I'
                 elif positive_flow[alternative_a] >= positive_flow[alternative_b] \
                         and negative_flow[alternative_a] <= negative_flow[alternative_b]:
-                    pairs.append((alternative_a, ' P ', alternative_b))
+                    pairs[alternative_b][alternative_a] = 'P'
                 else:
-                    pairs.append((alternative_a, ' ? ', alternative_b))
+                    pairs[alternative_b][alternative_a] = '?'
 
     return pairs
