@@ -1,14 +1,10 @@
-import pytest
 import sys
-import pandas as pd
 from pandas._testing import assert_frame_equal
-from pandas.testing import assert_series_equal
-from Tests.Example2Data import *
+from unit_tests.data.Example2Data import *
 from modular_parts.preference import compute_preference_indices
-sys.path.append('../..')
-
 from modular_parts.weights import equal_weights
 
+sys.path.append('../..')
 
 
 def test_preference():
@@ -26,7 +22,7 @@ def test_preference():
                                            generalized_criteria,
                                            criteria_directions, weights)
 
-    assert_frame_equal( actual , expected ,atol=0.006)
+    assert_frame_equal(actual, expected, atol=0.006)
 
 
 if __name__ == '__main__':

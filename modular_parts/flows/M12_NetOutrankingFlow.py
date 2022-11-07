@@ -4,6 +4,7 @@ from core.aliases import FlowsTable, NetOutrankingFlows
 
 __all__ = ['calculate_net_outranking_flows']
 
+
 def calculate_net_outranking_flows(flows: FlowsTable) -> NetOutrankingFlows:
     """
     Computes net outranking flow based on positive and negative flows.

@@ -4,6 +4,8 @@ from core.linear_solver import solve_linear_problem
 from typing import List
 import pandas as pd
 
+__all__ = ["compute_decision"]
+
 
 def compute_decision(flows: NetOutrankingFlows, constraints: List[Constraint]) -> pd.Series:
     """
