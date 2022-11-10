@@ -75,7 +75,7 @@ def v_shape_indifference_criterion(d: NumericValue, p: NumericValue, q: NumericV
         return 1
 
 
-def gaussianCriterion(d: NumericValue, s: NumericValue) -> NumericValue:
+def gaussian_criterion(d: NumericValue, s: NumericValue) -> NumericValue:
     """
     Calculates preference based on nonlinear gaussian function.
 
