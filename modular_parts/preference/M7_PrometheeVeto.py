@@ -20,7 +20,7 @@ def compute_veto(
 
     :param alternatives_performances: Dataframe of alternatives' value at every criterion
     :param weights: criteria with weights
-    :param v_list: veto threshold for each criteria
+    :param v_list: veto threshold for each criterion
     :param directions: directions of preference of criteria
     :param profiles_performance: Dataframe of profiles performance (value) at every criterion
     :param decimal_place: with this you can choose the decimal_place of the output numbers

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from core.aliases import PreferencesTable, NumericValue
 from core.Graph import Graph
 import numpy as np
@@ -38,7 +38,7 @@ def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int)
     return pd.Series(clusters, name='Alternatives in clusters')
 
 
-def _search_max(preferences: List[List[NumericValue]]) -> tuple[NumericValue, int, int]:
+def _search_max(preferences: List[List[NumericValue]]) -> Tuple[NumericValue, int, int]:
     max_pi = 0
     pi_i = 0
     pi_j = 0
@@ -64,7 +64,7 @@ def _check_graph(graph: np.ndarray, K: int) -> bool:
         return True
 
 
-def _calculate_degrees(graph: np.ndarray) -> tuple[list[int], bool]:
+def _calculate_degrees(graph: np.ndarray) -> Tuple[List[int], bool]:
     degrees = []
     no_nodes = True
     for j in range(len(graph)):
