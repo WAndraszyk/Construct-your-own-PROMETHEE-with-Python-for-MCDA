@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Tuple
 
-from core.aliases import NumericValue, PerformanceTable, PreferencePartialTable, DeviationsTable
+from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable
 from core.enums import PreferenceFunction
 import core.generalized_criteria as gc
 
@@ -150,7 +150,7 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
 
 
 def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | List[pd.DataFrame],
-                       profiles) -> pd.DataFrame | tuple[pd.DataFrame]:
+                       profiles) -> pd.DataFrame | Tuple[pd.DataFrame]:
     """
     Combines preference and discordance/veto indices to compute overall preference
 
@@ -174,7 +174,7 @@ def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | L
     return overall_preferences
 
 
-def criteria_series(criteria: pd.Index, weights: list[float]) -> pd.Series:
+def criteria_series(criteria: pd.Index, weights: List[float]) -> pd.Series:
     """
     Connect criterion name with its weight.
 

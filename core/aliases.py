@@ -1,9 +1,9 @@
-from typing import Union, List
+from typing import Union, List, Tuple
 
 import pandas as pd
 
 NumericValue = Union[int, float]
-PreferenceTable = Union[pd.DataFrame, tuple[pd.DataFrame]]
+PreferenceTable = Union[pd.DataFrame, Tuple[pd.DataFrame]]
 Id = str
 
 Alternative = Id
@@ -12,10 +12,10 @@ Criterion = Id
 
 PerformanceTable = pd.DataFrame  # Alternatives performances or Category Profiles performances
 PreferencesTable = pd.DataFrame
-PreferencePartialTable = pd.DataFrame | tuple[pd.DataFrame]
-Preferences = tuple[PreferenceTable]
+PreferencePartialTable = pd.DataFrame | Tuple[pd.DataFrame]
+Preferences = Tuple[PreferenceTable]
 FlowsTable = pd.DataFrame
 NetOutrankingFlows = pd.Series
 DMsTable = pd.DataFrame
 RankedCriteria = pd.Series
-DeviationsTable = List[List[List[NumericValue]] | List[List[List[NumericValue]]]]
+DeviationsTable = List[Union[List[List[NumericValue]], List[List[List[NumericValue]]]]]

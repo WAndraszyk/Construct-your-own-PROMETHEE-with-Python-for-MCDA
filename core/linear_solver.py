@@ -1,11 +1,11 @@
 import itertools
 import numpy as np
-from typing import List
+from typing import List, Tuple
 from core.constraint import Constraint, Relation
 from core.aliases import NumericValue
 
 
-def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue], n: int) -> tuple[int]:
+def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue], n: int) -> Tuple[int]:
     """
     Solves given linear problem. Component value can be either 1 or 0.
 
@@ -34,7 +34,7 @@ def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue], n
     return decision
 
 
-def check_constraint(constraint: Constraint, combination: tuple[int]) -> bool:
+def check_constraint(constraint: Constraint, combination: Tuple[int]) -> bool:
     if constraint.relation == Relation.EQ:
         return np.dot(combination, constraint.A) == constraint.b
     elif constraint.relation == Relation.MT:

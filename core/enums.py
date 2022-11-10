@@ -41,6 +41,7 @@ class PreferenceFunction(Enum):
     V_SHAPE_INDIFFERENCE = 5
     GAUSSIAN = 6
 
+
 class InteractionType(Enum):
     # STN = 1  # strengthening
     # WKN = 2  # weakening

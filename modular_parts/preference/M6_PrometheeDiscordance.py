@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import List
+from typing import Tuple, List, Union
 from core.aliases import NumericValue
 from core.preference_commons import overall_preference
 
@@ -8,8 +8,8 @@ __all__ = ["compute_discordance"]
 
 def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
                         preferences: pd.DataFrame = None,
-                        categories_profiles=False) -> tuple[pd.DataFrame | List[pd.DataFrame], pd.DataFrame |
-                                                            List[pd.DataFrame]] | pd.DataFrame | tuple[pd.DataFrame]:
+                        categories_profiles=False) -> Union[Tuple[pd.DataFrame | List[pd.DataFrame], pd.DataFrame |
+                                                            List[pd.DataFrame]], pd.DataFrame, Tuple[pd.DataFrame]]:
     """
     Calculates overall discordance by aggregating partial discordance indices.
 
