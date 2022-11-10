@@ -47,6 +47,10 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
     indifference_thresholds = indifference_thresholds
     reinforced_preference_thresholds = reinforced_preference_thresholds
     reinforcement_factors = reinforcement_factors
+    for i in reinforcement_factors.values:
+        if i <= 1:
+            raise Exception("Reinforcement factors need to be >1")
+
     if profiles_performance is not None:
         categories_profiles = profiles_performance.keys()
         profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
