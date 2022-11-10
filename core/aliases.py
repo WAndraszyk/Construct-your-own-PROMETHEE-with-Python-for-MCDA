@@ -12,10 +12,10 @@ Criterion = Id
 
 PerformanceTable = pd.DataFrame  # Alternatives performances or Category Profiles performances
 PreferencesTable = pd.DataFrame
-PreferencePartialTable = pd.DataFrame | tuple[pd.DataFrame]
+PreferencePartialTable = Union[pd.DataFrame, tuple[pd.DataFrame]]
 Preferences = tuple[PreferenceTable]
 FlowsTable = pd.DataFrame
 NetOutrankingFlows = pd.Series
 DMsTable = pd.DataFrame
 RankedCriteria = pd.Series
-DeviationsTable = List[List[List[NumericValue]] | List[List[List[NumericValue]]]]
+DeviationsTable = List[Union[List[List[NumericValue]], List[List[List[NumericValue]]]]]
