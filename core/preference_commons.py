@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from core.aliases import NumericValue, PerformanceTable, PreferencePartialTable, DeviationsTable
 from core.enums import PreferenceFunction
@@ -17,12 +17,9 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
     :param directions: directions of preference of criteria
     :return: 2D list of alternatives' value at every criterion
     """
-    copy_alternatives_performances = alternatives_performances
-    for direction in directions.keys():
-        if directions[direction] == 0:
-            copy_alternatives_performances[direction] = copy_alternatives_performances[direction] * -1
-
-    return copy_alternatives_performances
+    copy_alternatives_performances = alternatives_performances.copy()
+    directions[directions == 0] = -1
+    return copy_alternatives_performances.mul(directions, axis=1)
 
 
 def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
@@ -149,8 +146,8 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
     return ppIndices
 
 
-def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | List[pd.DataFrame],
-                       profiles) -> pd.DataFrame | tuple[pd.DataFrame]:
+def overall_preference(preferences: pd.DataFrame, discordances: Union[pd.DataFrame, List[pd.DataFrame]],
+                       profiles) -> Union[pd.DataFrame, tuple[pd.DataFrame]]:
     """
     Combines preference and discordance/veto indices to compute overall preference
 

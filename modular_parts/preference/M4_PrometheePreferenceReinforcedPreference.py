@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from core.preference_commons import PreferenceFunction
 from core.aliases import NumericValue, PerformanceTable
 import core.generalized_criteria as gc
@@ -15,7 +15,7 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
                                   reinforcement_factors: pd.Series,
                                   weights: pd.Series,
                                   profiles_performance: PerformanceTable = None,
-                                  decimal_place: NumericValue = 3) -> pd.DataFrame | tuple[pd.DataFrame]:
+                                  decimal_place: NumericValue = 3) -> Union[pd.DataFrame, tuple[pd.DataFrame]]:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences.
@@ -71,7 +71,7 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series, pre
                         indifference_thresholds: pd.Series, reinforced_preference_thresholds: pd.Series,
                         reinforcement_factors: pd.Series, alternatives_performances: PerformanceTable,
                         profile_performance_table: PerformanceTable, categories_profiles: pd.Index
-                        ) -> tuple[pd.DataFrame, List[List[List[List[int]]]] | List[List[int]]]:
+                        ) -> tuple[pd.DataFrame, Union[List[List[List[List[int]]]], List[List[int]]]]:
     """
     Calculates partial preference of every alternative over others at every criterion
     based on deviations using a method chosen by user. If deviation is greater then
@@ -164,7 +164,7 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series, preference_thr
 
 
 def _preferences(criteria: pd.Index, weights: pd.Series, reinforcement_factors: pd.Series, partialPref: pd.DataFrame,
-                 decimal_place: int, Frp: List[List[List[int]]] | List[List[int]], i_perf: PerformanceTable,
+                 decimal_place: int, Frp: Union[List[List[List[int]]], List[List[int]]], i_perf: PerformanceTable,
                  j_perf: PerformanceTable = None) -> pd.DataFrame:
     i_iter = i_perf.index
     if j_perf is None:

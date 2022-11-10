@@ -15,7 +15,6 @@ def test_preference():
                                   [0.399, 0.505, 0.305, 0.000, 0.223, 0.212],
                                   [0.444, 0.515, 0.487, 0.380, 0.000, 0.448],
                                   [0.286, 0.399, 0.250, 0.432, 0.133, 0.000]], columns=alternatives, index=alternatives)
-    # print(expected)
 
     actual, _ = compute_preference_indices(alternatives_performances, preference_thresholds,
                                            indifference_thresholds, standard_deviations,

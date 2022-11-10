@@ -1,3 +1,5 @@
+import math
+
 from core.aliases import NumericValue
 
 
@@ -82,7 +84,7 @@ def gaussianCriterion(d: NumericValue, s: NumericValue) -> NumericValue:
     :param s: intermediate value between q and p. Defines the inflection point of the preference function.
     :param d: difference between two alternatives on a specified criterion
     """
-    e = 2.718281828459045  # math.e
+    e = math.e
     if d <= 0:
         return 0
     else:
