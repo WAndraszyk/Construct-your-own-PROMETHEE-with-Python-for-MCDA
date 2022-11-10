@@ -101,7 +101,7 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd
                     alternativeIndices.append(gc.v_shape_indifference_criterion(deviations[k][i][j],
                                                                                 p, q))
                 elif method is PreferenceFunction.GAUSSIAN:
-                    alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
+                    alternativeIndices.append(gc.gaussian_criterion(deviations[k][i][j], s))
                 else:
                     raise ValueError(
                         "pref_func "
