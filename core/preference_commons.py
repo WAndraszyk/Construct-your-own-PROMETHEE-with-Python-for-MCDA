@@ -1,6 +1,7 @@
-from typing import List, Tuple
+import copy
+from typing import List, Tuple, Union
 
-from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable
+from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable, NumericValue
 from core.enums import PreferenceFunction
 import core.generalized_criteria as gc
 
@@ -17,7 +18,7 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
     :param directions: directions of preference of criteria
     :return: 2D list of alternatives' value at every criterion
     """
-    copy_alternatives_performances = alternatives_performances
+    copy_alternatives_performances = copy.deepcopy(alternatives_performances)
     for direction in directions.keys():
         if directions[direction] == 0:
             copy_alternatives_performances[direction] = copy_alternatives_performances[direction] * -1
@@ -101,7 +102,7 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd
                     alternativeIndices.append(gc.v_shape_indifference_criterion(deviations[k][i][j],
                                                                                 p, q))
                 elif method is PreferenceFunction.GAUSSIAN:
-                    alternativeIndices.append(gc.gaussianCriterion(deviations[k][i][j], s))
+                    alternativeIndices.append(gc.gaussian_criterion(deviations[k][i][j], s))
                 else:
                     raise ValueError(
                         "pref_func "
@@ -149,14 +150,15 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
     return ppIndices
 
 
-def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | List[pd.DataFrame],
-                       profiles) -> pd.DataFrame | Tuple[pd.DataFrame]:
+def overall_preference(preferences: pd.DataFrame, discordances: Union[pd.DataFrame, List[pd.DataFrame]],
+                       profiles: bool, decimal_place: NumericValue) -> Union[pd.DataFrame, Tuple[pd.DataFrame]]:
     """
     Combines preference and discordance/veto indices to compute overall preference
 
     :param preferences: aggregated preference indices
     :param discordances: aggregated discordance/veto indices
     :param profiles: were the preferences and discordance/veto calculated with profiles
+    :param decimal_place: with this you can choose the decimal_place of the output numbers
     :returns: overall preference indices
     """
     if profiles:
@@ -171,7 +173,7 @@ def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | L
                 discordances[n][i] = 1 - discordances[n][i]
         overall_preferences = preferences * discordances
 
-    return overall_preferences
+    return overall_preferences.round(decimal_place)
 
 
 def criteria_series(criteria: pd.Index, weights: List[float]) -> pd.Series:

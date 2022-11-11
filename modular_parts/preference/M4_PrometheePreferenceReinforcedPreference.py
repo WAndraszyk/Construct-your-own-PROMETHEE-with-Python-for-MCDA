@@ -17,7 +17,9 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
                                   reinforcement_factors: pd.Series,
                                   weights: pd.Series,
                                   profiles_performance: PerformanceTable = None,
-                                  decimal_place: NumericValue = 3) -> pd.DataFrame | Tuple[pd.DataFrame]:
+                                  decimal_place: NumericValue = 3) -> Union[Tuple[pd.DataFrame, pd.DataFrame],
+                                                                            Tuple[Tuple[pd.DataFrame, pd.DataFrame],
+                                                                                  pd.DataFrame]]:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences.
@@ -47,6 +49,10 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
     indifference_thresholds = indifference_thresholds
     reinforced_preference_thresholds = reinforced_preference_thresholds
     reinforcement_factors = reinforcement_factors
+    for i in reinforcement_factors.values:
+        if i <= 1:
+            raise Exception("Reinforcement factors need to be >1")
+
     if profiles_performance is not None:
         categories_profiles = profiles_performance.keys()
         profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
@@ -180,8 +186,7 @@ def _preferences(criteria: pd.Index, weights: pd.Series, reinforcement_factors: 
             Pi_A_B_nom = 0
             Pi_A_B_denom = 0
             for k in range(len(criteria)):
-                Pi_A_B_nom += partialPref.loc[criteria[k], i_iter[i]][j_iter[j]] * weights[
-                    criteria[k]]
+                Pi_A_B_nom += partialPref.loc[criteria[k], i_iter[i]][j_iter[j]] * weights[criteria[k]]
                 if Frp[k][i][j] == 1:
                     Pi_A_B_denom += weights[criteria[k]] * reinforcement_factors[criteria[k]]
                 else:
