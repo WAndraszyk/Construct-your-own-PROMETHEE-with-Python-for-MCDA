@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable
 from core.enums import PreferenceFunction
@@ -149,8 +149,8 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
     return ppIndices
 
 
-def overall_preference(preferences: pd.DataFrame, discordances: pd.DataFrame | List[pd.DataFrame],
-                       profiles) -> pd.DataFrame | Tuple[pd.DataFrame]:
+def overall_preference(preferences: pd.DataFrame, discordances: Union[pd.DataFrame, List[pd.DataFrame]],
+                       profiles) -> Union[pd.DataFrame, Tuple[pd.DataFrame]]:
     """
     Combines preference and discordance/veto indices to compute overall preference
 

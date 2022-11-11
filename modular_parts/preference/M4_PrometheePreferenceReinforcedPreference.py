@@ -17,7 +17,9 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
                                   reinforcement_factors: pd.Series,
                                   weights: pd.Series,
                                   profiles_performance: PerformanceTable = None,
-                                  decimal_place: NumericValue = 3) -> pd.DataFrame | Tuple[pd.DataFrame]:
+                                  decimal_place: NumericValue = 3) -> Union[Tuple[pd.DataFrame, pd.DataFrame],
+                                                                            Tuple[Tuple[pd.DataFrame, pd.DataFrame],
+                                                                                  pd.DataFrame]]:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences.
@@ -184,8 +186,7 @@ def _preferences(criteria: pd.Index, weights: pd.Series, reinforcement_factors: 
             Pi_A_B_nom = 0
             Pi_A_B_denom = 0
             for k in range(len(criteria)):
-                Pi_A_B_nom += partialPref.loc[criteria[k], i_iter[i]][j_iter[j]] * weights[
-                    criteria[k]]
+                Pi_A_B_nom += partialPref.loc[criteria[k], i_iter[i]][j_iter[j]] * weights[criteria[k]]
                 if Frp[k][i][j] == 1:
                     Pi_A_B_denom += weights[criteria[k]] * reinforcement_factors[criteria[k]]
                 else:

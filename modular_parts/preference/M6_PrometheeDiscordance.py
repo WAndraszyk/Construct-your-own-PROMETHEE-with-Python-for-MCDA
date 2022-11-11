@@ -8,8 +8,9 @@ __all__ = ["compute_discordance"]
 
 def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
                         preferences: pd.DataFrame = None,
-                        categories_profiles=False) -> Union[Tuple[pd.DataFrame | List[pd.DataFrame], pd.DataFrame |
-                                                            List[pd.DataFrame]], pd.DataFrame, Tuple[pd.DataFrame]]:
+                        categories_profiles=False) -> Union[Tuple[Union[pd.DataFrame, List[pd.DataFrame]],
+                                                                  Union[pd.DataFrame, List[pd.DataFrame]]],
+                                                            pd.DataFrame, Tuple[pd.DataFrame]]:
     """
     Calculates overall discordance by aggregating partial discordance indices.
 
