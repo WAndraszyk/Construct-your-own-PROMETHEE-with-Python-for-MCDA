@@ -11,8 +11,8 @@ import numpy as np
 __all__ = ["calculate_promethee_iii_ranking"]
 
 
-def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesTable,
-                                    alpha: NumericValue) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesTable, alpha: NumericValue,
+                                    decimal_place: NumericValue = 3) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Calculates intervals and outranking pairs:
     1st alternative in pair | relation between variants | 2nd alternative in pair.
@@ -23,6 +23,7 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
     :param flows: FlowsTable of both positive and negative outranking flows.
     :param preferences: PreferenceTable of alternatives over alternatives
     :param alpha: parameter used in calculating intervals
+    :param decimal_place: with this you can choose the decimal_place of the output numbers
 
     :return: Intervals; Preference ranking pairs
     """
@@ -33,7 +34,7 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
 
     if alpha <= 0:
         raise Exception("Alpha has to be greater than 0")
-    intervals_list, intervals = _calculate_intervals(alternatives, flow, preferences, alpha)
+    intervals_list, intervals = _calculate_intervals(alternatives, flow, preferences, alpha, decimal_place)
     pairs_data = np.zeros(np.shape(preferences), dtype=str)
     for num_a in range(len(alternatives)):
         for num_b in range(len(alternatives)):
@@ -50,8 +51,8 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
     return intervals, pairs
 
 
-def _calculate_intervals(alternatives, flow: pd.Series, preferences: PreferencesTable, alpha: NumericValue
-                         ) -> Tuple[List[List[NumericValue]], pd.DataFrame]:
+def _calculate_intervals(alternatives, flow: pd.Series, preferences: PreferencesTable, alpha: NumericValue,
+                         decimal_place: NumericValue = 3) -> Tuple[List[List[NumericValue]], pd.DataFrame]:
     """
     Calculates intervals used in alternatives comparison.
 
@@ -71,10 +72,10 @@ def _calculate_intervals(alternatives, flow: pd.Series, preferences: Preferences
     x = []
     y = []
     for i in range(n):
-        xi = flow[i] - alpha * sigmas[i]
-        x.append(xi)
-        yi = flow[i] + alpha * sigmas[i]
-        y.append(yi)
+        xi = flow[i] - (alpha * sigmas[i])
+        x.append(round(xi, decimal_place))
+        yi = flow[i] + (alpha * sigmas[i])
+        y.append(round(yi, decimal_place))
 
     intervals = {'x': x, 'y': y}
 
