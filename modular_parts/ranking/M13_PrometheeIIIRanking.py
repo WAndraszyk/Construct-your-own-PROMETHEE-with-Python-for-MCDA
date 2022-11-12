@@ -29,7 +29,7 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
 
     alternatives = preferences.index
     preferences = preferences
-    flow = np.subtract(flows['positive'].values, flows['negative'].values)
+    flow = pd.Series(data=np.subtract(flows['positive'].values, flows['negative'].values), index=alternatives)
 
     if alpha <= 0:
         raise Exception("Alpha has to be greater than 0")
@@ -50,7 +50,7 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
     return intervals, pairs
 
 
-def _calculate_intervals(alternatives, flow: FlowsTable, preferences: PreferencesTable, alpha: NumericValue
+def _calculate_intervals(alternatives, flow: pd.Series, preferences: PreferencesTable, alpha: NumericValue
                          ) -> Tuple[List[List[NumericValue]], pd.DataFrame]:
     """
     Calculates intervals used in alternatives comparison.
