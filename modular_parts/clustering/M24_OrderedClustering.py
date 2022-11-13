@@ -28,6 +28,10 @@ def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int)
         cluster = []
         degrees, no_nodes = _calculate_degrees(graph)
         if no_nodes:
+            for i in range(len(degrees)):
+                if i not in deleted_nodes:
+                    cluster.append(alternatives[i])
+            clusters.append(cluster)
             break
         for i in range(len(degrees)):
             if degrees[i] == 0 and i not in deleted_nodes:
@@ -59,7 +63,7 @@ def _check_graph(graph: np.ndarray, K: int) -> bool:
                 g.add_edge(i, j)
     is_cyclic = g.is_cyclic()
     if not is_cyclic:
-        return g.find_longest_path() > K - 1
+        return g.find_longest_path() >= K - 1
     else:
         return True
 

@@ -1,8 +1,7 @@
-from pandas._testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from unit_tests.data.Example2Data import *
 from modular_parts.preference import compute_preference_indices, compute_discordance
 from modular_parts.weights import equal_weights
-from core.preference_commons import overall_preference
 
 
 def test_discordance():
