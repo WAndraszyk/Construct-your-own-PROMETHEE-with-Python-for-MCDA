@@ -67,7 +67,7 @@ def _calculate_unimodal_alternatives_support(alternatives_support: pd.DataFrame)
                 unimodal_row[category] = max(support, min(max(row.iloc[:i]), max(row.iloc[i + 1:])))
         return unimodal_row
 
-    unimodal_alternatives_support = alternatives_support.apply(unimodal_single_row, axis=1)
+    unimodal_alternatives_support = alternatives_support.apply(unimodal_single_row, axis=1).astype(float)
 
     return unimodal_alternatives_support
 

@@ -305,4 +305,3 @@ def test_calculate_gdss_flows(dms_profiles_partial_preferences, dms_alternatives
 if __name__ == '__main__':
     test_calculate_gdss_flows(dms_profiles_partial_preferences, dms_alternatives_partial_preferences,
                               dms_profile_vs_profile_partial_preferences, criteria_weights)
-    
