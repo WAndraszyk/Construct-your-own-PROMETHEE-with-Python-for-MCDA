@@ -32,7 +32,7 @@ Wykonane moduły (przetestowane):
 - M21x:heavy_check_mark: 
 - M22 :heavy_check_mark:
 - M23 :heavy_check_mark: :heavy_check_mark:
-- M24 :heavy_check_mark:
+- M24 :heavy_check_mark: :heavy_check_mark:
 - M25
 - M26
 - M29 :heavy_check_mark:
