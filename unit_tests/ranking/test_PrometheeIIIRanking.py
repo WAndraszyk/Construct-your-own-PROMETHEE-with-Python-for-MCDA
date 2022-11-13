@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from pandas._testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from modular_parts.ranking import calculate_promethee_iii_ranking
 
 

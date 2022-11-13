@@ -2,7 +2,7 @@ import pandas as pd
 import random
 import core.preference_commons as pc
 from typing import List, Tuple, Dict
-from modular_parts.flows import calculate_promethee_outranking_flows
+from modular_parts.flows import calculate_prometheeI_outranking_flows
 from modular_parts.preference import compute_preference_indices
 
 __all__ = ['cluster_using_pclust']
@@ -53,7 +53,7 @@ def _calculate_profiles_net_flows(central_profiles: pd.DataFrame,
                                                          directions,
                                                          weights)
 
-    profiles_flows = calculate_promethee_outranking_flows(profiles_preferences)
+    profiles_flows = calculate_prometheeI_outranking_flows(profiles_preferences)
 
     return profiles_flows
 
