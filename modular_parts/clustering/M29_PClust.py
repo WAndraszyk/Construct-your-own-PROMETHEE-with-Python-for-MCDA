@@ -1,8 +1,10 @@
+import math
+
 import pandas as pd
 import random
 import core.preference_commons as pc
 from typing import List, Tuple, Dict
-from modular_parts.flows import calculate_promethee_outranking_flows
+from modular_parts.flows import calculate_prometheeI_outranking_flows
 from modular_parts.preference import compute_preference_indices
 
 __all__ = ['cluster_using_pclust']
@@ -53,7 +55,7 @@ def _calculate_profiles_net_flows(central_profiles: pd.DataFrame,
                                                          directions,
                                                          weights)
 
-    profiles_flows = calculate_promethee_outranking_flows(profiles_preferences)
+    profiles_flows = calculate_prometheeI_outranking_flows(profiles_preferences)
 
     return profiles_flows
 
@@ -105,7 +107,7 @@ def _update_of_the_central_profiles(principal_categories: Dict[str, List[str]],
             central_profiles.loc[category] = \
                 alternatives_performances.loc[principal_categories[category]].mean()
         else:
-            if i == 0:
+            if math.isclose(i, 0):
                 alternatives_in_interval = 0
                 new_profile_performances = pd.Series([0 for _ in alternatives_performances.columns],
                                                      index=alternatives_performances.columns)
@@ -128,7 +130,7 @@ def _update_of_the_central_profiles(principal_categories: Dict[str, List[str]],
 
                     central_profiles.loc[category] = performances
 
-            elif i == len(categories) - 1:
+            elif math.isclose(i, (len(categories) - 1)):
                 performances = [random.uniform(central_profiles[i - 1][criterion],
                                                alternatives_performances[criterion].max())
                                 for criterion in central_profiles.columns]
@@ -283,7 +285,7 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
                                                            categories, directions)
         heterogenity_indices = _calculate_heterogenity_index(principal_categories, alternatives_preferences, categories)
 
-        if heterogenity_indices == prev_heterogenity_indices:
+        if math.isclose(heterogenity_indices, prev_heterogenity_indices):
             iteration_without_change += 1
         else:
             iteration_without_change = 0

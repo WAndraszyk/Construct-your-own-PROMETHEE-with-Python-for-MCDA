@@ -29,7 +29,7 @@ def _limiting_profiles_sorting(categories: List[str], alternatives_flows: pd.Ser
 
     for alternative, alternative_net_flow in alternatives_flows.items():
         for i, (category, category_net_flow) in enumerate(list(category_profiles_flows.items())[:-1]):
-            if i != len(category_profiles_flows) - 1:
+            if math.isclose(i, (len(category_profiles_flows) - 1)):
                 if category_net_flow < alternative_net_flow <= category_profiles_flows.iloc[i + 1]:
                     classification[alternative] = categories[i]
     return classification
