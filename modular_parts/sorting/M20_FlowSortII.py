@@ -2,6 +2,7 @@
     This module computes the assignments of given alternatives to categories using FlowSort procedure based on
     Promethee II flows.
 """
+import math
 
 import pandas as pd
 from typing import List
@@ -51,11 +52,11 @@ def _boundary_profiles_sorting(categories: List[str], category_profiles: Perform
 
     for alternative, alternative_net_flow in alternatives_flows.items():
         for i, (category, category_net_flow) in enumerate(category_profiles_flows.items()):
-            if i == 0:
+            if math.isclose(i, 0):
                 if alternative_net_flow <= category_net_flow:
                     classification[alternative] = categories[i]
                     break
-            elif i == category_profiles.shape[0] - 1:
+            elif math.isclose(i, (category_profiles.shape[0] - 1)):
                 if category_profiles_flows[i - 1] < alternative_net_flow:
                     classification[alternative] = categories[i]
             else:
@@ -82,11 +83,11 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
 
     for alternative, alternative_net_flow in alternatives_flows.items():
         for i, (category, category_net_flow) in enumerate(category_profiles_flows.items()):
-            if i == 0:
+            if math.isclose(i, 0):
                 if alternative_net_flow <= (category_net_flow + category_profiles_flows[i + 1]) / 2:
                     classification[alternative] = categories[i]
                     break
-            elif i == category_profiles.shape[0] - 1:
+            elif math.isclose(i, (category_profiles.shape[0] - 1)):
                 if (category_profiles_flows[i - 1] + category_net_flow) / 2 < alternative_net_flow:
                     classification[alternative] = categories[i]
             else:
