@@ -54,7 +54,7 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
             raise Exception("Reinforcement factors need to be >1")
 
     if profiles_performance is not None:
-        categories_profiles = profiles_performance.keys()
+        categories_profiles = profiles_performance.index
         profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
     else:
         categories_profiles = None
