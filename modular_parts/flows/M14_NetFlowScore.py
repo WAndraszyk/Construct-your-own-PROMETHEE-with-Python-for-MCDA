@@ -2,6 +2,8 @@
     This class computes Net Flow Score which bases on calculating scores associated with
     each alternative.
 """
+import math
+
 import numpy as np
 import pandas as pd
 from core.aliases import PreferencesTable
@@ -73,7 +75,7 @@ def calculate_net_flows_score(preferences: PreferencesTable,
 
     if avoid_same_scores:
         scores = _calculate_score(preferences, function, direction)
-        if len(scores) != len(set(scores)):
+        if not math.isclose(len(scores), len(set(scores))):
             duplicated_values = _find_duplicates_values(scores)
             for duplicated_value in duplicated_values:
                 duplicated_score_indices = [i for i, score in enumerate(scores) if score == duplicated_value]

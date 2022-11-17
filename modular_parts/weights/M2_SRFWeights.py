@@ -1,6 +1,8 @@
 """
     This module computes weights of criteria using the revised Simos (or Simos-Roy-Figueira; SRF) method.
 """
+import math
+
 import pandas as pd
 
 from math import ceil, floor
@@ -138,7 +140,7 @@ def _round_properly_weights(criteria_ranks: pd.Series,
                 if criterion not in positive_ratios_larger_than_negative_ratios:
                     round_downward_list = round_downward_list.append(pd.Index([criterion]))
                     to_add_to_downward_list -= 1
-                    if to_add_to_downward_list == 0:
+                    if math.isclose(to_add_to_downward_list, 0):
                         break
 
     else:
@@ -150,7 +152,7 @@ def _round_properly_weights(criteria_ranks: pd.Series,
                 if criterion not in positive_ratios_larger_than_negative_ratios:
                     round_downward_list = round_downward_list.append(pd.Index([criterion]))
                     to_add_to_downward_list -= 1
-                    if to_add_to_downward_list == 0:
+                    if math.isclose(to_add_to_downward_list, 0):
                         break
 
     round_upward_list = list(set(criteria_ranks.index).difference(set(round_downward_list)))
