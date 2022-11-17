@@ -137,15 +137,15 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
                             i_iter=alternatives_performances, j_iter=alternatives_performances,
                             generalized_criteria=generalized_criteria)
     else:
-        ppIndices = [pp_deep(deviations=deviation[0], criteria=criteria, p_list=p_list,
+        ppIndices = (pp_deep(deviations=deviation[0], criteria=criteria, p_list=p_list,
                              q_list=q_list, s_list=s_list,
                              i_iter=alternatives_performances, j_iter=profile_performance_table,
                              generalized_criteria=generalized_criteria),
                      pp_deep(deviations=deviation[1], criteria=criteria, p_list=p_list,
                              q_list=q_list, s_list=s_list,
                              i_iter=profile_performance_table, j_iter=alternatives_performances,
-                             generalized_criteria=generalized_criteria)
-                     ]
+                             generalized_criteria=generalized_criteria))
+
 
     return ppIndices
 
