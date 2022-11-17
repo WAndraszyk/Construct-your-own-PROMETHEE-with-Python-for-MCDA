@@ -7,31 +7,32 @@ Założenia implementacyjne:
 
 ![alt text](https://github.com/WAndraszyk/Construct-your-own-PROMETHEE-with-Python-for-MCDA/blob/main/schemat.png "Schemat modułów")
 
-Wykonane moduły:
-- M1  :heavy_check_mark: 
-- M2  :heavy_check_mark:
-- M3  :heavy_check_mark:
+Wykonane moduły (przetestowane):
+- M1  :heavy_check_mark: :heavy_check_mark:
+- M2  :heavy_check_mark: :heavy_check_mark:
+- M3  :heavy_check_mark: :heavy_check_mark:
 - M4  :heavy_check_mark:
 - M5  :heavy_check_mark:
-- M6  :heavy_check_mark:
+- M6  :heavy_check_mark: :heavy_check_mark:
 - M7  :heavy_check_mark:
-- M8  :heavy_check_mark:
-- M9  :heavy_check_mark:
-- M10 :heavy_check_mark:
-- M11 :heavy_check_mark:
+- M8  :heavy_check_mark: :heavy_check_mark:
+- M9  :heavy_check_mark: :heavy_check_mark:
+- M10 :heavy_check_mark: :heavy_check_mark:
+- M11 :heavy_check_mark: :heavy_check_mark:
 - M12 :heavy_check_mark:
-- M13 :heavy_check_mark:
-- M14 :heavy_check_mark:
-- M15 :heavy_check_mark:
-- M16 :heavy_check_mark:
+- M13 :heavy_check_mark: :heavy_check_mark:
+- M14 :heavy_check_mark: :heavy_check_mark:
+- M15 :heavy_check_mark: :heavy_check_mark:
+- M16 :heavy_check_mark: :heavy_check_mark:
 - M17 :heavy_check_mark:
 - M18 :heavy_check_mark:
 - M19 :heavy_check_mark:
 - M20 :heavy_check_mark:
-- M21 :heavy_check_mark:
+- M21 :heavy_check_mark: :heavy_check_mark:
+- M21x:heavy_check_mark: 
 - M22 :heavy_check_mark:
-- M23 :heavy_check_mark:
-- M24 :heavy_check_mark:
+- M23 :heavy_check_mark: :heavy_check_mark:
+- M24 :heavy_check_mark: :heavy_check_mark:
 - M25
 - M26
 - M29 :heavy_check_mark:

@@ -1,9 +1,9 @@
-from typing import Union, List
+from typing import Union, List, Tuple
 
 import pandas as pd
 
 NumericValue = Union[int, float]
-PreferenceTable = Union[pd.DataFrame, tuple[pd.DataFrame]]
+PreferenceTable = Union[pd.DataFrame, Tuple[pd.DataFrame]]
 Id = str
 
 Alternative = Id

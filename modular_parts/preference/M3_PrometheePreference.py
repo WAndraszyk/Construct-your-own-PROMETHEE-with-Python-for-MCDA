@@ -32,7 +32,7 @@ def compute_preference_indices(alternatives_performances: PerformanceTable, pref
     criteria = weights.keys()
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
     if profiles_performance is not None:
-        categories_profiles = profiles_performance.keys()
+        categories_profiles = profiles_performance.index
         profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
     else:
         categories_profiles = None
