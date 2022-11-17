@@ -1,6 +1,7 @@
 """
     This module computes the assignments of given alternatives to categories using PromSort.
 """
+import math
 
 import pandas as pd
 from core.aliases import NumericValue, PerformanceTable, FlowsTable
@@ -25,8 +26,8 @@ def _define_outranking_relation(positive_flow_a: NumericValue, negative_flow_a: 
     :return: one of three types of outranking relation between first profile/alternative and
     second profile/alternative
     """
-    if positive_flow_a == positive_flow_b \
-            and negative_flow_a == negative_flow_b:
+    if math.isclose(positive_flow_a, positive_flow_b) \
+            and math.isclose(negative_flow_a, negative_flow_b):
         return "I"
     elif positive_flow_a >= positive_flow_b \
             and negative_flow_a <= negative_flow_b:

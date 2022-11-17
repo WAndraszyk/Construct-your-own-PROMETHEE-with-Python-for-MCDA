@@ -1,6 +1,7 @@
 """
     This module calculates alternatives support (basic and unimodal).
 """
+import math
 
 import pandas as pd
 from typing import List, Tuple
@@ -61,7 +62,7 @@ def _calculate_unimodal_alternatives_support(alternatives_support: pd.DataFrame)
         unimodal_row = pd.Series([0 for _ in range(row_len)], index=row.index)
 
         for i, (category, support) in enumerate(row.items()):
-            if i == 0 or i == row_len - 1:
+            if math.isclose(i, 0) or math.isclose(i, (row_len - 1)):
                 unimodal_row[category] = support
             else:
                 unimodal_row[category] = max(support, min(max(row.iloc[:i]), max(row.iloc[i + 1:])))

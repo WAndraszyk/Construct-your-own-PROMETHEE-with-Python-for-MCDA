@@ -45,6 +45,58 @@ def alternatives_vs_profiles_preferences():
     return alternatives_preferences, profiles_preferences
 
 
+@pytest.fixture
+def alternatives_vs_profiles_preferences():
+    alternatives = [f"a{i}" for i in range(1, 13)]
+    profiles = [f"p{i}" for i in range(1, 4)]
+    alternatives_preferences = pd.DataFrame([[1.0, 0.671159029649593, 0.0],
+                                             [0.751572327044025, 0.377358490566038, 0.190098464079345],
+                                             [0.858490566037736, 0.440251572327042, 0.0269541778975741],
+                                             [0.42722371967655, 0.0, 0.0],
+                                             [0.858490566037736, 0.609164420485175, 0.282641141527683],
+                                             [0.622641509433962, 0.528301886792453, 0.0],
+                                             [0.905660377358491, 0.294699011680141, 0.0],
+                                             [1.0, 0.886792452830189, 0.163144286181771],
+                                             [0.622641509433962, 0.528301886792453, 0.0566037735849057],
+                                             [0.141509433962264, 0.0, 0.0],
+                                             [0.471698113207547, 0.0943396226415094, 0.0],
+                                             [1.0, 1.0, 0.219748059766677]], index=alternatives, columns=profiles)
+    profiles_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0377358490566038, 0.0, 0.323450134766569, 0.0, 0.0,
+                                          0.209010387655298, 0.306080063546244, 0.323450134766569, 0.0],
+                                         [0.0, 0.289308176100629, 0.283018867924528, 0.714285714285714,
+                                          0.283018867924528, 0.377358490566038, 0.0943396226415094, 0.0,
+                                          0.377358490566038, 1.0, 0.669811320754717, 0.0],
+                                         [0.434860736747529, 0.622641509433962, 0.584905660377358, 1.0,
+                                          0.471698113207547, 0.49685534591195, 0.811320754716981, 0.192273135669362,
+                                          0.471698113207547, 1.0, 0.905660377358491, 0.0]], index=profiles,
+                                        columns=alternatives)
+    return alternatives_preferences, profiles_preferences
+
+
+@pytest.fixture
+def alternatives_vs_profiles_preferencesII():
+    alternatives = [f"a{i}" for i in range(1, 4)]
+    profiles = [f"p{i}" for i in range(1, 5)]
+    alternatives_preferences = pd.DataFrame([[0.97, 0.8, 0.38, 0.0],
+                                             [0.36, 0.0, 0.0, 0.0],
+                                             [1.0, 0.6, 0.4, 0.0]], index=alternatives, columns=profiles)
+    profiles_preferences = pd.DataFrame([[0.0, 0.0, 0.0],
+                                         [0.2, 0.95, 0.31],
+                                         [0.4, 1.0, 0.6],
+                                         [1.0, 1.0, 0.69]], index=profiles,
+                                        columns=alternatives)
+    return alternatives_preferences, profiles_preferences
+
+
+@pytest.fixture
+def profiles_preferences():
+    profiles = [f"p{i}" for i in range(1, 5)]
+    return pd.DataFrame([[0.0, 0.0, 0.0, 0.0],
+                         [1.0, 0.0, 0.0, 0.0],
+                         [1.0, 1.0, 0.0, 0.0],
+                         [1.0, 1.0, 1.0, 0.0]], index=profiles, columns=profiles)
+
+
 def test_prometheeI_outranking_flows(alternatives_preferences):
     alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
     expected = pd.DataFrame({'positive': [0.20756, 0.60942, 1.34350, 3.04672, 1.30291, 0.18260],
@@ -56,14 +108,26 @@ def test_prometheeI_outranking_flows(alternatives_preferences):
     assert_frame_equal(expected, actual, atol=0.006)
 
 
-def test_prometheeII_outranking_flows(alternatives_preferences):
-    alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
-    expected = pd.DataFrame({'positive': [0.04151, 0.12188, 0.26870, 0.60934, 0.26058, 0.03652],
-                             'negative': [0.49889, 0.22204, 0.08527, 0.05025, 0.08933, 0.39276]
-                             }, index=alternatives)
+def test_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII, profiles_preferences):
+    alternatives = [f"a{i}" for i in range(1, 4)]
+    profiles = [f"p{i}" for i in range(1, 5)]
+    external_index = []
+    internal_index = []
+    for alternative in alternatives:
+        external_index += [f"R{alternative}"] * (len(profiles) + 1)
+        internal_index += profiles + [alternative]
 
-    actual = calculate_prometheeII_outranking_flows(alternatives_preferences)
+    flows_index = pd.MultiIndex.from_arrays([external_index, internal_index])
 
+    expected = pd.DataFrame({'positive': [0.0, 0.3, 0.6, 1, 0.54,
+                                          0.0, 0.49, 0.75, 1.0, 0.09,
+                                          0.0, 0.33, 0.65, 0.92, 0.5],
+                             'negative': [0.99, 0.7, 0.34, 0.0, 0.4,
+                                          0.84, 0.5, 0.25, 0.0, 0.74,
+                                          1.0, 0.65, 0.35, 0.0, 0.4]}, index=flows_index)
+
+    actual = calculate_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII,
+                                                    profiles_preferences)
     assert_frame_equal(expected, actual, atol=0.006)
 
 
@@ -91,6 +155,6 @@ def test_prometheeI_outranking_flows_for_alternatives_vs_profiles(alternatives_v
 
 if __name__ == '__main__':
     test_prometheeI_outranking_flows(alternatives_preferences)
-    test_prometheeII_outranking_flows(alternatives_preferences)
+    test_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII, profiles_preferences)
     test_prometheeI_outranking_flows_for_alternatives_vs_profiles(alternatives_vs_profiles_preferences)
 
