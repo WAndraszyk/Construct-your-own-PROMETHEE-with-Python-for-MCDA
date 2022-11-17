@@ -31,6 +31,9 @@ def _define_outranking_relation(positive_flow_a: NumericValue, negative_flow_a: 
     elif positive_flow_a >= positive_flow_b \
             and negative_flow_a <= negative_flow_b:
         return "P"
+    elif (positive_flow_a > positive_flow_b and negative_flow_a > negative_flow_b) or \
+            (positive_flow_a < positive_flow_b and negative_flow_a < negative_flow_b):
+        return "R"
     else:
         return "?"
 
@@ -49,7 +52,7 @@ def _check_if_all_profiles_are_preferred_to_alternative(category_profiles_flows:
     :return: True if all profiles are preferred to alternative, else False
     """
     outranking_relations = category_profiles_flows.apply(
-        lambda row: _define_outranking_relation(row['positive_flow'], row['negative_flow'],
+        lambda row: _define_outranking_relation(row['positive'], row['negative'],
                                                 alternative_positive_flow, alternative_negative_flow), axis=1)
     return outranking_relations.str.contains('P').all()
 
@@ -78,18 +81,20 @@ def _calculate_first_step_assignments(categories: List[str], alternatives_flows:
 
     classification = {alternative: [] for alternative in alternatives_flows.index}
 
+    category_profiles = category_profiles_flows.index
+
     for alternative, alternative_row in alternatives_flows.iterrows():
         outranking_relations = category_profiles_flows.apply(
             lambda category_profile_row: _define_outranking_relation(
                 alternative_row['positive'], alternative_row['negative'],
                 category_profile_row['positive'], category_profile_row['negative']), axis=1)
 
-        first_i_occurrence = outranking_relations.str.contains('I').idxmax() if outranking_relations.str.contains(
-            'I').any() else float('inf')
-        first_r_occurrence = outranking_relations.str.contains('?').idxmax() if outranking_relations.str.contains(
-            '?').any() else float('inf')
-        last_p_occurrence = outranking_relations.str.contains('P').idxmin() if outranking_relations.str.contains(
-            'P').any() else float('inf')
+        first_i_occurrence = category_profiles.get_loc(outranking_relations.str.contains('I').idxmax())\
+            if outranking_relations.str.contains('I').any() else float('inf')
+        first_r_occurrence = category_profiles.get_loc(outranking_relations.str.contains('R').idxmax())\
+            if outranking_relations.str.contains('R').any() else float('inf')
+        last_p_occurrence = category_profiles.get_loc(outranking_relations.str.contains('P').idxmin()) -1\
+            if outranking_relations.str.contains('P').any() else float('inf')
 
         if outranking_relations[-1] == 'P':
             classification[alternative] = [categories[-1], categories[-1]]
@@ -125,7 +130,8 @@ def _calculate_final_assignments(alternatives_flows: FlowsTable, classification:
     :return: DataFrame with final classifications of alternatives (only one class)
     """
 
-    new_classification = classification.apply(lambda row: row['worse'] if row['worse'] == row['better'] else None)
+    new_classification = classification.apply(lambda row: row['worse'] if row['worse'] == row['better'] else None,
+                                              axis=1)
     not_classified = classification[new_classification.isnull()]
     classified = classification[~new_classification.isnull()]
 
@@ -136,7 +142,7 @@ def _calculate_final_assignments(alternatives_flows: FlowsTable, classification:
             classified[classified['worse'] == alternative_row['better']].index]
 
         alternative_net_outranking_flow = \
-            alternatives_flows[alternative]['positive'] - alternatives_flows[alternative]['negative']
+            alternatives_flows.loc[alternative, 'positive'] - alternatives_flows.loc[alternative, 'negative']
 
         worse_category_net_outranking_flow = worse_category_alternatives.apply(lambda row:
                                                                                row['positive'] - row['negative'],

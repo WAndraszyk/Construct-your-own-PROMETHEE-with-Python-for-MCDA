@@ -12,14 +12,13 @@ from core.promethee_check_dominance import check_dominance_condition
 __all__ = ["calculate_flowsortII_sorted_alternatives"]
 
 
-def _limiting_profiles_sorting(categories: List[str], category_profiles: PerformanceTable,
-                               alternatives_flows: pd.Series, category_profiles_flows: pd.Series) -> pd.Series:
+def _limiting_profiles_sorting(categories: List[str], alternatives_flows: pd.Series,
+                               category_profiles_flows: pd.Series) -> pd.Series:
     """
     Comparing positive and negative flows of each alternative with all limiting profiles and assign them to
     correctly class.
 
     :param categories: List of categories names (strings only)
-    :param category_profiles: DataFrame with category profiles performances
     :param alternatives_flows: Series with alternatives names as index and net flows as values
     :param category_profiles_flows: Series with categories names as index and net flows as values
 
@@ -28,9 +27,10 @@ def _limiting_profiles_sorting(categories: List[str], category_profiles: Perform
     classification = pd.Series(['None' for _ in alternatives_flows.index], index=alternatives_flows.index)
 
     for alternative, alternative_net_flow in alternatives_flows.items():
-        for i, category, category_net_flow in enumerate(list(category_profiles_flows.items())[:-1]):
-            if category_net_flow < alternative_net_flow <= category_profiles[i + 1]:
-                classification[alternative] = categories[i]
+        for i, (category, category_net_flow) in enumerate(list(category_profiles_flows.items())[:-1]):
+            if i != len(category_profiles_flows) - 1:
+                if category_net_flow < alternative_net_flow <= category_profiles_flows.iloc[i + 1]:
+                    classification[alternative] = categories[i]
     return classification
 
 
@@ -50,7 +50,7 @@ def _boundary_profiles_sorting(categories: List[str], category_profiles: Perform
     classification = pd.Series(['None' for _ in alternatives_flows.index], index=alternatives_flows.index)
 
     for alternative, alternative_net_flow in alternatives_flows.items():
-        for i, category, category_net_flow in enumerate(category_profiles_flows.items()):
+        for i, (category, category_net_flow) in enumerate(category_profiles_flows.items()):
             if i == 0:
                 if alternative_net_flow <= category_net_flow:
                     classification[alternative] = categories[i]
@@ -81,7 +81,7 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
     classification = pd.Series(['None' for _ in alternatives_flows.index], index=alternatives_flows.index)
 
     for alternative, alternative_net_flow in alternatives_flows.items():
-        for i, category, category_net_flow in enumerate(category_profiles_flows.items()):
+        for i, (category, category_net_flow) in enumerate(category_profiles_flows.items()):
             if i == 0:
                 if alternative_net_flow <= (category_net_flow + category_profiles_flows[i + 1]) / 2:
                     classification[alternative] = categories[i]
@@ -98,11 +98,11 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
 
 
 def calculate_flowsortII_sorted_alternatives(categories: List[str],
-                                            category_profiles: PerformanceTable,
-                                            criteria_directions: pd.Series,
-                                            alternatives_flows: pd.Series,
-                                            category_profiles_flows: pd.Series,
-                                            comparison_with_profiles: CompareProfiles) -> pd.Series:
+                                             category_profiles: PerformanceTable,
+                                             criteria_directions: pd.Series,
+                                             alternatives_flows: pd.Series,
+                                             category_profiles_flows: pd.Series,
+                                             comparison_with_profiles: CompareProfiles) -> pd.Series:
     """
     Sort alternatives to proper categories.
 
@@ -119,7 +119,7 @@ def calculate_flowsortII_sorted_alternatives(categories: List[str],
     check_dominance_condition(criteria_directions, category_profiles)
 
     if comparison_with_profiles == CompareProfiles.LIMITING_PROFILES:
-        return _limiting_profiles_sorting(categories, category_profiles, alternatives_flows, category_profiles_flows)
+        return _limiting_profiles_sorting(categories, alternatives_flows, category_profiles_flows)
     elif comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
         return _boundary_profiles_sorting(categories, category_profiles, alternatives_flows, category_profiles_flows)
     else:
