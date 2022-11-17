@@ -65,37 +65,23 @@ def n_categories():
     return 3
 
 
-@pytest.fixture
-def alternatives_flows():
-    alternatives = [f"a{i}" for i in range(1, 13)]
-    return pd.DataFrame([[0.466103079310626, 0.230034988326492],
-                         [0.348422671858281, 0.371926815323042],
-                         [0.3245119660214, 0.341486429966613],
-                         [0.156603420091293, 0.65600751449808],
-                         [0.510719494532462, 0.243445234011272],
-                         [0.337335620354488, 0.383887082385448],
-                         [0.375602385036347, 0.415120343223168],
-                         [0.599913319575344, 0.0876419178305971],
-                         [0.431640903710179, 0.31288316274282],
-                         [0.0710495063053403, 0.772747423119111],
-                         [0.133504859919954, 0.62002201663359],
-                         [0.695559811448251, 0.0157641101037327]],
-                        index=alternatives, columns=['positive', 'negative'])
-
-
-def test_calculate_alternatives_support(alternatives_performances, preference_thresholds, indifference_thresholds,
-                                        standard_deviations, generalized_criteria, criteria_directions,
-                                        criteria_weights, n_categories, alternatives_flows):
+def test_cluster_using_pclust(alternatives_performances, preference_thresholds, indifference_thresholds,
+                              standard_deviations, generalized_criteria, criteria_directions,
+                              criteria_weights, n_categories):
     actual_assigments, actual_central_profiles, actual_global_quality_index = cluster_using_pclust(
         alternatives_performances, preference_thresholds, indifference_thresholds, standard_deviations,
-        generalized_criteria, criteria_directions, criteria_weights, n_categories, alternatives_flows)
+        generalized_criteria, criteria_directions, criteria_weights, n_categories)
 
-    print(actual_assigments)
-    print(actual_central_profiles)
-    print(actual_global_quality_index)
+    assert (pd.notna(actual_assigments).all())
+
+    sorted_actual_central_profiles = actual_central_profiles.copy()
+    for direction, criterion in zip(criteria_directions.values, criteria_weights.index):
+        sorted_actual_central_profiles[criterion] = sorted_actual_central_profiles[criterion].sort_values(
+            ascending=bool(direction))
+    assert_frame_equal(actual_central_profiles, sorted_actual_central_profiles, atol=0.006)
 
 
 if __name__ == '__main__':
-    test_calculate_alternatives_support(alternatives_performances, preference_thresholds, indifference_thresholds,
-                                        standard_deviations, generalized_criteria, criteria_directions,
-                                        criteria_weights, n_categories, alternatives_flows)
+    test_cluster_using_pclust(alternatives_performances, preference_thresholds, indifference_thresholds,
+                              standard_deviations, generalized_criteria, criteria_directions,
+                              criteria_weights, n_categories)
