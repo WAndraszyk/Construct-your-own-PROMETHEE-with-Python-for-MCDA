@@ -47,6 +47,9 @@ def _calculate_prometheeII_flows(central_profiles_performances: pd.DataFrame,
     """
     Calculate the profiles net flows using this library module.
     """
+    # print(central_profiles_performances)
+    # print(alternatives_performances)
+
     alternatives_vs_profiles_preferences, _ = compute_preference_indices(alternatives_performances,
                                                                          preference_thresholds,
                                                                          indifference_thresholds,
