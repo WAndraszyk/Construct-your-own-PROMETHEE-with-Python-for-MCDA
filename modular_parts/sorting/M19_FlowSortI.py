@@ -2,6 +2,7 @@
     This module computes the assignments of given alternatives to categories using FlowSort procedure based on
     PrometheeI flows.
 """
+import math
 
 import pandas as pd
 from typing import List, Hashable
@@ -45,17 +46,20 @@ def _limiting_profiles_sorting(categories: List[str], alternatives_flows: FlowsT
     for alternative, alternative_row in alternatives_flows.iterrows():
         positive_flow_category = ''
         negative_flow_category = ''
-        for i, category, category_row in enumerate(category_profiles_flows.iterrows()):
+        for i, (category, category_row) in enumerate(category_profiles_flows.iterrows()):
             if not positive_flow_category:
-                if category_row['positive'] < alternative_row['positive'] \
-                        <= category_profiles_flows.iloc[i + 1]['positive']:
-                    positive_flow_category = category
+                if not math.isclose(i, (len(category_profiles_flows) - 1)):
+                    if category_row['positive'] < alternative_row['positive'] \
+                            <= category_profiles_flows.iloc[i + 1]['positive']:
+                        positive_flow_category = categories[i]
             if not negative_flow_category:
-                if category_row['negative'] >= alternative_row['negative'] \
-                        > category_profiles_flows.iloc[i + 1]['negative']:
-                    negative_flow_category = category
+                if not math.isclose(i, (len(category_profiles_flows) - 1)):
+                    if category_row['negative'] >= alternative_row['negative'] \
+                            > category_profiles_flows.iloc[i + 1]['negative']:
+                        negative_flow_category = categories[i]
             if positive_flow_category and negative_flow_category:
-                _append_to_classification(classification, negative_flow_category, positive_flow_category, alternative)
+                _append_to_classification(categories, classification, negative_flow_category,
+                                          positive_flow_category, alternative)
                 break
 
     return classification
@@ -80,12 +84,12 @@ def _boundary_profiles_sorting(categories: List[str], category_profiles: Perform
     for alternative, alternative_row in alternatives_flows.iterrows():
         positive_flow_category = ''
         negative_flow_category = ''
-        for i, category, category_row in enumerate(category_profiles_flows.iterrows()):
+        for i, (category, category_row) in enumerate(category_profiles_flows.iterrows()):
             if not positive_flow_category:
-                if i == 0:
+                if math.isclose(i, 0):
                     if alternative_row['positive'] <= category_row['positive']:
                         positive_flow_category = categories[i]
-                elif i == category_profiles.shape[0] - 1:
+                elif math.isclose(i, (category_profiles.shape[0] - 1)):
                     if alternative_row['positive'] > category_profiles_flows.iloc[i - 1]['positive']:
                         positive_flow_category = categories[i]
                 else:
@@ -93,10 +97,10 @@ def _boundary_profiles_sorting(categories: List[str], category_profiles: Perform
                             alternative_row['positive'] <= category_row['positive']:
                         positive_flow_category = categories[i]
             if not negative_flow_category:
-                if i == 0:
+                if math.isclose(i, 0):
                     if alternative_row['negative'] > category_row['negative']:
                         negative_flow_category = categories[i]
-                elif i == len(category_profiles) - 1:
+                elif math.isclose(i, (len(category_profiles) - 1)):
                     if alternative_row['negative'] <= category_profiles_flows.iloc[i - 1]['negative']:
                         negative_flow_category = categories[i]
                 else:
@@ -130,13 +134,13 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
     for alternative, alternative_row in alternatives_flows.iterrows():
         positive_flow_category = ''
         negative_flow_category = ''
-        for i, category, category_row in enumerate(category_profiles_flows.iterrows()):
+        for i, (category, category_row) in enumerate(category_profiles_flows.iterrows()):
             if not positive_flow_category:
-                if i == 0:
+                if math.isclose(i, 0):
                     if alternative_row['positive'] <= \
                             (category_row['positive'] + category_profiles_flows.iloc[i + 1]['positive']) / 2:
                         positive_flow_category = categories[i]
-                elif i == len(category_profiles) - 1:
+                elif math.isclose(i, (len(category_profiles) - 1)):
                     if (category_profiles_flows.iloc[i - 1]['positive'] + category_row['positive']) / 2 < \
                             alternative_row['positive']:
                         positive_flow_category = categories[i]
@@ -146,11 +150,11 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
                             (category_row['positive'] + category_profiles_flows.iloc[i + 1]['positive']) / 2:
                         positive_flow_category = categories[i]
             if not negative_flow_category:
-                if i == 0:
+                if math.isclose(i, 0):
                     if alternative_row['negative'] > \
                             (category_row['negative'] + category_profiles_flows.iloc[i + 1]['negative']) / 2:
                         negative_flow_category = categories[i]
-                elif i == len(category_profiles) - 1:
+                elif math.isclose(i, (len(category_profiles) - 1)):
                     if (category_profiles_flows.iloc[i - 1]['negative'] + category_row['negative']) / 2 >= \
                             alternative_row['negative']:
                         negative_flow_category = categories[i]

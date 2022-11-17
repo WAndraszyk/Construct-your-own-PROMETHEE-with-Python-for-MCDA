@@ -18,4 +18,5 @@ FlowsTable = pd.DataFrame
 NetOutrankingFlows = pd.Series
 DMsTable = pd.DataFrame
 RankedCriteria = pd.Series
+
 DeviationsTable = List[Union[List[List[NumericValue]], List[List[List[NumericValue]]]]]
