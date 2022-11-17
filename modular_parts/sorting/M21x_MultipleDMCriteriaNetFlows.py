@@ -29,30 +29,23 @@ def _calculate_alternatives_general_net_flows(alternatives: pd.Index, category_p
 
     :return: Series with global net flows (for each alternative)
     """
-    alternatives_net_flows_index = pd.MultiIndex.from_product(
-        [dms_profile_vs_profile_partial_preferences.index.get_level_values(0), category_profiles])
-
-    alternatives_net_flows = pd.Series(index=alternatives_net_flows_index, dtype=float)
+    alternatives_net_flows = pd.DataFrame(index=alternatives, columns=criteria_weights.index, dtype=float).fillna(0)
 
     n_profiles = len(category_profiles) * len(dms_profiles_partial_preferences)
 
     for alternatives_partial_preferences, profiles_partial_preferences \
             in zip(dms_alternatives_partial_preferences, dms_profiles_partial_preferences):
 
-        for (criterion, criterion_preferences1, _, criterion_preferences2) \
+        for (criterion, criterion_preferences1), (_, criterion_preferences2) \
                 in zip(alternatives_partial_preferences.groupby(level=0),
                        profiles_partial_preferences.groupby(level=0)):
-            for alternative_i, alternative_i_row, profile_j, profile_j_col \
+            for (alternative_i, alternative_i_row), (profile_j, profile_j_col) \
                     in zip(criterion_preferences1.droplevel(0).iterrows(),
                            criterion_preferences2.droplevel(0).T.iterrows()):
-                alternatives_net_flows[(criterion, alternative_i[1])] += (alternative_i_row - profile_j_col)
-
+                alternatives_net_flows.loc[alternative_i, criterion] += (alternative_i_row - profile_j_col).sum()
     alternatives_net_flows /= n_profiles
 
-    alternatives_global_net_flows = pd.Series(index=alternatives, dtype=float)
-    for DM_profile, alternative_criteria_net_flows in alternatives_net_flows.groupby(level=[1, 2]):
-        alternatives_global_net_flows[DM_profile] = alternative_criteria_net_flows.multiply(
-            criteria_weights, axis='rows').sum()
+    alternatives_global_net_flows = alternatives_net_flows.mul(criteria_weights, axis=1).sum(axis=1)
 
     return alternatives_global_net_flows
 
@@ -80,43 +73,45 @@ def _calculate_profiles_general_net_flows(alternatives: pd.Index, category_profi
     """
     n_profiles = len(category_profiles) * len(dms_profiles_partial_preferences)
 
-    profiles_vs_profiles = pd.DataFrame(index=dms_profile_vs_profile_partial_preferences.index,
-                                        columns=dms_profile_vs_profile_partial_preferences.columns,
-                                        dtype=float)
+    dms = dms_profile_vs_profile_partial_preferences.index.get_level_values(1).unique()
 
-    # group by criterion
+    profiles_vs_profiles_sum_index = pd.MultiIndex.from_product([
+        dms_profile_vs_profile_partial_preferences.index.get_level_values(1).unique(), category_profiles])
+
+    profiles_vs_profiles_sum = pd.DataFrame(index=profiles_vs_profiles_sum_index,
+                                            columns=criteria_weights.index,
+                                            dtype=float)
+
     for (criterion, criterion_preferences) in dms_profile_vs_profile_partial_preferences.groupby(level=0):
-        for profile_i, profile_i_row, profile_j, profile_j_col \
-                in zip(criterion_preferences.droplevel(0).iterrows(),
-                       criterion_preferences.droplevel(0).T.iterrows()):
-            profiles_vs_profiles.loc[(criterion, *profile_i), profile_j] = profile_i_row - profile_j_col
+        for (profile_i, profile_i_row), (profile_j, profile_j_col) \
+                in zip(criterion_preferences.droplevel(0).iterrows(), criterion_preferences.droplevel(0).T.iterrows()):
+            profiles_vs_profiles_sum.loc[profile_i, criterion] = (profile_i_row - profile_j_col).sum()
 
-    profiles_vs_profiles_sum = profiles_vs_profiles.sum(axis=1)
+    profiles_flows = pd.DataFrame(index=dms_profile_vs_profile_partial_preferences.index,
+                                  columns=alternatives)
 
-    alternatives_vs_profiles = pd.DataFrame(index=dms_profile_vs_profile_partial_preferences.index,
-                                            columns=alternatives)
+    for alternatives_partial_preferences, profiles_partial_preferences, dm \
+            in zip(dms_alternatives_partial_preferences, dms_profiles_partial_preferences, dms):
 
-    for alternatives_partial_preferences, profiles_partial_preferences \
-            in zip(dms_alternatives_partial_preferences, dms_profiles_partial_preferences):
+        for (criterion, alternatives_vs_profiles_partial_preferences), \
+            (_, profiles_vs_alternatives_partial_preferences) in zip(alternatives_partial_preferences.groupby(level=0),
+                                                                     profiles_partial_preferences.groupby(level=0)):
+            for (alternative_i, alternative_i_row), (_, profile_j_col) \
+                    in zip(alternatives_vs_profiles_partial_preferences.droplevel(0).iterrows(),
+                           profiles_vs_alternatives_partial_preferences.T.iterrows()):
+                for(_, alternative_vs_profile_partial_preference), (criterion_and_profile, profile_vs_alternative_partial_preference)\
+                        in zip(alternative_i_row.iteritems(), profile_j_col.iteritems()):
+                    profile = criterion_and_profile[1]
+                    profiles_flows.loc[(criterion, dm, profile), alternative_i] = \
+                        (alternative_vs_profile_partial_preference - profile_vs_alternative_partial_preference + \
+                         profiles_vs_profiles_sum.loc[(dm, profile), criterion]) / (n_profiles + 1)
 
-        for (criterion, criterion_preferences1, _, criterion_preferences2) \
-                in zip(profiles_partial_preferences.groupby(level=0),
-                       alternatives_partial_preferences.groupby(level=0)):
-            for profile_i, profile_i_row, alternative_j, alternative_j_col \
-                    in zip(criterion_preferences1.droplevel(0).iterrows(),
-                           criterion_preferences2.droplevel(0).T.iterrows()):
-                alternatives_vs_profiles[(criterion, *profile_i), alternative_j[1]] = \
-                    profile_i_row - alternative_j_col
+    profiles_global_net_flows_index = pd.MultiIndex.from_product([dms, category_profiles])
+    profiles_global_net_flows = pd.DataFrame(index=profiles_global_net_flows_index, dtype=float)
 
-    profiles_criteria_net_flows = alternatives_vs_profiles.apply(lambda col:
-                                                                 (col + profiles_vs_profiles_sum) / n_profiles)
-
-    profiles_global_net_flows_index = profiles_criteria_net_flows.droplevel(0).index.unique()
-
-    profiles_global_net_flows = pd.DataFrame(index=profiles_global_net_flows_index, columns=alternatives)
-    for DM_profile, profile_criteria_net_flows in profiles_criteria_net_flows.groupby(level=[1, 2]):
-        profiles_global_net_flows.loc[DM_profile, :] = profile_criteria_net_flows.multiply(criteria_weights,
-                                                                                           axis='rows').sum()
+    for DM_profile, profile_criteria_net_flows in profiles_flows.groupby(level=[1, 2]):
+        profiles_global_net_flows.loc[DM_profile, alternatives] = profile_criteria_net_flows.reset_index(drop=True)\
+            .multiply(criteria_weights.reset_index(drop=True), axis=0).sum(axis=0)
 
     return profiles_global_net_flows
 
