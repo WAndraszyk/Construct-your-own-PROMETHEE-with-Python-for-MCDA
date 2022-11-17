@@ -2,6 +2,7 @@
     This class compute PrometheeIRanking based on positive and negative flows.
     Implemented method is generalized to relation of the weak preference.
 """
+import math
 
 import pandas as pd
 from core.aliases import FlowsTable
@@ -43,8 +44,8 @@ def calculate_prometheeI_ranking(flows: FlowsTable,
                 else:
                     pairs[alternative_b][alternative_a] = '?'
             else:
-                if positive_flow[alternative_a] == positive_flow[alternative_b] \
-                        and negative_flow[alternative_a] == negative_flow[alternative_b]:
+                if math.isclose(positive_flow[alternative_a], positive_flow[alternative_b]) \
+                        and math.isclose(negative_flow[alternative_a], negative_flow[alternative_b]):
                     pairs[alternative_b][alternative_a] = 'I'
                 elif positive_flow[alternative_a] >= positive_flow[alternative_b] \
                         and negative_flow[alternative_a] <= negative_flow[alternative_b]:
