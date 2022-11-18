@@ -13,96 +13,101 @@ from core.promethee_check_dominance import check_dominance_condition
 __all__ = ["calculate_flowsortII_sorted_alternatives"]
 
 
-def _limiting_profiles_sorting(categories: List[str], alternatives_flows: pd.Series,
-                               category_profiles_flows: pd.Series) -> pd.Series:
+def _limiting_profiles_sorting(categories: List[str], prometheeII_net_flows: pd.Series) -> pd.Series:
     """
     Comparing positive and negative flows of each alternative with all limiting profiles and assign them to
     correctly class.
 
     :param categories: List of categories names (strings only)
-    :param alternatives_flows: Series with alternatives names as index and net flows as values
-    :param category_profiles_flows: Series with categories names as index and net flows as values
+    :param prometheeII_net_flows: Series with Promethee II net flows
 
     :return: Series with alternatives classification
     """
-    classification = pd.Series(['None' for _ in alternatives_flows.index], index=alternatives_flows.index)
+    classification = pd.Series(dtype=str)
 
-    for alternative, alternative_net_flow in alternatives_flows.items():
-        for i, (category, category_net_flow) in enumerate(list(category_profiles_flows.items())[:-1]):
-            if math.isclose(i, (len(category_profiles_flows) - 1)):
-                if category_net_flow < alternative_net_flow <= category_profiles_flows.iloc[i + 1]:
-                    classification[alternative] = categories[i]
+    for Ralternative, alternative_group_net_flow in prometheeII_net_flows.groupby(level=0):
+        alternative = Ralternative[1:]
+        profiles_net_flows = alternative_group_net_flow.iloc[:-1]
+        alternative_net_flow = alternative_group_net_flow.iloc[-1]
+
+        for i, (profile, profile_net_flow) in enumerate(profiles_net_flows.items()):
+            if alternative_net_flow <= profile_net_flow:
+                if i == 0:
+                    classification[alternative] = "Under limit"
+                else:
+                    classification[alternative] = categories[i - 1]
+                break
+            elif i == (len(profiles_net_flows) - 1):
+                classification[alternative] = "Over limit"
+
     return classification
 
 
 def _boundary_profiles_sorting(categories: List[str], category_profiles: PerformanceTable,
-                               alternatives_flows: pd.Series, category_profiles_flows: pd.Series) -> pd.Series:
+                               prometheeII_net_flows: pd.Series) -> pd.Series:
     """
     Comparing positive and negative flows of each alternative with all boundary profiles and assign them to
     correctly class.
 
     :param categories: List of categories names (strings only)
     :param category_profiles: DataFrame with category profiles performances
-    :param alternatives_flows: Series with alternatives names as index and net flows as values
-    :param category_profiles_flows: Series with categories names as index and net flows as values
+    :param prometheeII_net_flows: Series with Promethee II net flows
 
     :return: Series with alternatives classification
     """
-    classification = pd.Series(['None' for _ in alternatives_flows.index], index=alternatives_flows.index)
+    classification = pd.Series(dtype=str)
 
-    for alternative, alternative_net_flow in alternatives_flows.items():
-        for i, (category, category_net_flow) in enumerate(category_profiles_flows.items()):
-            if math.isclose(i, 0):
-                if alternative_net_flow <= category_net_flow:
-                    classification[alternative] = categories[i]
-                    break
-            elif math.isclose(i, (category_profiles.shape[0] - 1)):
-                if category_profiles_flows[i - 1] < alternative_net_flow:
-                    classification[alternative] = categories[i]
-            else:
-                if category_profiles_flows[i - 1] < alternative_net_flow <= category_net_flow:
-                    classification[alternative] = categories[i]
-                    break
+    for Ralternative, alternative_group_net_flow in prometheeII_net_flows.groupby(level=0):
+        alternative = Ralternative[1:]
+        profiles_net_flows = alternative_group_net_flow.iloc[:-1]
+        alternative_net_flow = alternative_group_net_flow.iloc[-1]
+
+        for i, (profile, profile_net_flow) in enumerate(profiles_net_flows.items()):
+            if alternative_net_flow <= profile_net_flow:
+                classification[alternative] = categories[i]
+                break
+            elif i == (len(profiles_net_flows) - 1):
+                classification[alternative] = categories[-1]
+
     return classification
 
 
 def _central_profiles_sorting(categories: List[str], category_profiles: PerformanceTable,
-                              alternatives_flows: pd.Series, category_profiles_flows: pd.Series) -> pd.Series:
+                              prometheeII_net_flows) -> pd.Series:
     """
     Comparing positive and negative flows of each alternative with all central profiles and assign them to
     correctly class.
 
     :param categories: List of categories names (strings only)
     :param category_profiles: DataFrame with category profiles performances
-    :param alternatives_flows: Series with alternatives names as index and net flows as values
-    :param category_profiles_flows: Series with categories names as index and net flows as values
+    :param prometheeII_net_flows: Series with Promethee II net flows
 
     :return: Series with alternatives classification
     """
-    classification = pd.Series(['None' for _ in alternatives_flows.index], index=alternatives_flows.index)
+    classification = pd.Series(dtype=str)
 
-    for alternative, alternative_net_flow in alternatives_flows.items():
-        for i, (category, category_net_flow) in enumerate(category_profiles_flows.items()):
-            if math.isclose(i, 0):
-                if alternative_net_flow <= (category_net_flow + category_profiles_flows[i + 1]) / 2:
+    for Ralternative, alternative_group_net_flow in prometheeII_net_flows.groupby(level=0):
+        alternative = Ralternative[1:]
+        profiles_net_flows = alternative_group_net_flow.iloc[:-1]
+        alternative_net_flow = alternative_group_net_flow.iloc[-1]
+
+        for i, (profile, profile_net_flow) in enumerate(profiles_net_flows.items()):
+            if i == (len(profiles_net_flows) - 1):
+                if alternative_net_flow > (profile_net_flow + profiles_net_flows.iloc[i - 1]) / 2:
                     classification[alternative] = categories[i]
                     break
-            elif math.isclose(i, (category_profiles.shape[0] - 1)):
-                if (category_profiles_flows[i - 1] + category_net_flow) / 2 < alternative_net_flow:
-                    classification[alternative] = categories[i]
             else:
-                if (category_profiles_flows[i - 1] + category_net_flow) / 2 < alternative_net_flow \
-                        <= (category_net_flow + category_profiles_flows[i + 1]) / 2:
+                if alternative_net_flow <= (profile_net_flow + profiles_net_flows.iloc[i + 1]) / 2:
                     classification[alternative] = categories[i]
                     break
+
     return classification
 
 
 def calculate_flowsortII_sorted_alternatives(categories: List[str],
                                              category_profiles: PerformanceTable,
                                              criteria_directions: pd.Series,
-                                             alternatives_flows: pd.Series,
-                                             category_profiles_flows: pd.Series,
+                                             prometheeII_net_flows: pd.Series,
                                              comparison_with_profiles: CompareProfiles) -> pd.Series:
     """
     Sort alternatives to proper categories.
@@ -110,8 +115,7 @@ def calculate_flowsortII_sorted_alternatives(categories: List[str],
     :param categories: List of categories names (strings only)
     :param category_profiles: DataFrame with category profiles performances
     :param criteria_directions: Series with criteria directions (max or min)
-    :param alternatives_flows: Series with alternatives names as index and net flows as values
-    :param category_profiles_flows: Series with categories names as index and net flows as values
+    :param prometheeII_net_flows: DataFrame with Promethee II flows
     :param comparison_with_profiles: Enum CompareProfiles - indicate information of profiles types used
     in calculation.
 
@@ -120,8 +124,8 @@ def calculate_flowsortII_sorted_alternatives(categories: List[str],
     check_dominance_condition(criteria_directions, category_profiles)
 
     if comparison_with_profiles == CompareProfiles.LIMITING_PROFILES:
-        return _limiting_profiles_sorting(categories, alternatives_flows, category_profiles_flows)
+        return _limiting_profiles_sorting(categories, prometheeII_net_flows)
     elif comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
-        return _boundary_profiles_sorting(categories, category_profiles, alternatives_flows, category_profiles_flows)
+        return _boundary_profiles_sorting(categories, category_profiles, prometheeII_net_flows)
     else:
-        return _central_profiles_sorting(categories, category_profiles, alternatives_flows, category_profiles_flows)
+        return _central_profiles_sorting(categories, category_profiles, prometheeII_net_flows)
