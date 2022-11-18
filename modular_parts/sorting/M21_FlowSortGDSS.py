@@ -1,8 +1,6 @@
 """
     This module computes the assignments of given alternatives to categories using FlowSort GDSS procedure.
 """
-import math
-
 import pandas as pd
 import numpy as np
 
@@ -78,18 +76,16 @@ def _calculate_first_step_assignments(alternatives: pd.Index, dms: pd.Index, alt
 
             if comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
                 for profile_i, profile_net_flow in enumerate(DM_profiles_general_net_flows_for_alternative.values):
-                    if math.isclose(profile_i, 0) and alternative_general_net_flow <= profile_net_flow:
+                    if profile_i == 0 and alternative_general_net_flow <= profile_net_flow:
                         alternative_assignments[DM] = categories[0]
                         break
-                    elif math.isclose(profile_i, (len(profiles) - 1)) and alternative_general_net_flow > profile_net_flow:
+                    elif profile_i == len(profiles) - 1 and alternative_general_net_flow > profile_net_flow:
                         alternative_assignments[DM] = categories[-1]
                         break
                     elif alternative_general_net_flow <= profile_net_flow:
                         alternative_assignments[DM] = categories[profile_i]
                         break
             else:
-                # profile_distances = [abs(profile_net_flow - alternative_general_net_flow) for profile_net_flow in
-                #                      DM_profiles_general_net_flows_for_alternative.values]
                 profile_distances = [profile_net_flow > alternative_general_net_flow for profile_net_flow in
                                      DM_profiles_general_net_flows_for_alternative.values]
 

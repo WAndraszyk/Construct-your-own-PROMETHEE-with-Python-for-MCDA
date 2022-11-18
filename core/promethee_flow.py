@@ -25,9 +25,6 @@ def compute_single_criterion_net_flows(partial_preferences: Union[pd.DataFrame, 
                            criterion_preferences2.droplevel(0).T.iterrows()):
                 single_criterion_net_flows.loc[object_i, criterion] = (object_i_row - object_j_col).sum() / n
 
-        # single_criterion_net_flows = single_criterion_net_flows.T
-        single_criterion_net_flows = single_criterion_net_flows
-        # single_criterion_net_flows.columns = partial_preferences[0].index.get_level_values(0)
         # single_criterion_net_flows.index = object_names
     else:
         object_names = partial_preferences.columns.tolist()
