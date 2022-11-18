@@ -15,7 +15,7 @@ def check_dominance_condition(criteria_directions: pd.Series, category_profiles:
 
 
 def check_dominance_condition_GDSS(profiles: pd.Index, profiles_performances: list[pd.DataFrame],
-                               criteria_directions: pd.Series):
+                                   criteria_directions: pd.Series):
     """
     Check if each boundary profile is strictly worse in each criterion than betters profiles (even from other DM's)
 
@@ -50,7 +50,3 @@ def check_if_profiles_are_strictly_worse(criteria_thresholds: pd.Series, categor
             profile_j = category_profiles.iloc[i + 1]
             if profile_i[criterion] + threshold > profile_j[criterion]:
                 raise ValueError("Each profile needs to be preferred over profiles which are worse than it")
-
-
-
-
