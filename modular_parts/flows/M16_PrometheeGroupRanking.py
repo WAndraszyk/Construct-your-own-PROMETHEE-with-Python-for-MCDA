@@ -3,8 +3,7 @@
     Allows many Decision Makers to get influence on final flows.
 """
 import pandas as pd
-import numpy as np
-from core.aliases import DMsTable
+from core.input_validation.flow_input_validation import promethee_group_ranking_validation
 
 __all__ = ['calculate_promethee_group_ranking']
 
@@ -18,6 +17,8 @@ def calculate_promethee_group_ranking(dms_flows: pd.DataFrame, dms_weights: pd.S
 
     :return: DataFrame with aggregated flows(column 'aggregated') and  weighted flows(column 'weighted')
     """
+    promethee_group_ranking_validation(dms_flows, dms_weights)
+
     weighted_flows = dms_flows.mul(dms_weights, axis=1)
     aggregated_flows = weighted_flows.sum(axis=1)
     aggregated_flows.name = 'aggregated_flows'

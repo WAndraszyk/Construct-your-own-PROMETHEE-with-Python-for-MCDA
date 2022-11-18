@@ -3,6 +3,7 @@ import pandas as pd
 __all__ = ["promethee_i_ranking_validation"]
 
 
+# M11
 def _check_flows(flows: pd.DataFrame):
     columns = flows.columns.values.tolist()
 

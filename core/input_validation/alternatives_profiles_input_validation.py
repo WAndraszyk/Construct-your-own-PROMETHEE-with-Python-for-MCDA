@@ -3,6 +3,7 @@ import pandas as pd
 __all__ = ["alternatives_profiles_validation"]
 
 
+# M10
 def _check_weights(weights: pd.Series, criteria_num: int):
     if not isinstance(weights, pd.Series):
         raise ValueError("Criteria weights should be passed as a Series object")
