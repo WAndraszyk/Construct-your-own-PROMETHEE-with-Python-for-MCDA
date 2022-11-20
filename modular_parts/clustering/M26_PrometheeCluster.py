@@ -36,7 +36,7 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
 
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
 
-    if number_of_clusters >= alternatives_performances.index.__len__():
+    if number_of_clusters > alternatives_performances.index.__len__():
         raise Exception("Number of cluster must be smaller then number of alternatives!")
 
     profiles = alternatives_performances.iloc[
