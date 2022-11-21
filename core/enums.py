@@ -49,3 +49,8 @@ class InteractionType(Enum):
     STN = 1  # strengthening
     WKN = 1  # weakening
     ANT = -1  # antagonistic
+
+
+class Direction(Enum):
+    MAX = 1
+    MIN = 0

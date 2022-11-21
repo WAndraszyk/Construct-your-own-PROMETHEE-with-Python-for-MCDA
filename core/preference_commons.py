@@ -2,7 +2,7 @@ import copy
 from typing import List, Tuple, Union
 
 from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable, NumericValue
-from core.enums import PreferenceFunction
+from core.enums import PreferenceFunction, Direction
 import core.generalized_criteria as gc
 
 import pandas as pd
@@ -20,7 +20,7 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
     """
     copy_alternatives_performances = copy.deepcopy(alternatives_performances)
     for direction in directions.keys():
-        if directions[direction] == 0:
+        if directions[direction] == 0 or directions[direction] == Direction.MIN:
             copy_alternatives_performances[direction] = copy_alternatives_performances[direction] * -1
 
     return copy_alternatives_performances
