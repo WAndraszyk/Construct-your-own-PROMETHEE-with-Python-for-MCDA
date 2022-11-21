@@ -1,8 +1,9 @@
 import pandas as pd
-from typing import List, Union
+from typing import List, Union, Tuple
 from core.input_validation.ranking_input_validation import *
+from core.input_validation.alternatives_profiles_input_validation import *
 
-__all__ = ["alternatives_support_validation", "prom_sort_validation"]
+__all__ = ["alternatives_support_validation", "prom_sort_validation", "promethee_tri_validation"]
 
 
 # M22
@@ -98,3 +99,35 @@ def prom_sort_validation(categories: List[str],
     _check_criteria_directions(criteria_directions)
     _check_cut_point(cut_point)
     _check_assign_to_better(assign_to_better_class)
+
+
+def _check_marginal_val(use_marginal_val: bool):
+    if not isinstance(use_marginal_val, bool):
+        raise ValueError("Use marginal value parameter should have value True or False")
+
+
+def _check_alternative_partial_pref(alternatives_partial_preferences: Tuple[pd.DataFrame, pd.DataFrame]):
+    if not isinstance(alternatives_partial_preferences, tuple):
+        raise ValueError("Alternatives partial preferences should be passed as Tuple with 2 DataFrames with partial "
+                         "preferences (alternatives vs profiles) and (profiles vs alternatives)")
+
+    if not isinstance(alternatives_partial_preferences[0], pd.DataFrame) or not \
+            isinstance(alternatives_partial_preferences[1], pd.DataFrame):
+        raise ValueError("Partial preferences should be passed as a DataFrame object")
+
+
+# M18
+def promethee_tri_validation(categories: List[str],
+                             criteria_weights: pd.Series,
+                             alternatives_partial_preferences: Tuple[pd.DataFrame, pd.DataFrame],
+                             profiles_partial_preferences: pd.DataFrame,
+                             assign_to_better_class: bool = True,
+                             use_marginal_value: bool = True):
+    criteria_from_df = alternatives_partial_preferences[0].index.get_level_values(0).unique()
+
+    _check_categories(categories)
+    _check_weights(criteria_weights, len(criteria_from_df))
+    _check_alternative_partial_pref(alternatives_partial_preferences)
+    _check_partial_preferences(profiles_partial_preferences)
+    _check_assign_to_better(assign_to_better_class)
+    _check_marginal_val(use_marginal_value)

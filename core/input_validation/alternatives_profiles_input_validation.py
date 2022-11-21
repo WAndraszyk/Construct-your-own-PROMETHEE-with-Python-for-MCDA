@@ -1,6 +1,6 @@
 import pandas as pd
 
-__all__ = ["alternatives_profiles_validation"]
+__all__ = ["alternatives_profiles_validation", "_check_weights", "_check_partial_preferences"]
 
 
 # M10
