@@ -2,7 +2,7 @@ import copy
 from typing import List, Tuple, Union
 
 from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable, NumericValue
-from core.enums import PreferenceFunction
+from core.enums import PreferenceFunction, Direction
 import core.generalized_criteria as gc
 
 import pandas as pd
@@ -20,7 +20,7 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
     """
     copy_alternatives_performances = copy.deepcopy(alternatives_performances)
     for direction in directions.keys():
-        if directions[direction] == 0:
+        if directions[direction] == 0 or directions[direction] == Direction.MIN:
             copy_alternatives_performances[direction] = copy_alternatives_performances[direction] * -1
 
     return copy_alternatives_performances
@@ -137,15 +137,15 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
                             i_iter=alternatives_performances, j_iter=alternatives_performances,
                             generalized_criteria=generalized_criteria)
     else:
-        ppIndices = [pp_deep(deviations=deviation[0], criteria=criteria, p_list=p_list,
+        ppIndices = (pp_deep(deviations=deviation[0], criteria=criteria, p_list=p_list,
                              q_list=q_list, s_list=s_list,
                              i_iter=alternatives_performances, j_iter=profile_performance_table,
                              generalized_criteria=generalized_criteria),
                      pp_deep(deviations=deviation[1], criteria=criteria, p_list=p_list,
                              q_list=q_list, s_list=s_list,
                              i_iter=profile_performance_table, j_iter=alternatives_performances,
-                             generalized_criteria=generalized_criteria)
-                     ]
+                             generalized_criteria=generalized_criteria))
+
 
     return ppIndices
 

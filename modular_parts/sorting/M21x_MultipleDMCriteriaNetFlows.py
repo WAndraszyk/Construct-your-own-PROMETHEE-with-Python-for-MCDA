@@ -11,8 +11,7 @@ __all__ = ["calculate_gdss_flows"]
 def _calculate_alternatives_general_net_flows(alternatives: pd.Index, category_profiles: pd.Index,
                                               criteria_weights: pd.Series,
                                               dms_profiles_partial_preferences: List[pd.DataFrame],
-                                              dms_alternatives_partial_preferences: List[pd.DataFrame],
-                                              dms_profile_vs_profile_partial_preferences: pd.DataFrame) -> pd.Series:
+                                              dms_alternatives_partial_preferences: List[pd.DataFrame]) -> pd.Series:
     """
     First calculate net flows for each alternative, each profile and each criterion,
     then accumulate criteria values to global alternative net flows.
@@ -24,8 +23,6 @@ def _calculate_alternatives_general_net_flows(alternatives: pd.Index, category_p
      MultiIndex: DM, criterion, profile; Column: alternative
     :param dms_alternatives_partial_preferences: List of partial preferences alternatives vs profiles.
      Nesting order: DM, criterion, alternative, profile
-    :param dms_profile_vs_profile_partial_preferences: DataFrame with partial preferences profiles vs profiles
-     between any DM. Nesting order: DM, criterion, profile_i, profile_j
 
     :return: Series with global net flows (for each alternative)
     """
@@ -99,11 +96,12 @@ def _calculate_profiles_general_net_flows(alternatives: pd.Index, category_profi
             for (alternative_i, alternative_i_row), (_, profile_j_col) \
                     in zip(alternatives_vs_profiles_partial_preferences.droplevel(0).iterrows(),
                            profiles_vs_alternatives_partial_preferences.T.iterrows()):
-                for(_, alternative_vs_profile_partial_preference), (criterion_and_profile, profile_vs_alternative_partial_preference)\
+                for(_, alternative_vs_profile_partial_preference), \
+                   (criterion_and_profile, profile_vs_alternative_partial_preference)\
                         in zip(alternative_i_row.iteritems(), profile_j_col.iteritems()):
                     profile = criterion_and_profile[1]
                     profiles_flows.loc[(criterion, dm, profile), alternative_i] = \
-                        (alternative_vs_profile_partial_preference - profile_vs_alternative_partial_preference + \
+                        (alternative_vs_profile_partial_preference - profile_vs_alternative_partial_preference +
                          profiles_vs_profiles_sum.loc[(dm, profile), criterion]) / (n_profiles + 1)
 
     profiles_global_net_flows_index = pd.MultiIndex.from_product([dms, category_profiles])
@@ -141,8 +139,7 @@ def calculate_gdss_flows(dms_profiles_partial_preferences: List[pd.DataFrame],  
     alternatives_general_net_flows = \
         _calculate_alternatives_general_net_flows(alternatives, category_profiles,
                                                   criteria_weights, dms_profiles_partial_preferences,
-                                                  dms_alternatives_partial_preferences,
-                                                  dms_profile_vs_profile_partial_preferences)
+                                                  dms_alternatives_partial_preferences)
     profiles_general_net_flows = _calculate_profiles_general_net_flows(alternatives, category_profiles,
                                                                        criteria_weights,
                                                                        dms_profiles_partial_preferences,

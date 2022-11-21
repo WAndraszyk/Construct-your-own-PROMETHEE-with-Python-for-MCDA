@@ -74,10 +74,10 @@ def calculate_net_flows_score(preferences: PreferencesTable,
 
     if avoid_same_scores:
         scores = _calculate_score(preferences, function, direction)
-        if not math.isclose(len(scores), len(set(scores))):
+        if len(scores) != len(set(scores)):
             duplicated_values = _find_duplicates_values(scores)
             for duplicated_value in duplicated_values:
-                duplicated_score_indices = [i for i, score in enumerate(scores) if score == duplicated_value]
+                duplicated_score_indices = [i for i, score in enumerate(scores) if math.isclose(score, duplicated_value)]
                 sub_preferences = preferences.iloc[:, duplicated_score_indices].iloc[duplicated_score_indices, :]
                 sub_scores = _calculate_score(sub_preferences, function, direction)
                 for index, score in zip(duplicated_score_indices, sub_scores):
