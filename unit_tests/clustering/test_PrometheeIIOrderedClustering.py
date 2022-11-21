@@ -4,7 +4,6 @@ import pandas as pd
 from pandas._testing import assert_series_equal
 
 from core.enums import PreferenceFunction
-from pandas.testing import assert_frame_equal
 from modular_parts.clustering import promethee_II_ordered_clustering
 from modular_parts.weights import equal_weights
 
