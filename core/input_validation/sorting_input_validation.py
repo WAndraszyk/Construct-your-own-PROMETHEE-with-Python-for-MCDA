@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import List, Union, Tuple
 from enum import Enum
-from core.enums import CompareProfiles
+from core.enums import CompareProfiles, Direction
 from core.input_validation.ranking_input_validation import *
 from core.input_validation.alternatives_profiles_input_validation import *
 
@@ -54,23 +54,30 @@ def _check_thresholds(thresholds: pd.Series, criteria_num: int):
             raise ValueError("Threshold should be a numeric values")
 
 
-def _check_category_profiles(category_profiles: pd.DataFrame, criteria: List[str]):
+def _check_category_profiles(category_profiles: pd.DataFrame):
     if not isinstance(category_profiles, pd.DataFrame):
         raise ValueError("Category profiles should be passed as a DataFrame object")
 
-    for criterion in criteria:
-        for profile_per in category_profiles[criterion]:
-            if not isinstance(profile_per, (int, float)):
-                raise ValueError("Category profiles performance be a numeric value")
+    if category_profiles.dtypes.values.all() not in ['float64', 'int64']:
+        raise ValueError("Category profiles performance be a numeric value")
+
+    # for criterion in criteria:
+    #     for profile_per in category_profiles[criterion]:
+    #         if not isinstance(profile_per, (int, float)):
+    #             raise ValueError("Category profiles performance be a numeric value")
 
 
 def _check_criteria_directions(criteria_directions: pd.Series):
     if not isinstance(criteria_directions, pd.Series):
         raise ValueError("Criteria directions should be passed as a Series object")
 
-    for direction in criteria_directions:
-        if not isinstance(direction, (int, float)):
-            raise ValueError("Criteria direction should be a numeric values")
+    if criteria_directions.any() not in [Direction.MAX, Direction.MIN] and \
+            criteria_directions.values.any() not in [0, 1]:
+        raise ValueError("Criteria directions should Direction enums from core.enums")
+
+    # for direction in criteria_directions:
+    #     if not isinstance(direction, (int, float)):
+    #         raise ValueError("Criteria direction should be a numeric values")
 
 
 def _check_cut_point(cut_point: Union[int, float]):
@@ -98,7 +105,7 @@ def prom_sort_validation(categories: List[str],
     _check_flows(alternatives_flows)
     _check_flows(category_profiles_flows)
     _check_thresholds(criteria_thresholds, len(criteria_from_df))
-    _check_category_profiles(category_profiles, criteria_from_df)
+    _check_category_profiles(category_profiles)
     _check_criteria_directions(criteria_directions)
     _check_cut_point(cut_point)
     _check_assign_to_better(assign_to_better_class)
@@ -157,8 +164,59 @@ def flow_sort_i_validation(categories: List[str],
     criteria_from_df = category_profiles.columns.unique().tolist()
 
     _check_categories(categories)
-    _check_category_profiles(category_profiles, criteria_from_df)
+    _check_category_profiles(category_profiles)
     _check_criteria_directions(criteria_directions)
     _check_flows(alternatives_flows)
     _check_flows(category_profiles_flows)
     _check_enum(comparison_with_profiles)
+
+
+def _check_compare_profiles_type_and_profiles_and_categories_length(compare_profiles: Enum,
+                                                                    categories: List[str],
+                                                                    category_profiles: pd.DataFrame):
+    if compare_profiles is CompareProfiles.LIMITING_PROFILES:
+        if len(categories) != len(category_profiles) - 1:
+            raise ValueError("Number of categories should be equals to number of limiting profiles minus 1")
+    elif compare_profiles is CompareProfiles.BOUNDARY_PROFILES:
+        if len(categories) != len(category_profiles) + 1:
+            raise ValueError("Number of categories should be equals to number of boundary profiles plus 1")
+    elif compare_profiles is CompareProfiles.CENTRAL_PROFILES:
+        if len(categories) != len(category_profiles):
+            raise ValueError("Number of categories should be equals to number of central profiles")
+
+
+def _check_prometheeII_flows(prometheeII_flows: pd.DataFrame, category_profiles: pd.DataFrame):
+    if not isinstance(prometheeII_flows, pd.DataFrame):
+        raise ValueError("PrometheeII flows should be passed as a DataFrame object")
+    if not isinstance(prometheeII_flows.index, pd.MultiIndex):
+        raise ValueError("PrometheeII flows should be passed as a DataFrame with MultiIndex")
+
+    if prometheeII_flows.columns.tolist() != ['positive', 'negative', 'net']:
+        raise ValueError("PrometheeII flows should be passed as a DataFrame with columns: positive, negative, net")
+
+    for index, prometheeII_alternative_flows in prometheeII_flows.groupby(level=0):
+        if not len(prometheeII_alternative_flows) == len(category_profiles) + 1:
+            raise ValueError(f"Number of alternative's group objects in PrometheeII flows should be equals to "
+                             f"number of profiles in category profiles plus 1. Alternative's group {index} has "
+                             f"{len(prometheeII_alternative_flows)} object")
+
+
+def _check_if_criteria_are_the_same(checked_object: pd.DataFrame, criteria: pd.Index, checked_object_name: str):
+    if not (checked_object.columns == criteria).all():
+        raise ValueError(f"Criteria in {checked_object_name} should be the same as in every other object with criteria")
+
+
+# M20
+def flow_sort_ii_validation(categories: List[str],
+                            category_profiles: pd.DataFrame,
+                            criteria_directions: pd.Series,
+                            prometheeII_flows: pd.DataFrame,
+                            comparison_with_profiles: CompareProfiles):
+    _check_categories(categories)
+    _check_category_profiles(category_profiles)
+    _check_criteria_directions(criteria_directions)
+    _check_prometheeII_flows(prometheeII_flows, category_profiles)
+    _check_enum(comparison_with_profiles)
+    _check_compare_profiles_type_and_profiles_and_categories_length(comparison_with_profiles, categories,
+                                                                    category_profiles)
+    _check_if_criteria_are_the_same(category_profiles, criteria_directions.index, "Profiles preferences")

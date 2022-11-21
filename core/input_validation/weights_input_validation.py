@@ -22,7 +22,7 @@ def _check_criteria_weight_ratio(criteria_weight_ratio: NumericValue):
 def _check_criteria_ranks(criteria_ranks: pd.Series):
     if not isinstance(criteria_ranks, pd.Series):
         raise TypeError("Criteria ranks must be pandas Series")
-    if not criteria_ranks.dtype == int:
+    if not criteria_ranks.dtype == 'int64':
         raise TypeError("Criteria ranks must be integer")
     if not all(criteria_ranks >= 1):
         raise ValueError("Criteria ranks must be greater than 1")

@@ -5,6 +5,7 @@
 import pandas as pd
 from core.aliases import PreferencesTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
+from core.input_validation.ranking_input_validation import net_flow_score_iterative_validation
 from modular_parts.flows import calculate_net_flows_score
 
 __all__ = ['calculate_netflow_score_ranking']
@@ -26,6 +27,8 @@ def calculate_netflow_score_ranking(preferences: PreferencesTable,
 
     :return: Ranking list of alternatives based on Net Flow Scores.
     """
+    net_flow_score_iterative_validation(preferences, function, direction, avoid_same_scores)
+
     scores = calculate_net_flows_score(preferences, function, direction, avoid_same_scores=avoid_same_scores)
 
     ranking = scores.sort_values(ascending=False)
