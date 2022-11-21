@@ -66,15 +66,17 @@ def n_categories(alternatives_performances):
     return alternatives_performances.values.__len__()
 
 
-def test_cluster_using_prometheecluster(alternatives_performances,preference_thresholds,indifference_thresholds,
-                      standard_deviations,generalized_criteria,criteria_directions,criteria_weights, n_categories):
-    assignment  = promethee_cluster(alternatives_performances,preference_thresholds,indifference_thresholds,
-                      standard_deviations,generalized_criteria,criteria_directions,criteria_weights, n_categories)
-    assignment_to_check = pd.Series(data= [[category] for category in assignment.keys()], index=assignment.keys())
+def test_cluster_using_prometheecluster(alternatives_performances, preference_thresholds, indifference_thresholds,
+                                        standard_deviations, generalized_criteria, criteria_directions,
+                                        criteria_weights, n_categories):
+    assignment = promethee_cluster(alternatives_performances, preference_thresholds, indifference_thresholds,
+                                   standard_deviations, generalized_criteria, criteria_directions, criteria_weights,
+                                   n_categories)
+    assignment_to_check = pd.Series(data=[[category] for category in assignment.keys()], index=assignment.keys())
     assert_series_equal(assignment_to_check, assignment, atol=0.006)
+
 
 if __name__ == '__main__':
     test_cluster_using_prometheecluster(alternatives_performances, preference_thresholds, indifference_thresholds,
                                         standard_deviations, generalized_criteria, criteria_directions,
                                         criteria_weights, n_categories)
-
