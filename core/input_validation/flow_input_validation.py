@@ -72,7 +72,7 @@ def _check_tuple_len(tuple_to_check: Tuple, tuple_len: int, checked_object_name:
 
 
 def _check_dtype(checked_object: Union[pd.DataFrame, pd.Series], checked_object_name: str):
-    if not checked_object.dtype not in [int, float]:
+    if not checked_object.dtypes not in [int, float]:
         raise ValueError(f"{checked_object_name} should be passed with int or float values")
 
 
