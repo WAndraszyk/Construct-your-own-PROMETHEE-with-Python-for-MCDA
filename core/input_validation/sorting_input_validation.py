@@ -1,9 +1,12 @@
 import pandas as pd
 from typing import List, Union, Tuple
+from enum import Enum
+from core.enums import CompareProfiles
 from core.input_validation.ranking_input_validation import *
 from core.input_validation.alternatives_profiles_input_validation import *
 
-__all__ = ["alternatives_support_validation", "prom_sort_validation", "promethee_tri_validation"]
+__all__ = ["alternatives_support_validation", "prom_sort_validation", "promethee_tri_validation",
+           "flow_sort_i_validation"]
 
 
 # M22
@@ -131,3 +134,31 @@ def promethee_tri_validation(categories: List[str],
     _check_partial_preferences(profiles_partial_preferences)
     _check_assign_to_better(assign_to_better_class)
     _check_marginal_val(use_marginal_value)
+
+
+def _check_enum(profiles: Enum):
+    if profiles is CompareProfiles.LIMITING_PROFILES:
+        pass
+    elif profiles is CompareProfiles.BOUNDARY_PROFILES:
+        pass
+    elif profiles is CompareProfiles.CENTRAL_PROFILES:
+        pass
+    else:
+        raise ValueError(f"Incorrect profiles type: {profiles}")
+
+
+# M19
+def flow_sort_i_validation(categories: List[str],
+                           category_profiles: pd.DataFrame,
+                           criteria_directions: pd.Series,
+                           alternatives_flows: pd.DataFrame,
+                           category_profiles_flows: pd.DataFrame,
+                           comparison_with_profiles: Enum):
+    criteria_from_df = category_profiles.columns.unique().tolist()
+
+    _check_categories(categories)
+    _check_category_profiles(category_profiles, criteria_from_df)
+    _check_criteria_directions(criteria_directions)
+    _check_flows(alternatives_flows)
+    _check_flows(category_profiles_flows)
+    _check_enum(comparison_with_profiles)
