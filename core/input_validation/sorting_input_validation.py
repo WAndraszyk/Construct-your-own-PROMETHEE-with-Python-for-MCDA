@@ -154,6 +154,15 @@ def _check_enum(profiles: Enum):
         raise ValueError(f"Incorrect profiles type: {profiles}")
 
 
+def _check_enum_gdss(profiles: Enum):
+    if profiles is CompareProfiles.BOUNDARY_PROFILES:
+        pass
+    elif profiles is CompareProfiles.CENTRAL_PROFILES:
+        pass
+    else:
+        raise ValueError(f"Incorrect profiles type: {profiles}")
+
+
 # M19
 def flow_sort_i_validation(categories: List[str],
                            category_profiles: pd.DataFrame,
@@ -206,6 +215,82 @@ def _check_if_criteria_are_the_same(checked_object: pd.DataFrame, criteria: pd.I
         raise ValueError(f"Criteria in {checked_object_name} should be the same as in every other object with criteria")
 
 
+def _check_net_flows(net_flows: pd.Series, checked_object_name: str):
+    if not isinstance(net_flows, pd.Series):
+        raise ValueError(f"{checked_object_name} should be passed as a Series object")
+
+    if net_flows.dtype not in ['int64', 'float64']:
+        raise ValueError(f"{checked_object_name} should be passed as a Series with numeric values")
+
+
+def _check_profiles_general_net_flows(profiles_general_net_flows: pd.DataFrame,
+                                      alternatives_general_net_flows: pd.Series,
+                                      profiles_performances: List[pd.DataFrame]):
+    if not isinstance(profiles_general_net_flows, pd.DataFrame):
+        raise ValueError("Profiles general net flows should be passed as a DataFrame object")
+    if not isinstance(profiles_general_net_flows.index, pd.MultiIndex):
+        raise ValueError("Profiles general net flows should be passed as a DataFrame with MultiIndex")
+
+    if not (profiles_general_net_flows.columns == alternatives_general_net_flows.index).all():
+        raise ValueError("Profiles general net flows should have columns equals to "
+                         "alternatives general net flows index")
+
+    for index, profiles_general_net_flows_group in profiles_general_net_flows.groupby(level=0):
+        if not len(profiles_general_net_flows_group) == len(profiles_performances[0]):
+            raise ValueError(f"Number of profiles in profiles general net flows should be equals to "
+                             f"number of profiles in profiles performances. Profiles group {index} has "
+                             f"{len(profiles_general_net_flows_group)} profiles")
+
+    if profiles_general_net_flows.dtypes.values.all() not in ['float64', 'int64']:
+        raise ValueError("Profiles general net flows should be passed as a DataFrame with numeric values")
+
+    for index, profiles_general_net_flow in profiles_general_net_flows.groupby(level=0):
+        if not len(profiles_general_net_flow) == len(profiles_general_net_flow.index.get_level_values(1).unique()):
+            raise ValueError(f"Number of profiles in Profiles general net flows should be equals to "
+                             f"number of alternatives in Profiles general net flows. Profile {index} has "
+                             f"{len(profiles_general_net_flow)} alternatives")
+
+
+def _check_profiles_performances_list(profiles_performances: List[pd.DataFrame]):
+    if not isinstance(profiles_performances, list):
+        raise ValueError("Profiles performances should be passed as a list of DataFrames")
+
+    if not all(isinstance(profiles_performance, pd.DataFrame) for profiles_performance in profiles_performances):
+        raise ValueError("Profiles performances should be passed as a list of DataFrames")
+
+    if not all(len(profiles_performance) ==
+               len(profiles_performances[0]) for profiles_performance in profiles_performances):
+        raise ValueError("Number of profiles in every profiles performances should be the same")
+
+    if not all(len(profiles_performance.columns) == len(profiles_performances[0].columns)
+               for profiles_performance in profiles_performances):
+        raise ValueError("Number of criteria in every profiles performances should be the same")
+
+    if not all(profiles_performance.dtypes.values.all() in ['float64', 'int64']
+               for profiles_performance in profiles_performances):
+        raise ValueError("Profiles performances should be passed as a list of DataFrames with numeric values")
+
+
+def _check_dms_weights(dms_weights: pd.Series, profiles_general_net_flows: pd.DataFrame):
+    if not isinstance(dms_weights, pd.Series):
+        raise ValueError("DMS weights should be passed as a Series object")
+
+    if (dms_weights <= 0).any():
+        raise ValueError("DMS weights should be positive")
+
+    if not (dms_weights.index == profiles_general_net_flows.index.get_level_values(0).unique()).all():
+        raise ValueError("DMS weights should have index equals to profiles general net flows index")
+
+
+def _check_number_of_dms(profiles_general_net_flows: pd.DataFrame,
+                         profiles_performances: List[pd.DataFrame],
+                         dms_weights: pd.Series):
+    if not len(profiles_performances) == len(dms_weights.index) == \
+           len(profiles_general_net_flows.index.get_level_values(0).unique()):
+        raise ValueError("Number of DMs in profiles performances should be the same as in DMS weights and "
+                         "in profiles general net flows")
+
+
 # M20
 def flow_sort_ii_validation(categories: List[str],
                             category_profiles: pd.DataFrame,
@@ -216,7 +301,29 @@ def flow_sort_ii_validation(categories: List[str],
     _check_category_profiles(category_profiles)
     _check_criteria_directions(criteria_directions)
     _check_prometheeII_flows(prometheeII_flows, category_profiles)
-    _check_enum(comparison_with_profiles)
+    _check_enum_gdss(comparison_with_profiles)
     _check_compare_profiles_type_and_profiles_and_categories_length(comparison_with_profiles, categories,
                                                                     category_profiles)
     _check_if_criteria_are_the_same(category_profiles, criteria_directions.index, "Profiles preferences")
+
+
+# M21
+def flow_sort_gdss_validation(alternatives_general_net_flows: pd.Series,
+                              profiles_general_net_flows: pd.DataFrame,
+                              categories: List[str],
+                              criteria_directions: pd.Series,
+                              profiles_performances: List[pd.DataFrame],
+                              dms_weights: pd.Series,
+                              comparison_with_profiles: CompareProfiles,
+                              assign_to_better_class: bool = True):
+    _check_net_flows(alternatives_general_net_flows, "Alternatives general net flows")
+    _check_profiles_general_net_flows(profiles_general_net_flows, alternatives_general_net_flows,
+                                      profiles_performances)
+    _check_categories(categories)
+    _check_criteria_directions(criteria_directions)
+    _check_profiles_performances_list(profiles_performances)
+    _check_dms_weights(dms_weights, profiles_general_net_flows)
+    _check_enum(comparison_with_profiles)
+    _check_compare_profiles_type_and_profiles_and_categories_length(comparison_with_profiles, categories,
+                                                                    profiles_performances[0])
+    _check_assign_to_better(assign_to_better_class)
