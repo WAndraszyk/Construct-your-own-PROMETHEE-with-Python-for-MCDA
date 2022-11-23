@@ -43,12 +43,6 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
     """
     criteria = weights.index
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
-    weights = weights
-    generalized_criteria = generalized_criteria
-    preference_thresholds = preference_thresholds
-    indifference_thresholds = indifference_thresholds
-    reinforced_preference_thresholds = reinforced_preference_thresholds
-    reinforcement_factors = reinforcement_factors
     for i in reinforcement_factors.values:
         if i <= 1:
             raise Exception("Reinforcement factors need to be >1")

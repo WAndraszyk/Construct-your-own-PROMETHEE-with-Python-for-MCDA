@@ -1,6 +1,6 @@
 import pandas as pd
 
-__all__ = ["srf_weights_validation"]
+__all__ = ["srf_weights_validation", "surrogate_weights_validation"]
 
 from core.aliases import NumericValue
 
@@ -41,4 +41,15 @@ def srf_weights_validation(criteria_ranks: pd.Series, criteria_weight_ratio: Num
     """
     _check_decimal_place(decimal_place)
     _check_criteria_weight_ratio(criteria_weight_ratio)
+    _check_criteria_ranks(criteria_ranks)
+
+
+def surrogate_weights_validation(criteria_ranks: pd.Series, decimal_place: int):
+    """
+   Validate input data for surrogate weights calculation.
+   :param criteria_ranks: Series with ranks of criteria
+   :param decimal_place: Decimal place for weights
+   :return: None
+   """
+    _check_decimal_place(decimal_place)
     _check_criteria_ranks(criteria_ranks)
