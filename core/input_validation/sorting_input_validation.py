@@ -327,3 +327,128 @@ def flow_sort_gdss_validation(alternatives_general_net_flows: pd.Series,
     _check_compare_profiles_type_and_profiles_and_categories_length(comparison_with_profiles, categories,
                                                                     profiles_performances[0])
     _check_assign_to_better(assign_to_better_class)
+
+
+def _check_dms_profiles_partial_preferences(dms_profiles_partial_preferences: List[pd.DataFrame]):
+    if not isinstance(dms_profiles_partial_preferences, list):
+        raise ValueError("DMs profiles partial preferences should be passed as a list of DataFrames")
+
+    if not all(isinstance(dms_profiles_partial_preference, pd.DataFrame)
+               for dms_profiles_partial_preference in dms_profiles_partial_preferences):
+        raise ValueError("DMs profiles partial preferences should be passed as a list of DataFrames")
+
+    if not all(len(dms_profiles_partial_preference) ==
+               len(dms_profiles_partial_preferences[0]) for dms_profiles_partial_preference in
+               dms_profiles_partial_preferences):
+        raise ValueError("Number of profiles in every DMs profiles partial preferences should be the same")
+
+    if not all(len(dms_profiles_partial_preference.columns) ==
+               len(dms_profiles_partial_preferences[0].columns)
+               for dms_profiles_partial_preference in dms_profiles_partial_preferences):
+        raise ValueError("Number of criteria in every DMs profiles partial preferences should be the same")
+
+    if not all(dms_profiles_partial_preference.dtypes.values.all() in ['float64', 'int64']
+               for dms_profiles_partial_preference in dms_profiles_partial_preferences):
+        raise ValueError("DMs profiles partial preferences should be passed as a list of DataFrames with "
+                         "numeric values")
+
+
+def _check_dms_alternatives_partial_preferences(dms_alternatives_partial_preferences: List[pd.DataFrame]):
+    if not isinstance(dms_alternatives_partial_preferences, list):
+        raise ValueError("DMS alternatives partial preferences should be passed as a list of DataFrames")
+
+    if not all(isinstance(dms_alternatives_partial_preference, pd.DataFrame)
+               for dms_alternatives_partial_preference in dms_alternatives_partial_preferences):
+        raise ValueError("DMS alternatives partial preferences should be passed as a list of DataFrames")
+
+    if not all(len(dms_alternatives_partial_preference) ==
+               len(dms_alternatives_partial_preferences[0]) for dms_alternatives_partial_preference in
+               dms_alternatives_partial_preferences):
+        raise ValueError("Number of alternatives in every DMs alternatives partial preferences should be the same")
+
+    if not all(len(dms_alternatives_partial_preference.columns) ==
+               len(dms_alternatives_partial_preferences[0].columns)
+               for dms_alternatives_partial_preference in dms_alternatives_partial_preferences):
+        raise ValueError("Number of criteria in every DMS alternatives partial preferences should be the same")
+
+    if not all(dms_alternatives_partial_preference.dtypes.values.all() in ['float64', 'int64']
+               for dms_alternatives_partial_preference in dms_alternatives_partial_preferences):
+        raise ValueError("DMs alternatives partial preferences should be passed as a list of DataFrames with "
+                         "numeric values")
+
+
+def _check_dms_profile_vs_profile_partial_preferences(dms_profile_vs_profile_partial_preferences: pd.DataFrame):
+    if not isinstance(dms_profile_vs_profile_partial_preferences, pd.DataFrame):
+        raise ValueError("DMs profile vs profile partial preferences should be passed as a DataFrame")
+
+    number_of_criteria = len(dms_profile_vs_profile_partial_preferences.index.get_level_values(0).unique())
+    columns_size = len(dms_profile_vs_profile_partial_preferences) / number_of_criteria
+
+    if len(dms_profile_vs_profile_partial_preferences.columns) != columns_size:
+        raise ValueError("DMs profile vs profile partial preferences should be passed as a DataFrame with "
+                         "number of columns equal to number of all profiles")
+
+    if not (dms_profile_vs_profile_partial_preferences.index.droplevel(0).unique() ==
+            dms_profile_vs_profile_partial_preferences.columns).all():
+        raise ValueError("DMs profile vs profile partial preferences should be passed as a DataFrame with "
+                         "identical index and columns")
+
+    profiles_index = dms_profile_vs_profile_partial_preferences.index.droplevel(0).unique()
+
+    for index, profile_vs_profile_partial_preferences in dms_profile_vs_profile_partial_preferences.groupby(level=0):
+        if not ((profile_vs_profile_partial_preferences.droplevel(0).index == profiles_index).all() and
+                (profile_vs_profile_partial_preferences.columns == profiles_index).all()):
+            raise ValueError("DMs profile vs profile partial preferences should be passed as a DataFrame with "
+                             "identical index and columns")
+
+    if not dms_profile_vs_profile_partial_preferences.dtypes.values.all() in ['float64', 'int64']:
+        raise ValueError("DMs profile vs profile partial preferences should be passed as a DataFrame with "
+                         "numeric values")
+
+
+def _check_criteria_weights(weights: pd.Series):
+    if not isinstance(weights, pd.Series):
+        raise ValueError("Criteria weights should be passed as a Series object")
+
+    if weights.dtype not in ['float64', 'int64']:
+        raise ValueError("Criteria weights should be passed as a Series object with numeric values")
+
+    if (weights <= 0).any():
+        raise ValueError("Weights should be positive")
+
+
+def _check_number_of_dms_gdss(dms_profiles_partial_preferences: List[pd.DataFrame],
+                              dms_alternatives_partial_preferences: List[pd.DataFrame],
+                              dms_profile_vs_profile_partial_preferences: pd.DataFrame):
+
+    if not (len(dms_profiles_partial_preferences[0].index.get_level_values(0).unique()) ==
+            len(dms_alternatives_partial_preferences[0].index.get_level_values(0).unique()) ==
+            len(dms_profile_vs_profile_partial_preferences.index.get_level_values(0).unique())):
+        raise ValueError("Number of DMs should be the same in every DMs partial preferences")
+
+
+def _check_criteria_weights_gdss(dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
+                                 dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
+                                 dms_profile_vs_profile_partial_preferences: pd.DataFrame,  # P(r_i,r_j)
+                                 criteria_weights: pd.Series):
+    if not len(dms_profiles_partial_preferences[0].index.get_level_values(0).unique()) == \
+           len(dms_alternatives_partial_preferences[0].index.get_level_values(0).unique()) == \
+           len(dms_profile_vs_profile_partial_preferences.index.get_level_values(0).unique()) == \
+           len(criteria_weights):
+        raise ValueError("Number of criteria should be the same in every DMs partial preferences and criteria weights")
+
+
+# M21x
+def multiple_dm_criteria_net_flows_validation(dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
+                                              dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
+                                              dms_profile_vs_profile_partial_preferences: pd.DataFrame,  # P(r_i,r_j)
+                                              criteria_weights: pd.Series):
+    _check_dms_profiles_partial_preferences(dms_profiles_partial_preferences)
+    _check_dms_alternatives_partial_preferences(dms_alternatives_partial_preferences)
+    _check_dms_profile_vs_profile_partial_preferences(dms_profile_vs_profile_partial_preferences)
+    _check_criteria_weights(criteria_weights)
+
+    _check_number_of_dms_gdss(dms_profiles_partial_preferences, dms_alternatives_partial_preferences,
+                              dms_profile_vs_profile_partial_preferences)
+    _check_criteria_weights_gdss(dms_profiles_partial_preferences, dms_alternatives_partial_preferences,
+                                 dms_profile_vs_profile_partial_preferences, criteria_weights)

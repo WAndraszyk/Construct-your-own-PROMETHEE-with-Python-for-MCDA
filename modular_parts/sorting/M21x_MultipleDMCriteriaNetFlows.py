@@ -7,6 +7,8 @@ from typing import List, Tuple
 
 __all__ = ["calculate_gdss_flows"]
 
+from core.input_validation.sorting_input_validation import multiple_dm_criteria_net_flows_validation
+
 
 def _calculate_alternatives_general_net_flows(alternatives: pd.Index, category_profiles: pd.Index,
                                               criteria_weights: pd.Series,
@@ -96,8 +98,8 @@ def _calculate_profiles_general_net_flows(alternatives: pd.Index, category_profi
             for (alternative_i, alternative_i_row), (_, profile_j_col) \
                     in zip(alternatives_vs_profiles_partial_preferences.droplevel(0).iterrows(),
                            profiles_vs_alternatives_partial_preferences.T.iterrows()):
-                for(_, alternative_vs_profile_partial_preference), \
-                   (criterion_and_profile, profile_vs_alternative_partial_preference)\
+                for (_, alternative_vs_profile_partial_preference), \
+                    (criterion_and_profile, profile_vs_alternative_partial_preference) \
                         in zip(alternative_i_row.iteritems(), profile_j_col.iteritems()):
                     profile = criterion_and_profile[1]
                     profiles_flows.loc[(criterion, dm, profile), alternative_i] = \
@@ -108,7 +110,7 @@ def _calculate_profiles_general_net_flows(alternatives: pd.Index, category_profi
     profiles_global_net_flows = pd.DataFrame(index=profiles_global_net_flows_index, dtype=float)
 
     for DM_profile, profile_criteria_net_flows in profiles_flows.groupby(level=[1, 2]):
-        profiles_global_net_flows.loc[DM_profile, alternatives] = profile_criteria_net_flows.reset_index(drop=True)\
+        profiles_global_net_flows.loc[DM_profile, alternatives] = profile_criteria_net_flows.reset_index(drop=True) \
             .multiply(criteria_weights.reset_index(drop=True), axis=0).sum(axis=0)
 
     return profiles_global_net_flows
@@ -133,6 +135,11 @@ def calculate_gdss_flows(dms_profiles_partial_preferences: List[pd.DataFrame],  
     :return: alternatives general net flows(List of net flows for each alternative) \
     and profiles general net flows(3D List of net flows for each alternative, DM and category_profile)
     """
+    multiple_dm_criteria_net_flows_validation(dms_profiles_partial_preferences,
+                                              dms_alternatives_partial_preferences,
+                                              dms_profile_vs_profile_partial_preferences,
+                                              criteria_weights)
+
     alternatives = dms_profiles_partial_preferences[0].columns
     category_profiles = dms_alternatives_partial_preferences[0].columns
 
