@@ -1,4 +1,5 @@
 import pandas as pd
+from typing import List
 
 
 def check_dominance_condition(criteria_directions: pd.Series, category_profiles: pd.DataFrame):
@@ -14,7 +15,7 @@ def check_dominance_condition(criteria_directions: pd.Series, category_profiles:
                 raise ValueError("Profiles don't fulfill the dominance condition")
 
 
-def check_dominance_condition_GDSS(profiles: pd.Index, profiles_performances: list[pd.DataFrame],
+def check_dominance_condition_GDSS(profiles: pd.Index, profiles_performances: List[pd.DataFrame],
                                    criteria_directions: pd.Series):
     """
     Check if each boundary profile is strictly worse in each criterion than betters profiles (even from other DM's)
