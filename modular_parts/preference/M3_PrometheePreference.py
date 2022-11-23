@@ -1,5 +1,6 @@
 from core.aliases import NumericValue, PerformanceTable
 import core.preference_commons as pc
+from core.input_validation import promethee_preference_validation
 import pandas as pd
 
 __all__ = ["compute_preference_indices"]
@@ -7,8 +8,7 @@ __all__ = ["compute_preference_indices"]
 
 def compute_preference_indices(alternatives_performances: PerformanceTable, preference_thresholds: pd.Series,
                                indifference_thresholds: pd.Series, standard_deviations: pd.Series,
-                               generalized_criteria: pd.Series,
-                               directions: pd.Series, weights: pd.Series,
+                               generalized_criteria: pd.Series, directions: pd.Series, weights: pd.Series,
                                profiles_performance: PerformanceTable = None,
                                decimal_place: NumericValue = 3) -> tuple:
     """
@@ -29,7 +29,12 @@ def compute_preference_indices(alternatives_performances: PerformanceTable, pref
     :return: partial preferences
     """
     alternatives = alternatives_performances.index
-    criteria = weights.keys()
+    criteria = weights.index
+
+    promethee_preference_validation(alternatives_performances, preference_thresholds, indifference_thresholds,
+                                    standard_deviations, generalized_criteria, directions, weights,
+                                    profiles_performance, decimal_place, criteria)
+
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
     if profiles_performance is not None:
         categories_profiles = profiles_performance.index
