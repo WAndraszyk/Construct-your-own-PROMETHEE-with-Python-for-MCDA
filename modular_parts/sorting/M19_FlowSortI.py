@@ -10,6 +10,7 @@ from core.enums import CompareProfiles
 from core.aliases import PerformanceTable, FlowsTable
 from core.preference_commons import directed_alternatives_performances
 from core.promethee_check_dominance import check_dominance_condition
+from core.input_validation.sorting_input_validation import flow_sort_i_validation
 
 __all__ = ["calculate_flowsortI_sorted_alternatives"]
 
@@ -188,6 +189,9 @@ def calculate_flowsortI_sorted_alternatives(categories: List[str],
 
     :return: DataFrame with alternatives assigned to proper classes
     """
+    flow_sort_i_validation(categories, category_profiles, criteria_directions,
+                           alternatives_flows, category_profiles_flows, comparison_with_profiles)
+
     check_dominance_condition(criteria_directions, category_profiles)
 
     category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles, criteria_directions),

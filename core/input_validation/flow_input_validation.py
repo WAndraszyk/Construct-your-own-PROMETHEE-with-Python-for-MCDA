@@ -72,7 +72,7 @@ def _check_tuple_len(tuple_to_check: Tuple, tuple_len: int, checked_object_name:
 
 
 def _check_dtype(checked_object: Union[pd.DataFrame, pd.Series], checked_object_name: str):
-    if not checked_object.dtype not in [int, float]:
+    if not checked_object.dtypes.all() not in ['int64', 'float64']:
         raise ValueError(f"{checked_object_name} should be passed with int or float values")
 
 
@@ -82,9 +82,9 @@ def _check_columns_and_indices_in_tuple(preferences: Tuple[pd.DataFrame, pd.Data
         raise ValueError("Columns of one DataFrame should be equal to indices of the other")
 
 
-def _check_if_alternatives_vs_alternatives(preferences: pd.DataFrame):
+def _check_if_alternatives_vs_alternatives(preferences: pd.DataFrame, checked_object_name: str = "Preferences"):
     if not preferences.index.equals(preferences.columns):
-        raise ValueError("Indices and columns of preferences DataFrame should be the same")
+        raise ValueError(f"Indices and columns of {checked_object_name} DataFrame should be the same")
 
 
 def promethee_group_ranking_validation(dms_flows: pd.DataFrame, dms_weights: pd.Series):
@@ -110,7 +110,8 @@ def prometheeI_outranking_flows_validation(preferences: Union[Tuple[pd.DataFrame
         _check_if_alternatives_vs_alternatives(preferences)
 
 
-def prometheeII_outranking_flows_validation(preferences: Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]):
+def prometheeII_outranking_flows_validation(preferences: Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame],
+                                            profiles_preferences: pd.DataFrame):
     if isinstance(preferences, tuple):
         _check_tuple_len(preferences, 2, "Preferences")
         _check_if_dataframe(preferences[0], "Preferences")
@@ -120,3 +121,8 @@ def prometheeII_outranking_flows_validation(preferences: Union[Tuple[pd.DataFram
         _check_columns_and_indices_in_tuple(preferences)
     else:
         raise ValueError("Preferences should be passed as a tuple of DataFrames")
+
+    _check_if_dataframe(profiles_preferences, "Profiles preferences")
+    _check_dtype(profiles_preferences, "Profiles preferences")
+    _check_if_alternatives_vs_alternatives(profiles_preferences, "Profiles preferences")
+

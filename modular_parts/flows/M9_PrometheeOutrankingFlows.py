@@ -7,6 +7,8 @@ from typing import Tuple, Union
 
 __all__ = ["calculate_prometheeI_outranking_flows", "calculate_prometheeII_outranking_flows"]
 
+from core.input_validation import prometheeI_outranking_flows_validation, prometheeII_outranking_flows_validation
+
 
 def _calculate_flow(preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable],
                     positive: bool = True) -> pd.Series:
@@ -63,6 +65,8 @@ def calculate_prometheeI_outranking_flows(
 
     :return: FlowTable of both positive and negative outranking flows.
     """
+    prometheeI_outranking_flows_validation(preferences)
+
     index = preferences[0].index if isinstance(preferences, tuple) else preferences.index
     return pd.DataFrame({'positive': _calculate_flow(preferences),
                          'negative': _calculate_flow(preferences, positive=False)
@@ -77,6 +81,8 @@ def calculate_prometheeII_outranking_flows(
 
     :return: FlowTable of both positive and negative outranking flows.
     """
+    prometheeII_outranking_flows_validation(preferences, profiles_preferences)
+
     return pd.DataFrame({'positive': _calculate_prometheeII_style_flow(preferences, profiles_preferences),
                          'negative': _calculate_prometheeII_style_flow(preferences, profiles_preferences,
                                                                        positive=False)})

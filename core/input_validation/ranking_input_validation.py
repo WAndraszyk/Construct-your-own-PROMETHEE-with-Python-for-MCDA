@@ -2,18 +2,18 @@ from enum import Enum
 
 import pandas as pd
 
-__all__ = ["promethee_i_ranking_validation"]
+__all__ = ["promethee_i_ranking_validation", "_check_flows"]
 
 
 # M11
-from core.input_validation import net_flow_score_validation
+from core.input_validation.flow_input_validation import net_flow_score_validation
 
 
 def _check_flows(flows: pd.DataFrame):
-    columns = flows.columns.values.tolist()
-
     if not isinstance(flows, pd.DataFrame):
         raise ValueError("Flows should be passed as a DataFrame object")
+
+    columns = flows.columns.values.tolist()
 
     if 'positive' not in columns or 'negative' not in columns:
         raise ValueError("Columns of DataFrame with flows should be named positive and negative")

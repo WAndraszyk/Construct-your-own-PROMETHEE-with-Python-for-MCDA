@@ -5,6 +5,7 @@
 import pandas as pd
 from typing import List, Tuple
 from core.promethee_flow import compute_single_criterion_net_flows
+from core.input_validation.sorting_input_validation import *
 
 __all__ = ["calculate_prometheetri_sorted_alternatives"]
 
@@ -99,6 +100,9 @@ def calculate_prometheetri_sorted_alternatives(categories: List[str], criteria_w
 
     :return: Series with precise assignments of alternatives to categories
     """
+    promethee_tri_validation(categories, criteria_weights, alternatives_partial_preferences,
+                             profiles_partial_preferences, assign_to_better_class, use_marginal_value)
+
     alternatives = alternatives_partial_preferences[1].columns.tolist()
 
     profiles_criteria_net_flows, alternatives_criteria_net_flows = \

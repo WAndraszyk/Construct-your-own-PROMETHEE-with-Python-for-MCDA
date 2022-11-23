@@ -6,6 +6,7 @@ import pandas as pd
 from typing import List
 from core.enums import CompareProfiles
 from core.aliases import PerformanceTable
+from core.input_validation.sorting_input_validation import flow_sort_ii_validation
 from core.promethee_check_dominance import check_dominance_condition
 
 __all__ = ["calculate_flowsortII_sorted_alternatives"]
@@ -148,6 +149,8 @@ def calculate_flowsortII_sorted_alternatives(categories: List[str],
 
     :return: DataFrame with altenatives sorted to proper categories using flows (positive, negative and net)
     """
+    flow_sort_ii_validation(categories, category_profiles, criteria_directions, prometheeII_flows,
+                            comparison_with_profiles)
     check_dominance_condition(criteria_directions, category_profiles)
 
     if comparison_with_profiles == CompareProfiles.LIMITING_PROFILES:
