@@ -2,15 +2,16 @@ import pandas as pd
 from typing import Tuple, List, Union
 from core.aliases import NumericValue
 from core.preference_commons import overall_preference
+from core.input_validation import discordance_validation
 
 __all__ = ["compute_discordance"]
 
 
 def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
                         decimal_place: NumericValue = 3, preferences: pd.DataFrame = None,
-                        categories_profiles=False) -> Union[Tuple[Union[pd.DataFrame, List[pd.DataFrame]],
-                                                                  Union[pd.DataFrame, List[pd.DataFrame]]],
-                                                            pd.DataFrame, Tuple[pd.DataFrame]]:
+                        categories_profiles: bool = False) -> Union[Tuple[Union[pd.DataFrame, List[pd.DataFrame]],
+                                                                          Union[pd.DataFrame, List[pd.DataFrame]]],
+                                                                    pd.DataFrame, Tuple[pd.DataFrame]]:
     """
     Calculates overall discordance by aggregating partial discordance indices.
 
@@ -24,11 +25,7 @@ def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, 
     :return: matrix of overall discordance and matrix of partial discordance indices. Alternatively: preference
     """
 
-    criteria = criteria
-    categories_profiles = categories_profiles
-    partial_preferences = partial_preferences
-    if tau < 1 or tau > len(criteria):
-        raise Exception("Tau needs to be a number from 1 to k, where k is the number of criteria.")
+    discordance_validation(criteria, partial_preferences, tau, decimal_place, preferences, categories_profiles)
 
     if not categories_profiles:
         partial_discordance = _calculate_partial_discordance(criteria, partial_preferences)

@@ -1,18 +1,20 @@
+from typing import List
+
 import pandas as pd
 from core.aliases import PerformanceTable, NumericValue
 from core.enums import Direction
 
-__all__ = ["promethee_preference_validation", "reinforced_preference_validation"]
+__all__ = ["promethee_preference_validation", "reinforced_preference_validation", "discordance_validation"]
 
 
 def _check_performances(performance_table: pd.DataFrame, criteria: pd.Index):
-    _check_criteria(performance_table.columns, criteria)
+    _compare_criteria(performance_table.columns, criteria)
     if not isinstance(performance_table, pd.DataFrame):
         raise TypeError("Performances on criteria should be passed as a DataFrame object")
 
 
 def _check_preference_thresholds(preference_thresholds: pd.Series, criteria: pd.Index):
-    _check_criteria(preference_thresholds.index, criteria)
+    _compare_criteria(preference_thresholds.index, criteria)
     if not isinstance(preference_thresholds, pd.Series):
         raise TypeError("Preference thresholds should be passed as a DataSeries object")
     if len(preference_thresholds) != len(criteria):
@@ -26,7 +28,7 @@ def _check_preference_thresholds(preference_thresholds: pd.Series, criteria: pd.
 
 
 def _check_indifference_thresholds(indifference_thresholds: pd.Series, criteria: pd.Index):
-    _check_criteria(indifference_thresholds.index, criteria)
+    _compare_criteria(indifference_thresholds.index, criteria)
     if not isinstance(indifference_thresholds, pd.Series):
         raise TypeError("Indifference thresholds should be passed as a DataSeries object")
     if len(indifference_thresholds) != len(criteria):
@@ -40,7 +42,7 @@ def _check_indifference_thresholds(indifference_thresholds: pd.Series, criteria:
 
 
 def _check_standard_deviations(standard_deviations: pd.Series, criteria: pd.Index):
-    _check_criteria(standard_deviations.index, criteria)
+    _compare_criteria(standard_deviations.index, criteria)
     if not isinstance(standard_deviations, pd.Series):
         raise TypeError("Standard deviations should be passed as a DataSeries object")
     if len(standard_deviations) != len(criteria):
@@ -54,7 +56,7 @@ def _check_standard_deviations(standard_deviations: pd.Series, criteria: pd.Inde
 
 
 def _check_generalized_criteria(generalized_criteria: pd.Series, criteria: pd.Index):
-    _check_criteria(generalized_criteria.index, criteria)
+    _compare_criteria(generalized_criteria.index, criteria)
     if not isinstance(generalized_criteria, pd.Series):
         raise TypeError("Generalized criteria should be passed as a DataSeries object")
     if len(generalized_criteria) != len(criteria):
@@ -62,7 +64,7 @@ def _check_generalized_criteria(generalized_criteria: pd.Series, criteria: pd.In
 
 
 def _check_directions(directions: pd.Series, criteria: pd.Index):
-    _check_criteria(directions.index, criteria)
+    _compare_criteria(directions.index, criteria)
     if not isinstance(directions, pd.Series):
         raise TypeError("Directions should be passed as a DataSeries object")
     if len(directions) != len(criteria):
@@ -78,7 +80,7 @@ def _check_directions(directions: pd.Series, criteria: pd.Index):
 
 
 def _check_weights(weights: pd.Series, criteria: pd.Index):
-    _check_criteria(weights.index, criteria)
+    _compare_criteria(weights.index, criteria)
     if not isinstance(weights, pd.Series):
         raise ValueError("Criteria weights should be passed as a Series object")
 
@@ -97,7 +99,7 @@ def _check_decimal_place(decimal_place: int):
         raise ValueError("Decimal place must be positive")
 
 
-def _check_criteria(criteria_from_series: pd.Index, criteria_from_df: pd.Index):
+def _compare_criteria(criteria_from_series: pd.Index, criteria_from_df: pd.Index):
     if not criteria_from_series.equals(criteria_from_df):
         raise ValueError("Criteria do not match in all inputs")
 
@@ -134,7 +136,7 @@ def promethee_preference_validation(alternatives_performances: PerformanceTable,
 
 
 def _check_reinforced_preference_thresholds(reinforced_preference_thresholds: pd.Series, criteria: pd.Index):
-    _check_criteria(reinforced_preference_thresholds.index, criteria)
+    _compare_criteria(reinforced_preference_thresholds.index, criteria)
     if not isinstance(reinforced_preference_thresholds, pd.Series):
         raise TypeError("Reinforced preference thresholds should be passed as a DataSeries object")
     if len(reinforced_preference_thresholds) != len(criteria):
@@ -148,7 +150,7 @@ def _check_reinforced_preference_thresholds(reinforced_preference_thresholds: pd
 
 
 def _check_reinforcement_factors(reinforcement_factors: pd.Series, criteria: pd.Index):
-    _check_criteria(reinforcement_factors.index, criteria)
+    _compare_criteria(reinforcement_factors.index, criteria)
     if not isinstance(reinforcement_factors, pd.Series):
         raise TypeError("Reinforcement factors should be passed as a DataSeries object")
     if len(reinforcement_factors) != len(criteria):
@@ -193,3 +195,56 @@ def reinforced_preference_validation(alternatives_performances: PerformanceTable
     _check_decimal_place(decimal_place)
     if profiles_performance is not None:
         _check_performances(profiles_performance, criteria)
+
+
+def _check_criteria(criteria: List[str]):
+    if not isinstance(criteria, list):
+        raise TypeError("Criteria should be passed as a list object")
+    for k in criteria:
+        if not isinstance(k, str):
+            raise TypeError("Criterion should be a string")
+
+
+def _check_partial_preferences(partial_preferences: pd.DataFrame):
+    if not isinstance(partial_preferences, pd.DataFrame):
+        raise TypeError("Partial preferences should be passed as a DataFrame object")
+
+
+def _check_tau(tau: NumericValue, criteria: List[str]):
+    if not isinstance(tau, (int, float)):
+        raise TypeError("Tau should be a numeric value")
+    if tau < 1 or tau > len(criteria):
+        raise ValueError("Tau needs to be a number from 1 to k, where k is the number of criteria.")
+
+
+def _check_categories_profiles(categories_profiles: bool):
+    if not isinstance(categories_profiles, bool):
+        raise TypeError("Categories profiles should be a boolean value")
+
+
+def _check_if_dataframe(data_frame: pd.DataFrame, checked_object_name: str):
+    if not isinstance(data_frame, pd.DataFrame):
+        raise ValueError(f"{checked_object_name} should be passed as a DataFrame object")
+
+
+def discordance_validation(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
+                           decimal_place: NumericValue, preferences: pd.DataFrame, categories_profiles: bool):
+    """
+    Validate input data for Discordance calculation.
+
+    :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker discordance
+    :param decimal_place: with this you can choose the decimal_place of the output numbers
+    :param preferences: if not empty function returns already calculated preference instead of just discordance
+    :param criteria: list of criteria names
+    :param partial_preferences: partial preference of every alternative over other alternatives or profiles
+    :param categories_profiles: were the preferences calculated for profiles
+
+    :return: None
+    """
+    _check_criteria(criteria)
+    _check_partial_preferences(partial_preferences)
+    _check_tau(tau, criteria)
+    _check_decimal_place(decimal_place)
+    if preferences is not None:
+        _check_if_dataframe(preferences, "Preferences")
+    _check_categories_profiles(categories_profiles)
