@@ -1,6 +1,7 @@
 from typing import List, Tuple, Union
 from core.preference_commons import PreferenceFunction
 from core.aliases import NumericValue, PerformanceTable
+from core.input_validation import reinforced_preference_validation
 import core.generalized_criteria as gc
 import core.preference_commons as pc
 import pandas as pd
@@ -43,9 +44,10 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
     """
     criteria = weights.index
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
-    for i in reinforcement_factors.values:
-        if i <= 1:
-            raise Exception("Reinforcement factors need to be >1")
+
+    reinforced_preference_validation(alternatives_performances, preference_thresholds, indifference_thresholds,
+                                     generalized_criteria, directions, reinforced_preference_thresholds,
+                                     reinforcement_factors, weights, profiles_performance, decimal_place, criteria)
 
     if profiles_performance is not None:
         categories_profiles = profiles_performance.index
