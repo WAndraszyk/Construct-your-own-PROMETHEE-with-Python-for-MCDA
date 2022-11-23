@@ -61,11 +61,6 @@ def _check_category_profiles(category_profiles: pd.DataFrame):
     if category_profiles.dtypes.values.all() not in ['float64', 'int64']:
         raise ValueError("Category profiles performance be a numeric value")
 
-    # for criterion in criteria:
-    #     for profile_per in category_profiles[criterion]:
-    #         if not isinstance(profile_per, (int, float)):
-    #             raise ValueError("Category profiles performance be a numeric value")
-
 
 def _check_criteria_directions(criteria_directions: pd.Series):
     if not isinstance(criteria_directions, pd.Series):
@@ -74,10 +69,6 @@ def _check_criteria_directions(criteria_directions: pd.Series):
     if criteria_directions.any() not in [Direction.MAX, Direction.MIN] and \
             criteria_directions.values.any() not in [0, 1]:
         raise ValueError("Criteria directions should Direction enums from core.enums")
-
-    # for direction in criteria_directions:
-    #     if not isinstance(direction, (int, float)):
-    #         raise ValueError("Criteria direction should be a numeric values")
 
 
 def _check_cut_point(cut_point: Union[int, float]):
