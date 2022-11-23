@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 from core.aliases import PreferencesTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
+from core.input_validation.flow_input_validation import net_flow_score_validation
+
 
 __all__ = ['calculate_net_flows_score']
 
@@ -26,19 +28,15 @@ def _calculate_score(preferences: PreferencesTable,
         function = np.nanmax
     elif function is ScoringFunction.MIN:
         function = np.nanmin
-    elif function is ScoringFunction.SUM:
-        function = np.nansum
     else:
-        raise ValueError(f"Incorrect scoring function: {function}")
+        function = np.nansum
 
     if direction is ScoringFunctionDirection.IN_FAVOR:
         scores = function(preferences.values, axis=1)
     elif direction is ScoringFunctionDirection.AGAINST:
         scores = -function(preferences.values, axis=0)
-    elif direction is ScoringFunctionDirection.DIFFERENCE:
-        scores = function(preferences.values - preferences.values.T, axis=1)
     else:
-        raise ValueError(f"Incorrect scoring function direction: {direction}")
+        scores = function(preferences.values - preferences.values.T, axis=1)
 
     return scores
 
@@ -71,6 +69,7 @@ def calculate_net_flows_score(preferences: PreferencesTable,
                               alternatives which get the same score.
     :return: List of Net Flow Scores for all preferences.
     """
+    net_flow_score_validation(preferences, function, direction, avoid_same_scores)
     np.fill_diagonal(preferences.values, np.NaN)
 
     if avoid_same_scores:
