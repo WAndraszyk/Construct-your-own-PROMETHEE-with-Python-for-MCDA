@@ -43,13 +43,13 @@ def compute_veto(
                                categories_profiles)
 
     if not categories_profiles:
-        veto = _vetoes(criteria, weights, full_veto, partialVet, alternatives)
+        veto = _vetoes(criteria, weights, full_veto, partialVet, decimal_place, alternatives)
         partial_veto = partialVet
     else:
         partial_veto = partialVet[1], partialVet[0]
-        veto = (_vetoes(criteria, weights, full_veto, partialVet[1], categories_profiles,
+        veto = (_vetoes(criteria, weights, full_veto, partialVet[1], decimal_place, categories_profiles,
                         alternatives),
-                _vetoes(criteria, weights, full_veto, partialVet[0], alternatives,
+                _vetoes(criteria, weights, full_veto, partialVet[0], decimal_place, alternatives,
                         categories_profiles))
     if preferences is not None:
         return pc.overall_preference(preferences, veto, categories_profiles)
@@ -58,6 +58,7 @@ def compute_veto(
 
 
 def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool, partial_veto: PreferencePartialTable,
+            decimal_place: NumericValue,
             i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
     if j_iter is None:
         j_iter = i_iter
@@ -76,7 +77,7 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool, partial_vet
                 else:
                     Pi_A_B += partial_veto.loc[k, j][i] * weights[k]
 
-            aggregated_v.append(Pi_A_B)
+            aggregated_v.append(round(Pi_A_B, decimal_place))
         Vetoes.append(aggregated_v)
 
     return pd.DataFrame(data=Vetoes, index=index, columns=columns)
