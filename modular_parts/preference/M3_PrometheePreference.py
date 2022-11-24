@@ -28,12 +28,12 @@ def compute_preference_indices(alternatives_performances: PerformanceTable, pref
     :return: preferences
     :return: partial preferences
     """
-    alternatives = alternatives_performances.index
-    criteria = weights.index
-
     promethee_preference_validation(alternatives_performances, preference_thresholds, indifference_thresholds,
                                     standard_deviations, generalized_criteria, directions, weights,
-                                    profiles_performance, decimal_place, criteria)
+                                    profiles_performance, decimal_place)
+
+    alternatives = alternatives_performances.index
+    criteria = weights.index
 
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
     if profiles_performance is not None:

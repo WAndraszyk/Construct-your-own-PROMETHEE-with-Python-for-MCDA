@@ -6,6 +6,7 @@ import numpy as np
 
 from typing import List, Tuple, Dict
 from core.enums import CompareProfiles
+from core.input_validation.sorting_input_validation import flow_sort_gdss_validation
 from core.preference_commons import directed_alternatives_performances
 from core.promethee_check_dominance import check_dominance_condition_GDSS
 
@@ -92,7 +93,7 @@ def _calculate_first_step_assignments(alternatives: pd.Index, dms: pd.Index, alt
                 if profile_distances[-1]:
                     alternative_assignments[DM] = categories[-1]
                 elif True in profile_distances:
-                    category_index = profile_distances.index(True)+1
+                    category_index = profile_distances.index(True) + 1
                     alternative_assignments[DM] = categories[category_index]
                 else:
                     alternative_assignments[DM] = categories[0]
@@ -211,6 +212,10 @@ def calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows: 
 
     :return: DataFrame with imprecise assignments (columns: 'worse', 'better') and Series with precise assignments.
     """
+    flow_sort_gdss_validation(alternatives_general_net_flows, profiles_general_net_flows, categories,
+                              criteria_directions, profiles_performances, dms_weights, comparison_with_profiles,
+                              assign_to_better_class)
+
     alternatives = alternatives_general_net_flows.index
     categories = categories
     profiles = profiles_performances[0].index

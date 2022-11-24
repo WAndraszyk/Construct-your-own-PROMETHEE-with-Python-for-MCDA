@@ -6,6 +6,7 @@ from typing import List, Tuple
 
 import pandas as pd
 from core.aliases import FlowsTable, PreferencesTable, NumericValue
+from core.input_validation import promethee_iii_ranking_validation
 import numpy as np
 
 __all__ = ["calculate_promethee_iii_ranking"]
@@ -27,13 +28,11 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
 
     :return: Intervals; Preference ranking pairs
     """
+    promethee_iii_ranking_validation(flows, preferences, alpha, decimal_place)
 
     alternatives = preferences.index
-    preferences = preferences
     flow = pd.Series(data=np.subtract(flows['positive'].values, flows['negative'].values), index=alternatives)
 
-    if alpha <= 0:
-        raise Exception("Alpha has to be greater than 0")
     intervals_list, intervals = _calculate_intervals(alternatives, flow, preferences, alpha, decimal_place)
     pairs_data = np.zeros(np.shape(preferences), dtype=str)
     for num_a in range(len(alternatives)):

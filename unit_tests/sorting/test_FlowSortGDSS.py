@@ -100,7 +100,7 @@ def dms_weights():
 
 @pytest.fixture
 def comparison_with_profiles():
-    return CompareProfiles.LIMITING_PROFILES
+    return CompareProfiles.BOUNDARY_PROFILES
 
 
 @pytest.fixture
@@ -112,11 +112,10 @@ def test_calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_fl
                                                      categories, criteria_directions, profiles_performances,
                                                      dms_weights, comparison_with_profiles, assign_to_better_class):
     alternatives = [f"a{i}" for i in range(1, 47)]
-    expected = pd.Series(['C3', 'C3', 'C3', 'C3', 'C2', 'C3', 'C3', 'C2', 'C3', 'C3',
-                          'C3', 'C3', 'C3', 'C1', 'C3', 'C2', 'C3', 'C3', 'C3', 'C2',
-                          'C3', 'C3', 'C3', 'C3', 'C2', 'C2', 'C3', 'C2', 'C2', 'C2',
-                          'C2', 'C2', 'C2', 'C1', 'C2', 'C1', 'C1', 'C1', 'C1', 'C1',
-                          'C1', 'C1', 'C1', 'C1', 'C1', 'C1'], index=alternatives, name='better')
+    expected = pd.Series(['C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C3', 'C1',
+                          'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1', 'C1',
+                          'C1', 'C1', 'C1', 'C3', 'C1', 'C3', 'C3', 'C3', 'C3', 'C3',
+                          'C3', 'C3', 'C3', 'C3', 'C3', 'C3'], index=alternatives, name='better')
 
     _, actual = calculate_flowsort_gdss_sorted_alternatives(alternatives_general_net_flows, profiles_general_net_flows,
                                                             categories, criteria_directions, profiles_performances,

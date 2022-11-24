@@ -42,12 +42,12 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
     :return: preferences
     :return: partial preferences
     """
-    criteria = weights.index
-    alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
-
     reinforced_preference_validation(alternatives_performances, preference_thresholds, indifference_thresholds,
                                      generalized_criteria, directions, reinforced_preference_thresholds,
-                                     reinforcement_factors, weights, profiles_performance, decimal_place, criteria)
+                                     reinforcement_factors, weights, profiles_performance, decimal_place)
+
+    criteria = weights.index
+    alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
 
     if profiles_performance is not None:
         categories_profiles = profiles_performance.index
