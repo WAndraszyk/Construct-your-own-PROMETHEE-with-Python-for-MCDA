@@ -15,6 +15,9 @@ def _check_weights(weights: pd.Series, criteria_num: int):
         if not isinstance(weight, (int, float)):
             raise ValueError("Weights should be a numeric values")
 
+    if (weights <= 0).any():
+        raise ValueError("Weights should be positive")
+
 
 def _check_partial_preferences(partial_preferences: pd.DataFrame):
     if not isinstance(partial_preferences, pd.DataFrame):
