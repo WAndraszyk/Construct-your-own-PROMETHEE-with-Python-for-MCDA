@@ -4,7 +4,8 @@ import pandas as pd
 from core.aliases import PerformanceTable, NumericValue
 from core.enums import Direction
 
-__all__ = ["promethee_preference_validation", "reinforced_preference_validation", "discordance_validation"]
+__all__ = ["promethee_preference_validation", "reinforced_preference_validation", "discordance_validation",
+           "_check_decimal_place", "_check_if_dataframe"]
 
 
 def _check_performances(performance_table: pd.DataFrame, criteria: pd.Index):
@@ -105,7 +106,7 @@ def promethee_preference_validation(alternatives_performances: PerformanceTable,
                                     profiles_performance: PerformanceTable,
                                     decimal_place: NumericValue):
     """
-    Validate input data for Promethee Preference calculation.
+    Validates input data for Promethee Preference calculation.
     :param alternatives_performances: Dataframe of alternatives' value at every criterion
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
@@ -165,7 +166,7 @@ def reinforced_preference_validation(alternatives_performances: PerformanceTable
                                      profiles_performance: PerformanceTable,
                                      decimal_place: NumericValue):
     """
-    Validate input data for Reinforced Preference calculation.
+    Validates input data for Reinforced Preference calculation.
     :param alternatives_performances: Dataframe of alternatives' value at every criterion
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
@@ -225,7 +226,7 @@ def _check_if_dataframe(data_frame: pd.DataFrame, checked_object_name: str):
 def discordance_validation(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
                            decimal_place: NumericValue, preferences: pd.DataFrame, categories_profiles: bool):
     """
-    Validate input data for Discordance calculation.
+    Validates input data for Discordance calculation.
 
     :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker discordance
     :param decimal_place: with this you can choose the decimal_place of the output numbers
