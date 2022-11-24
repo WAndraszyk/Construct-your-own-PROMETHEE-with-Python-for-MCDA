@@ -3,10 +3,29 @@ from enum import Enum
 
 from typing import Tuple, Union
 
+from core.aliases import FlowsTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
 
-__all__ = ["net_flow_score_validation", "promethee_group_ranking_validation",
+# from core.input_validation.sorting_input_validation import _check_flows
+__all__ = ["net_flow_score_validation", "promethee_group_ranking_validation","_check_flows",
            "prometheeI_outranking_flows_validation", "prometheeII_outranking_flows_validation"]
+
+
+def _check_flows(flows: pd.DataFrame):
+    if not isinstance(flows, pd.DataFrame):
+        raise ValueError("Flows should be passed as a DataFrame object")
+
+    columns = flows.columns.values.tolist()
+
+    if 'positive' not in columns or 'negative' not in columns:
+        raise ValueError("Columns of DataFrame with flows should be named positive and negative")
+
+    if len(columns) != 2:
+        raise ValueError("DataFrame with flows should have two columns named positive and negative")
+
+    for positive_flow, negative_flow in zip(flows['positive'], flows['negative']):
+        if not isinstance(positive_flow, (int, float)) or not isinstance(negative_flow, (int, float)):
+            raise ValueError("Flow should be a numeric values")
 
 
 # M14
@@ -126,3 +145,6 @@ def prometheeII_outranking_flows_validation(preferences: Union[Tuple[pd.DataFram
     _check_dtype(profiles_preferences, "Profiles preferences")
     _check_if_alternatives_vs_alternatives(profiles_preferences, "Profiles preferences")
 
+
+def calculate_net_outranking_flows_validation(flows: FlowsTable):
+    _check_flows(flows)

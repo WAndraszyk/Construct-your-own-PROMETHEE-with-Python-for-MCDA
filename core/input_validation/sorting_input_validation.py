@@ -2,7 +2,7 @@ import pandas as pd
 from typing import List, Union, Tuple
 from enum import Enum
 from core.enums import CompareProfiles, Direction
-from core.input_validation.ranking_input_validation import *
+from core.input_validation.flow_input_validation import _check_flows
 from core.input_validation.alternatives_profiles_input_validation import *
 
 __all__ = ["alternatives_support_validation", "prom_sort_validation", "promethee_tri_validation",
