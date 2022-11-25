@@ -8,7 +8,7 @@ Weighst:
 
 Preferences:
 - M3_PrometheePreference  :heavy_check_mark:
-- M4_PrometheePreferenceReinforcedPreference  :heavy_check_mark:
+- M4_PrometheeReinforcedPreference  :heavy_check_mark:
 - M5_PrometheePreferenceWithInteractions  :heavy_check_mark:
 - M6_PrometheeDiscordance  :heavy_check_mark:
 - M7__PrometheeVeto  :heavy_check_mark:
