@@ -66,8 +66,7 @@ def _check_criteria_directions(criteria_directions: pd.Series):
     if not isinstance(criteria_directions, pd.Series):
         raise ValueError("Criteria directions should be passed as a Series object")
 
-    if criteria_directions.any() not in [Direction.MAX, Direction.MIN] and \
-            criteria_directions.values.any() not in [0, 1]:
+    if criteria_directions.values.any() not in [Direction.MAX, Direction.MIN]:
         raise ValueError("Criteria directions should Direction enums from core.enums")
 
 

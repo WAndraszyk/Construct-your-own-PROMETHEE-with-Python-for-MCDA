@@ -3,7 +3,7 @@ import numpy as np
 import random
 from typing import List, Tuple, Dict
 
-from core.input_validation.clustering_input_validation import pclust_validation
+from core.input_validation import pclust_validation
 from modular_parts.flows import calculate_prometheeII_outranking_flows
 from modular_parts.preference import compute_preference_indices
 

@@ -1,9 +1,9 @@
 import pytest
 import sys
 import pandas as pd
-from pandas._testing import assert_series_equal
+from pandas.testing import assert_series_equal
 
-from core.enums import PreferenceFunction
+from core.enums import PreferenceFunction, Direction
 from modular_parts.clustering import promethee_cluster
 
 sys.path.append('../..')
@@ -51,7 +51,7 @@ def generalized_criteria():
 @pytest.fixture
 def criteria_directions():
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.Series([1, 1, 0, 0, 1], index=criteria)
+    return pd.Series([Direction.MAX, Direction.MAX, Direction.MIN, Direction.MIN, Direction.MAX], index=criteria)
 
 
 @pytest.fixture
