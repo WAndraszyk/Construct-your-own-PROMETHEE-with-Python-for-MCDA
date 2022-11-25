@@ -1,7 +1,7 @@
 # Construct-you-own-PROMETHEE-with-Python-for-MCDA
 ![alt text](https://github.com/WAndraszyk/Construct-your-own-PROMETHEE-with-Python-for-MCDA/blob/main/schemat.png "Schemat modułów")
 
-##Implemented modules
+## Implemented modules
 Weighst:
 - M1_SurogateWeights  :heavy_check_mark:
 - M2_SRFWeighst  :heavy_check_mark:
