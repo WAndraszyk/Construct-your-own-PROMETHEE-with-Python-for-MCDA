@@ -8,7 +8,7 @@ __all__ = ["compute_discordance"]
 
 
 def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
-                        decimal_place: NumericValue = 3, preferences: pd.DataFrame = None,
+                        decimal_place: NumericValue = 3, preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]] = None,
                         categories_profiles: bool = False) -> Union[Tuple[Union[pd.DataFrame, List[pd.DataFrame]],
                                                                           Union[pd.DataFrame, List[pd.DataFrame]]],
                                                                     pd.DataFrame, Tuple[pd.DataFrame]]:

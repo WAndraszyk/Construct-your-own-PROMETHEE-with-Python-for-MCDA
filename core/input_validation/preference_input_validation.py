@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union, Tuple
 
 import pandas as pd
 from core.aliases import PerformanceTable, NumericValue
@@ -224,7 +224,8 @@ def _check_if_dataframe(data_frame: pd.DataFrame, checked_object_name: str):
 
 
 def discordance_validation(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
-                           decimal_place: NumericValue, preferences: pd.DataFrame, categories_profiles: bool):
+                           decimal_place: NumericValue, preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
+                           categories_profiles: bool):
     """
     Validates input data for Discordance calculation.
 
@@ -242,5 +243,5 @@ def discordance_validation(criteria: List[str], partial_preferences: pd.DataFram
     _check_tau(tau, criteria)
     _check_decimal_place(decimal_place)
     if preferences is not None:
-        _check_if_dataframe(preferences, "Preferences")
+        _check_preferences(preferences)
     _check_categories_profiles(categories_profiles)
