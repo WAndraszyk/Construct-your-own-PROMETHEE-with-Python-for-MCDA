@@ -7,8 +7,9 @@ from core.input_validation import discordance_validation
 __all__ = ["compute_discordance"]
 
 
-def compute_discordance(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
-                        decimal_place: NumericValue = 3, preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]] = None,
+def compute_discordance(criteria: List[str], partial_preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
+                        tau: NumericValue, decimal_place: NumericValue = 3,
+                        preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]] = None,
                         categories_profiles: bool = False) -> Union[Tuple[Union[pd.DataFrame, List[pd.DataFrame]],
                                                                           Union[pd.DataFrame, List[pd.DataFrame]]],
                                                                     pd.DataFrame, Tuple[pd.DataFrame]]:
