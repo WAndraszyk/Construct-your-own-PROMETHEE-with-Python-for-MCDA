@@ -145,8 +145,6 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
                              q_list=q_list, s_list=s_list,
                              i_iter=profile_performance_table, j_iter=alternatives_performances,
                              generalized_criteria=generalized_criteria))
-
-
     return ppIndices
 
 
