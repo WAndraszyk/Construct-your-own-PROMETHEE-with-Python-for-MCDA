@@ -1,38 +1,46 @@
 # Construct-you-own-PROMETHEE-with-Python-for-MCDA
-Założenia implementacyjne:
-- poszczególne moduły mają być klasami
-- wszystkie potrzebne na wejściu zmienne powinny być polami klasy
-- wszystko co robi moduł powinno być metodą klasy
-- każdy moduł powinien zwracać wynik w formie, który może przyjąć inny moduł według schematu:
-
 ![alt text](https://github.com/WAndraszyk/Construct-your-own-PROMETHEE-with-Python-for-MCDA/blob/main/schemat.png "Schemat modułów")
 
-Wykonane i przetestowane moduły:
-- M1  :heavy_check_mark:
-- M2  :heavy_check_mark:
-- M3  :heavy_check_mark:
-- M4  :heavy_check_mark:
-- M5  :heavy_check_mark:
-- M6  :heavy_check_mark:
-- M7  :heavy_check_mark:
-- M8  :heavy_check_mark:
-- M9  :heavy_check_mark:
-- M10 :heavy_check_mark: 
-- M11 :heavy_check_mark:
-- M12 :heavy_check_mark:
-- M13 :heavy_check_mark:
-- M14 :heavy_check_mark:
-- M15 :heavy_check_mark: 
-- M16 :heavy_check_mark:
-- M17 :heavy_check_mark:
-- M18 :heavy_check_mark:
-- M19 :heavy_check_mark:
-- M20 :heavy_check_mark:
-- M21 :heavy_check_mark:
-- M21x:heavy_check_mark: 
-- M22 :heavy_check_mark:
-- M23 :heavy_check_mark:
-- M24 :heavy_check_mark:
-- M25 :heavy_check_mark:
-- M26 :heavy_check_mark:
-- M29 :heavy_check_mark:
+##Implemented modules
+Weighst:
+- M1_SurogateWeights  :heavy_check_mark:
+- M2_SRFWeighst  :heavy_check_mark:
+
+Preferences:
+- M3_PrometheePreference  :heavy_check_mark:
+- M4_PrometheePreferenceReinforcedPreference  :heavy_check_mark:
+- M5_PrometheePreferenceWithInteractions  :heavy_check_mark:
+- M6_PrometheeDiscordance  :heavy_check_mark:
+- M7__PrometheeVeto  :heavy_check_mark:
+
+Flows:
+- M8_PrometheeOutrankingFlows  :heavy_check_mark:
+- M9_NetOutrankingFlows :heavy_check_mark: 
+- M10_NetFlowsScore :heavy_check_mark:
+- M11_PrometheeAggregatedFlows :heavy_check_mark:
+- M12_MultipleDMCriteriaNetFlow :heavy_check_mark:
+
+Alternatives Profiles:
+- M13_PrometheeAlternativesProfiles :heavy_check_mark:
+
+Rankings:
+- M14_PrometheeIRanking :heavy_check_mark:
+- M15_PrometheeIIIRanking :heavy_check_mark:
+- M16_NetFlowScoreIterative :heavy_check_mark:
+
+Sorting:
+- M17_PromSort :heavy_check_mark:
+- M18_PrometheeTri :heavy_check_mark:
+- M19_FlowsSortI :heavy_check_mark:
+- M20_FlowSortII :heavy_check_mark:
+- M21_FlowSortGDSS :heavy_check_mark:
+- M22_GroupClassAcceptabilities :heavy_check_mark:
+
+Choice:
+- M23_PrometheeV :heavy_check_mark:
+
+Clustering:
+- M24_OrderedClustering :heavy_check_mark:
+- M25_PrometheeIIOrderedClustering :heavy_check_mark:
+- M26_PrometheeCluster :heavy_check_mark:
+- M27_PClust :heavy_check_mark:
