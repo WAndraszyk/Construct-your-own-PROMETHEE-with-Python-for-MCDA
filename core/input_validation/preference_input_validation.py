@@ -202,8 +202,14 @@ def _check_criteria(criteria: List[str]):
 
 
 def _check_partial_preferences(partial_preferences: pd.DataFrame):
-    if not isinstance(partial_preferences, pd.DataFrame):
-        raise TypeError("Partial preferences should be passed as a DataFrame object")
+    if not isinstance(partial_preferences, tuple):
+        if not isinstance(partial_preferences, pd.DataFrame):
+            raise TypeError("Partial preferences should be passed as a DataFrame object")
+    else:
+        if len(partial_preferences) != 2:
+            raise TypeError("Partial preferences with profiles should be passed as tuple of two DataFrames")
+        if not isinstance(partial_preferences[0], pd.DataFrame) or not isinstance(partial_preferences[1], pd.DataFrame):
+            raise TypeError("Partial preferences with profiles should be passed as tuple of two DataFrames")
 
 
 def _check_tau(tau: NumericValue, criteria: List[str]):
@@ -223,9 +229,20 @@ def _check_if_dataframe(data_frame: pd.DataFrame, checked_object_name: str):
         raise ValueError(f"{checked_object_name} should be passed as a DataFrame object")
 
 
-def discordance_validation(criteria: List[str], partial_preferences: pd.DataFrame, tau: NumericValue,
-                           decimal_place: NumericValue, preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
-                           categories_profiles: bool):
+def _check_preferences(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
+    if not isinstance(preferences, tuple):
+        if not isinstance(preferences, pd.DataFrame):
+            raise TypeError("Preferences should be passed as a DataFrame object")
+    else:
+        if len(preferences) != 2:
+            raise TypeError("Preferences with profiles should be passed as tuple of two DataFrames")
+        if not isinstance(preferences[0], pd.DataFrame) or not isinstance(preferences[1], pd.DataFrame):
+            raise TypeError("Preferences with profiles should be passed as tuple of two DataFrames")
+
+
+def discordance_validation(criteria: List[str], partial_preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
+                           tau: NumericValue, decimal_place: NumericValue,
+                           preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]], categories_profiles: bool):
     """
     Validates input data for Discordance calculation.
 
