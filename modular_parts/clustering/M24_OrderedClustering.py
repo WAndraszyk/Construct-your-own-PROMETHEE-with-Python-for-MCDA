@@ -1,5 +1,6 @@
 from typing import List, Tuple
 from core.aliases import PreferencesTable, NumericValue
+from core.input_validation import ordered_clustering_validation
 from core.Graph import Graph
 import numpy as np
 import pandas as pd
@@ -8,6 +9,8 @@ __all__ = ["group_into_ordered_clusters"]
 
 
 def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int) -> pd.Series:
+    ordered_clustering_validation(preferences, clusters_no)
+
     alternatives = preferences.index
     shape = np.shape(preferences)
     preferences = preferences.values.tolist()
