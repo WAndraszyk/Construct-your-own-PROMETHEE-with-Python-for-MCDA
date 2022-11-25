@@ -1,7 +1,9 @@
 import pandas as pd
 
-from typing import Tuple, Union
 from core.enums import PreferenceFunction, Direction
+from core.input_validation import _check_if_dataframe
+
+__all__ = ["pclust_validation", "ordered_clustering_validation"]
 
 
 def _check_alternatives_performances(alternatives_performances: pd.DataFrame):
@@ -24,9 +26,9 @@ def _check_generalized_criteria(generalized_criteria: pd.Series):
     if not isinstance(generalized_criteria, pd.Series):
         raise ValueError("Generalized criteria should be passed as a Series")
     if not (generalized_criteria.values.all() in [PreferenceFunction.USUAL, PreferenceFunction.U_SHAPE,
-                                            PreferenceFunction.V_SHAPE, PreferenceFunction.LEVEL,
-                                            PreferenceFunction.V_SHAPE_INDIFFERENCE,
-                                            PreferenceFunction.GAUSSIAN]):
+                                                  PreferenceFunction.V_SHAPE, PreferenceFunction.LEVEL,
+                                                  PreferenceFunction.V_SHAPE_INDIFFERENCE,
+                                                  PreferenceFunction.GAUSSIAN]):
         raise ValueError("Generalized criteria should be core.enums.PreferenceFunction enums")
 
 
@@ -34,8 +36,7 @@ def _check_criteria_directions(criteria_directions: pd.Series):
     if not isinstance(criteria_directions, pd.Series):
         raise ValueError("Criteria directions should be a Series object")
 
-    if criteria_directions.any() not in [Direction.MAX, Direction.MIN] and \
-            criteria_directions.values.any() not in [0, 1]:
+    if criteria_directions.values.any() not in [Direction.MAX, Direction.MIN]:
         raise ValueError("Criteria directions should be core.enums.Direction enums")
 
 
@@ -114,3 +115,15 @@ def pclust_validation(alternatives_performances: pd.DataFrame,
                                                 indifference_thresholds, standard_deviations,
                                                 generalized_criteria, criteria_directions,
                                                 criteria_weights)
+
+
+def _check_cluster_no(clusters_no: int):
+    if not isinstance(clusters_no, int):
+        raise TypeError("Number of clusters should be an integer")
+    if clusters_no <= 0:
+        raise ValueError("Number of clusters should be grater than 0")
+
+
+def ordered_clustering_validation(preferences: pd.DataFrame, clusters_no: int):
+    _check_if_dataframe(preferences, "Preferences")
+    _check_cluster_no(clusters_no)

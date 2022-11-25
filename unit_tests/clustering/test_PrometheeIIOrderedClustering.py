@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 from pandas._testing import assert_series_equal
 
-from core.enums import PreferenceFunction
+from core.enums import PreferenceFunction, Direction
 from modular_parts.clustering import promethee_II_ordered_clustering
 from modular_parts.weights import equal_weights
 
@@ -54,7 +54,8 @@ def generalized_criteria():
 @pytest.fixture
 def criteria_directions():
     criteria = [f"g{i}" for i in range(1, 7)]
-    return pd.Series([0, 1, 0, 0, 0, 1], index=criteria)
+    return pd.Series([Direction.MIN, Direction.MAX, Direction.MIN, Direction.MIN, Direction.MIN, Direction.MAX],
+                     index=criteria)
 
 
 @pytest.fixture
