@@ -1,6 +1,7 @@
 from core.aliases import NetOutrankingFlows
 from core.constraint import Constraint
 from core.linear_solver import solve_linear_problem
+from core.input_validation import decision_validation
 from typing import List
 import pandas as pd
 
@@ -13,6 +14,8 @@ def compute_decision(flows: NetOutrankingFlows, constraints: List[Constraint]) -
 
     :returns: alternatives that are part of the decision
     """
+    decision_validation(flows, constraints)
+
     alternatives = flows.index
     flows = flows.values
     constraints = constraints
