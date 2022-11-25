@@ -2,7 +2,6 @@ import pytest
 import sys
 import pandas as pd
 from pandas.testing import assert_series_equal
-
 from core.enums import PreferenceFunction, Direction
 from modular_parts.clustering import promethee_cluster
 
@@ -72,6 +71,7 @@ def test_cluster_using_prometheecluster(alternatives_performances, preference_th
     assignment = promethee_cluster(alternatives_performances, preference_thresholds, indifference_thresholds,
                                    standard_deviations, generalized_criteria, criteria_directions, criteria_weights,
                                    n_categories)
+    print(assignment)
     assignment_to_check = pd.Series(data=[[category] for category in assignment.keys()], index=assignment.keys())
     assert_series_equal(assignment_to_check, assignment, atol=0.006)
 

@@ -5,7 +5,6 @@ from core.clusters_commons import group_alternatives, _calculate_new_profiles
 from modular_parts.sorting import calculate_prometheetri_sorted_alternatives
 import pandas as pd
 import random
-from unit_tests.data.Example2Data import *
 from modular_parts.preference.M3_PrometheePreference import *
 
 __all__ = ['promethee_cluster']
@@ -44,13 +43,13 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
     old_assignment = pd.Series([], dtype=pd.StringDtype())
     assignment, profiles = _calculate_sorted_alternatives(alternatives_performances, preference_thresholds,
                                                           indifference_thresholds, standard_deviations,
-                                                          generalized_criteria, criteria_directions, weights,
+                                                          generalized_criteria, directions, weights,
                                                           profiles)
     while not old_assignment.equals(assignment):
         old_assignment = assignment.copy()
         assignment, profiles = _calculate_sorted_alternatives(alternatives_performances, preference_thresholds,
                                                               indifference_thresholds, standard_deviations,
-                                                              generalized_criteria, criteria_directions, weights,
+                                                              generalized_criteria, directions, weights,
                                                               profiles)
 
     cluster = group_alternatives(assignment)
@@ -60,7 +59,7 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
 
 def _calculate_sorted_alternatives(alternatives_performances, preference_thresholds,
                                    indifference_thresholds, standard_deviations,
-                                   generalized_criteria, criteria_directions, weights,
+                                   generalized_criteria, directions, weights,
                                    profiles):
     """
     Calculates new partial preferences, applies PrometheeTri and redefines new clusters.
@@ -70,14 +69,14 @@ def _calculate_sorted_alternatives(alternatives_performances, preference_thresho
     """
     _, partial_prefe = compute_preference_indices(alternatives_performances, preference_thresholds,
                                                   indifference_thresholds, standard_deviations,
-                                                  generalized_criteria, criteria_directions, weights,
+                                                  generalized_criteria, directions, weights,
                                                   profiles)
 
     _, profile_partial_pref = compute_preference_indices(profiles, preference_thresholds,
                                                          indifference_thresholds, standard_deviations,
-                                                         generalized_criteria, criteria_directions, weights)
+                                                         generalized_criteria, directions, weights)
 
-    assignment = calculate_prometheetri_sorted_alternatives(profiles.index, weights, (partial_prefe),
+    assignment = calculate_prometheetri_sorted_alternatives(profiles.index.tolist(), weights, (partial_prefe),
                                                             profile_partial_pref, True)
 
     profiles_return = _calculate_new_profiles(profiles, alternatives_performances, assignment, numpy.median)
