@@ -3,7 +3,8 @@ import pandas as pd
 from core.enums import PreferenceFunction, Direction
 from core.input_validation import _check_if_dataframe
 
-__all__ = ["pclust_validation", "ordered_clustering_validation"]
+__all__ = ["pclust_validation", "ordered_clustering_validation", "promethee_II_ordered_clustering_validation",
+           "promethee_cluster_validation"]
 
 
 def _check_alternatives_performances(alternatives_performances: pd.DataFrame):
@@ -89,6 +90,42 @@ def _check_max_iterations(number_of_iterations: int):
         raise ValueError("Max iterations should be passed as an integer")
     if number_of_iterations <= 0:
         raise ValueError("Max iterations should be greater than 0")
+
+
+def promethee_cluster_validation(alternatives_performances: pd.DataFrame,
+                                 preference_thresholds: pd.Series,
+                                 indifference_thresholds: pd.Series,
+                                 standard_deviations: pd.Series,
+                                 generalized_criteria: pd.Series,
+                                 directions: pd.Series,
+                                 weights: pd.Series,
+                                 n_categories: int):
+    pclust_validation(alternatives_performances,
+                      preference_thresholds,
+                      indifference_thresholds,
+                      standard_deviations,
+                      generalized_criteria,
+                      directions,
+                      weights,
+                      n_categories)
+
+
+def promethee_II_ordered_clustering_validation(alternatives_performances: pd.DataFrame,
+                                               preference_thresholds: pd.Series,
+                                               indifference_thresholds: pd.Series,
+                                               standard_deviations: pd.Series,
+                                               generalized_criteria: pd.Series,
+                                               directions: pd.Series,
+                                               weights: pd.Series,
+                                               n_categories: int):
+    pclust_validation(alternatives_performances,
+                      preference_thresholds,
+                      indifference_thresholds,
+                      standard_deviations,
+                      generalized_criteria,
+                      directions,
+                      weights,
+                      n_categories)
 
 
 def pclust_validation(alternatives_performances: pd.DataFrame,

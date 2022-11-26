@@ -2,6 +2,7 @@ import numpy
 from pandas._libs.internals import defaultdict
 import core.preference_commons as pc
 from core.clusters_commons import group_alternatives, _calculate_new_profiles
+from core.input_validation.clustering_input_validation import promethee_cluster_validation
 from modular_parts.sorting import calculate_prometheetri_sorted_alternatives
 import pandas as pd
 import random
@@ -17,7 +18,7 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
                       generalized_criteria: pd.Series,
                       directions: pd.Series,
                       weights: pd.Series,
-                      number_of_clusters: int) -> pd.Series:
+                      n_categories: int) -> pd.Series:
     """
     Cluster the alternatives using k-mean algorithm and PrometheeTri.
 
@@ -28,17 +29,24 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
     :param generalized_criteria: Series of generalized criteria.
     :param directions: Series of directions.
     :param weights: Series of weights.
-    :param number_of_clusters: Number of categories
+    :param n_categories: Number of categories
 
     :return: Tuple containing Series with the cluster labels and grouped alternatives data."""
-
+    promethee_cluster_validation(alternatives_performances,
+                                 preference_thresholds,
+                                 indifference_thresholds,
+                                 standard_deviations,
+                                 generalized_criteria,
+                                 directions,
+                                 weights,
+                                 n_categories)
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
-    categories = pd.Index([f'C{i}' for i in range(1, number_of_clusters + 1)])
-    if number_of_clusters > alternatives_performances.index.__len__():
+    categories = pd.Index([f'C{i}' for i in range(1, n_categories + 1)])
+    if n_categories > alternatives_performances.index.__len__():
         raise Exception("Number of cluster must be smaller then number of alternatives!")
 
     profiles = alternatives_performances.iloc[
-        random.sample(range(0, alternatives_performances.index.__len__()), number_of_clusters)]
+        random.sample(range(0, alternatives_performances.index.__len__()), n_categories)]
     profiles.index = categories
     old_assignment = pd.Series([], dtype=pd.StringDtype())
     assignment, profiles = _calculate_sorted_alternatives(alternatives_performances, preference_thresholds,
