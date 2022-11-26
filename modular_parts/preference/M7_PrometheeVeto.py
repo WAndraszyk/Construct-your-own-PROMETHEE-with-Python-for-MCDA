@@ -42,17 +42,19 @@ def compute_veto(
     partialVet = _partial_veto(v_list, criteria, alternatives_performances, profile_performance_table,
                                categories_profiles)
 
+    profiles = False
     if not categories_profiles:
         veto = _vetoes(criteria, weights, full_veto, partialVet, decimal_place, alternatives)
         partial_veto = partialVet
     else:
+        profiles = True
         partial_veto = partialVet[1], partialVet[0]
         veto = (_vetoes(criteria, weights, full_veto, partialVet[1], decimal_place, categories_profiles,
                         alternatives),
                 _vetoes(criteria, weights, full_veto, partialVet[0], decimal_place, alternatives,
                         categories_profiles))
     if preferences is not None:
-        return pc.overall_preference(preferences, veto, categories_profiles)
+        return pc.overall_preference(preferences, veto, profiles, decimal_place)
     else:
         return veto, partial_veto
 
