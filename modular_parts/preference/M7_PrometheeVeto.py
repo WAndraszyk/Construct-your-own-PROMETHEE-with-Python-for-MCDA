@@ -33,7 +33,7 @@ def compute_veto(
     criteria = weights.keys()
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
     if profiles_performance is not None:
-        categories_profiles = profiles_performance.keys()
+        categories_profiles = profiles_performance.index
         profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
     else:
         categories_profiles = None
@@ -43,7 +43,7 @@ def compute_veto(
                                categories_profiles)
 
     profiles = False
-    if not categories_profiles:
+    if categories_profiles is None:
         veto = _vetoes(criteria, weights, full_veto, partialVet, decimal_place, alternatives)
         partial_veto = partialVet
     else:
@@ -95,7 +95,7 @@ def _partial_veto(v_list: pd.Series, criteria: pd.Index, alternatives_performanc
     """
     deviations = pc.deviations(criteria=criteria, alternatives_performances=alternatives_performances,
                                profile_performance_table=profile_performance_table)
-    if not categories_profiles:
+    if categories_profiles is None:
 
         pvetos = _veto_deep(v_list=v_list, criteria=criteria, deviations=deviations, i_iter=alternatives_performances,
                             j_iter=alternatives_performances)

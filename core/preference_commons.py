@@ -148,7 +148,8 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
     return ppIndices
 
 
-def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]], discordances: Union[pd.DataFrame, Tuple[pd.DataFrame]],
+def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
+                       discordances: Union[pd.DataFrame, Tuple[pd.DataFrame]],
                        profiles: bool, decimal_place: NumericValue) -> Union[pd.DataFrame, Tuple[pd.DataFrame]]:
     """
     Combines preference and discordance/veto indices to compute overall preference
@@ -170,8 +171,13 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]], di
             for i in discordances.columns:
                 discordances[n][i] = 1 - discordances[n][i]
         overall_preferences = preferences * discordances
-
-    return overall_preferences.round(decimal_place)
+    if type(overall_preferences) == tuple:
+        for i in range(2):
+            overall_preferences = overall_preferences[0].round(decimal_place), overall_preferences[1].round(
+                decimal_place)
+    else:
+        overall_preferences = overall_preferences.round(decimal_place)
+    return overall_preferences
 
 
 def criteria_series(criteria: pd.Index, weights: List[float]) -> pd.Series:
