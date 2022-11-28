@@ -1,7 +1,7 @@
 from core.aliases import NumericValue, PerformanceTable, PreferencePartialTable, DeviationsTable
 import core.preference_commons as pc
 import pandas as pd
-
+from typing import Tuple, List, Union
 __all__ = ["compute_veto"]
 
 
@@ -13,7 +13,9 @@ def compute_veto(
         profiles_performance: PerformanceTable = None,
         decimal_place: NumericValue = 3,
         full_veto: bool = True,
-        preferences=None) -> tuple:
+        preferences=None) -> Union[Tuple[Union[pd.DataFrame, List[pd.DataFrame]],
+                                                                          Union[pd.DataFrame, List[pd.DataFrame]]],
+                                                                    pd.DataFrame, Tuple[pd.DataFrame]]:
     """
     Calculates veto of every alternative over other alternatives
     or profiles based on partial veto
