@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
-from modular_parts.preference import compute_reinforced_preference, compute_veto, compute_preference_indices
+from modular_parts.preference import compute_veto, compute_preference_indices
 from core.enums import PreferenceFunction, Direction
 
 
@@ -80,28 +80,32 @@ def test_veto_preference(alternatives, alternatives_performances, weights, vetoe
             [1, 0, 1, 0, 1],
             [0, 1, 1, 1, 0]]
     expected = pd.DataFrame(data=data, columns=alternatives, index=alternatives)
-    actual, _ = compute_veto(alternatives_performances=alternatives_performances, weights=weights, v_list=vetoes,
+    actual, _ = compute_veto(alternatives_performances=alternatives_performances, weights=weights,
+                             veto_thresholds=vetoes,
                              directions=directions)
 
     assert_frame_equal(actual, expected, atol=0.006)
 
 
 def test_overall_preference(alternatives, alternatives_performances, weights, preference_thresholds,
-                            indifference_thresholds, reinforcement_thresholds,generalized_criteria, vetoes, directions):
+                            indifference_thresholds, reinforcement_thresholds, generalized_criteria, vetoes,
+                            directions):
     preference, _ = compute_preference_indices(alternatives_performances, preference_thresholds,
-                                                          indifference_thresholds, reinforcement_thresholds,
-                                                          generalized_criteria,
-                                                          directions, weights)
+                                               indifference_thresholds, reinforcement_thresholds,
+                                               generalized_criteria,
+                                               directions, weights)
     expected = pd.DataFrame(data=[[0.000, 0.333, 0.000, 0.333, 1.000],
                                   [0.667, 0.000, 0.000, 0.333, 0.667],
                                   [0.000, 0.667, 0.000, 0.667, 0.000],
                                   [0.000, 0.000, 0.000, 0.000, 0.000],
                                   [0.000, 0.000, 0.000, 0.000, 0.000]], columns=alternatives, index=alternatives)
-    actual= compute_veto(alternatives_performances=alternatives_performances, weights=weights, v_list=vetoes,
-                             directions=directions, preferences=preference)
+    actual = compute_veto(alternatives_performances=alternatives_performances, weights=weights, veto_thresholds=vetoes,
+                          directions=directions, preferences=preference)
 
     assert_frame_equal(actual, expected, atol=0.006)
+
+
 if __name__ == '__main__':
     test_veto_preference(alternatives, alternatives_performances, weights, vetoes, directions)
     test_overall_preference(alternatives, alternatives_performances, weights, preference_thresholds,
-                            indifference_thresholds, reinforcement_thresholds,generalized_criteria, vetoes, directions)
+                            indifference_thresholds, reinforcement_thresholds, generalized_criteria, vetoes, directions)

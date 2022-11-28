@@ -56,6 +56,20 @@ def _check_standard_deviations(standard_deviations: pd.Series, criteria: pd.Inde
                 raise ValueError("Standard deviation can not be lower than 0")
 
 
+def _check_veto_thresholds(veto_thresholds: pd.Series, criteria: pd.Index):
+    if not isinstance(veto_thresholds, pd.Series):
+        raise TypeError("Veto thresholds should be passed as a DataSeries object")
+    _compare_criteria(veto_thresholds.index, criteria)
+    if len(veto_thresholds) != len(criteria):
+        raise ValueError("Number of veto thresholds should be equal to number of criteria")
+    for i in veto_thresholds:
+        if i is not None:
+            if not isinstance(i, (int, float)):
+                raise TypeError("Veto thresholds should be numeric values")
+            if i < 0:
+                raise ValueError("Veto thresholds can not be lower than 0")
+
+
 def _check_generalized_criteria(generalized_criteria: pd.Series, criteria: pd.Index):
     if not isinstance(generalized_criteria, pd.Series):
         raise TypeError("Generalized criteria should be passed as a DataSeries object")
@@ -240,6 +254,11 @@ def _check_preferences(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
             raise TypeError("Preferences with profiles should be passed as tuple of two DataFrames")
 
 
+def _check_full_veto(full_veto: bool):
+    if not isinstance(full_veto, bool):
+        raise TypeError("Full veto should be a boolean value")
+
+
 def discordance_validation(criteria: List[str], partial_preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
                            tau: NumericValue, decimal_place: NumericValue,
                            preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]], categories_profiles: bool):
@@ -262,3 +281,19 @@ def discordance_validation(criteria: List[str], partial_preferences: Union[pd.Da
     if preferences is not None:
         _check_preferences(preferences)
     _check_categories_profiles(categories_profiles)
+
+
+def veto_validation(alternatives_performances: PerformanceTable, weights: pd.Series, veto_thresholds: pd.Series,
+                    directions: pd.Series, full_veto: bool, profiles_performance: PerformanceTable,
+                    decimal_place: NumericValue, preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
+    _check_weights(weights)
+    criteria = weights.index
+    _check_performances(alternatives_performances, criteria)
+    _check_veto_thresholds(veto_thresholds, criteria)
+    _check_directions(directions, criteria)
+    _check_full_veto(full_veto)
+    _check_decimal_place(decimal_place)
+    if profiles_performance is not None:
+        _check_performances(profiles_performance, criteria)
+    if preferences is not None:
+        _check_preferences(preferences)
