@@ -6,9 +6,9 @@ from typing import Tuple, Union
 from core.aliases import FlowsTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
 
-# from core.input_validation.sorting_input_validation import _check_flows
 __all__ = ["net_flow_score_validation", "promethee_group_ranking_validation", "_check_flows",
-           "prometheeI_outranking_flows_validation", "prometheeII_outranking_flows_validation"]
+           "prometheeI_outranking_flows_validation", "prometheeII_outranking_flows_validation",
+           "calculate_net_outranking_flows_validation"]
 
 
 def _check_flows(flows: pd.DataFrame):
