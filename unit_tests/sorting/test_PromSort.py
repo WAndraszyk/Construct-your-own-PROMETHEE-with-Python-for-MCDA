@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 from pandas.testing import assert_series_equal, assert_frame_equal
 from modular_parts.sorting import calculate_promsort_sorted_alternatives
+from core.enums import Direction
 
 sys.path.append('../..')
 
@@ -51,7 +52,7 @@ def category_profiles_performances():
 @pytest.fixture
 def criteria_directions():
     criteria = [f"c{i}" for i in range(1, 6)]
-    return pd.Series([1, 1, 0, 0, 1], index=criteria)
+    return pd.Series([Direction.MAX, Direction.MAX, Direction.MIN, Direction.MIN, Direction.MAX], index=criteria)
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import pytest
 import sys
 import pandas as pd
-from core.enums import CompareProfiles
+from core.enums import CompareProfiles,Direction
 from pandas.testing import assert_frame_equal
 from modular_parts.sorting import calculate_flowsortII_sorted_alternatives
 
@@ -39,7 +39,7 @@ def category_profiles_performances_central():
 @pytest.fixture
 def criteria_directions():
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.Series([1, 1, 1, 1, 1], index=criteria)
+    return pd.Series([Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX], index=criteria)
 
 
 @pytest.fixture
