@@ -1,5 +1,5 @@
 # Construct-you-own-PROMETHEE-with-Python-for-MCDA
-![alt text](https://github.com/WAndraszyk/Construct-your-own-PROMETHEE-with-Python-for-MCDA/blob/main/schemat.png "Schemat modułów")
+![alt text](https://github.com/WAndraszyk/Construct-your-own-PROMETHEE-with-Python-for-MCDA/blob/main/mapa.jpg "Schemat modułów")
 
 ## Implemented modules
 Weighst:
