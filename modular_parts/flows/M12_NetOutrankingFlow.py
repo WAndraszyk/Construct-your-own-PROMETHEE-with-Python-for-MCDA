@@ -16,7 +16,7 @@ def calculate_net_outranking_flows(flows: FlowsTable) -> NetOutrankingFlows:
     :return: net outranking flow Series.
     """
 
-    # calculate_net_outranking_flows_validation(flows)
+    calculate_net_outranking_flows_validation(flows)
     positive_flow = flows['positive'].values
     negative_flow = flows['negative'].values
     alternatives = flows.index
@@ -32,9 +32,9 @@ def calculate_net_outranking_flows_for_prometheeII(flows: FlowsTable) -> DataFra
     'Net outranking flow' is a difference between positive and negative flow for each alternative.
 
     :param flows: FlowsTable of both positive and negative outranking flows.
-    :return: net outranking flow Series.
+    :return: FlowTable of all positive and negative and net outranking flow Series.
     """
-    # calculate_net_outranking_flows_validation(flows)
+    calculate_net_outranking_flows_validation(flows)
     flows_copy = flows.copy()
     flows_copy['net'] = calculate_net_outranking_flows(flows).values
     return flows_copy
