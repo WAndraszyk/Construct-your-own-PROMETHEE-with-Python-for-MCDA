@@ -1,5 +1,5 @@
 import sys
-from pandas._testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from unit_tests.data.Example2Data import *
 from modular_parts.preference import compute_preference_indices
 from modular_parts.weights import equal_weights

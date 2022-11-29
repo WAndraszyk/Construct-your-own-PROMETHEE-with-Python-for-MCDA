@@ -6,6 +6,8 @@ import math
 
 import pandas as pd
 from core.aliases import FlowsTable
+from core.input_validation.ranking_input_validation import promethee_i_ranking_validation
+
 
 __all__ = ["calculate_prometheeI_ranking"]
 
@@ -26,6 +28,8 @@ def calculate_prometheeI_ranking(flows: FlowsTable,
                             the weak preference
     :return: List of preference ranking pairs (alternative, relation, alternative)
     """
+    promethee_i_ranking_validation(flows, weak_preference)
+
     alternatives = flows.index
     positive_flow = flows['positive']
     negative_flow = flows['negative']

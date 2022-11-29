@@ -4,6 +4,7 @@ import random
 import core.preference_commons as pc
 from core.enums import CompareProfiles
 from core.clusters_commons import group_alternatives, _calculate_new_profiles, _initialization_of_the_central_profiles
+from core.input_validation.clustering_input_validation import promethee_II_ordered_clustering_validation
 from modular_parts.preference import compute_preference_indices
 from modular_parts.sorting.M20_FlowSortII import *
 from modular_parts.flows.M9_PrometheeOutrankingFlows import calculate_prometheeII_outranking_flows
@@ -19,7 +20,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                     generalized_criteria: pd.Series,
                                     directions: pd.Series,
                                     weights: pd.Series,
-                                    number_of_clusters: int) -> pd.Series:
+                                    n_categories: int) -> pd.Series:
     """
     Cluster the alternatives using k-mean algorithm and PrometheeII.
 
@@ -30,12 +31,21 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
     :param generalized_criteria: Series of generalized criteria.
     :param directions: Series of directions.
     :param weights: Series of weights.
-    :param number_of_clusters: Number of categories
+    :param n_categories: Number of categories
 
     :return: Tuple containing Series with the cluster labels and grouped alternatives data."""
+
+    promethee_II_ordered_clustering_validation(alternatives_performances,
+                                               preference_thresholds,
+                                               indifference_thresholds,
+                                               standard_deviations,
+                                               generalized_criteria,
+                                               directions,
+                                               weights,
+                                               n_categories)
     global sorted_old
     alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
-    categories = pd.Index([f'C{i}' for i in range(1, number_of_clusters + 1)])
+    categories = pd.Index([f'C{i}' for i in range(1, n_categories + 1)])
 
     def which_profile():
         return CompareProfiles.CENTRAL_PROFILES

@@ -1,14 +1,6 @@
-import copy
 import random
-from typing import List, Tuple, Union
-
-from pandas._libs.internals import defaultdict
-
-from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable, NumericValue
-from core.enums import PreferenceFunction
-import core.generalized_criteria as gc
-
 import pandas as pd
+from pandas._libs.internals import defaultdict
 
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:

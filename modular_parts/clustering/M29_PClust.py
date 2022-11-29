@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import random
 from typing import List, Tuple, Dict
+
+from core.input_validation import pclust_validation
 from modular_parts.flows import calculate_prometheeII_outranking_flows
 from modular_parts.preference import compute_preference_indices
 
@@ -253,6 +255,10 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
     :return: Tuple containing Series with the cluster labels, DataFrame with the central profiles
      and the global quality index as float.
     """
+    pclust_validation(alternatives_performances, preference_thresholds, indifference_thresholds,
+                      standard_deviations, generalized_criteria, criteria_directions, criteria_weights,
+                      n_categories)
+
     categories = pd.Index([f'C{i}' for i in range(1, n_categories + 1)])
     alternatives_preferences, _ = compute_preference_indices(alternatives_performances,
                                                              preference_thresholds,

@@ -10,6 +10,8 @@ from core.aliases import NumericValue
 
 __all__ = ['calculate_srf_weights']
 
+from core.input_validation.weights_input_validation import srf_weights_validation
+
 
 def _calculate_spaces_between_criteria_ranks(criteria_ranks: pd.Series) -> pd.Series:
     """
@@ -175,6 +177,7 @@ def calculate_srf_weights(criteria_ranks: pd.Series, criteria_weight_ratio: Nume
     Calculate weights of criteria with SRF method.
     :return: Series with weights of criteria
     """
+    srf_weights_validation(criteria_ranks, criteria_weight_ratio, decimal_place)
 
     primal_index = criteria_ranks.index
 

@@ -8,6 +8,7 @@ from core.aliases import NumericValue, PerformanceTable, FlowsTable
 from typing import List, Tuple
 from core.preference_commons import directed_alternatives_performances
 from core.promethee_check_dominance import check_if_profiles_are_strictly_worse
+from core.input_validation.sorting_input_validation import *
 
 __all__ = ["calculate_promsort_sorted_alternatives"]
 
@@ -200,6 +201,9 @@ def calculate_promsort_sorted_alternatives(categories: List[str],
     :return: DataFrame with imprecise category assignments(worse and better class)
     and Series with precise assignments
     """
+    prom_sort_validation(categories, alternatives_flows, category_profiles_flows, criteria_thresholds,
+                         category_profiles, criteria_directions, cut_point, assign_to_better_class)
+
     category_profiles = pd.DataFrame(directed_alternatives_performances(category_profiles, criteria_directions),
                                      index=category_profiles.columns, columns=category_profiles.columns)
     check_if_profiles_are_strictly_worse(criteria_thresholds, category_profiles)

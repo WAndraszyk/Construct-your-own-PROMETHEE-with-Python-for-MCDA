@@ -7,6 +7,7 @@ from pandas import Series
 from core.aliases import NumericValue, RankedCriteria
 from typing import List
 from core.preference_commons import criteria_series
+from core.input_validation import surrogate_weights_validation
 import pandas as pd
 
 __all__ = ["equal_weights", "rank_sum", "reciprocal_of_ranks", "rank_order_centroid"]
@@ -28,6 +29,8 @@ def equal_weights(ranked_criteria: RankedCriteria, decimal_place: NumericValue =
 
     :return: Criteria with weights
     """
+    surrogate_weights_validation(ranked_criteria, decimal_place)
+
     n = ranked_criteria.size
     weights = []
     wi = round(1 / n, decimal_place)
@@ -42,6 +45,8 @@ def rank_sum(ranked_criteria: RankedCriteria, decimal_place: NumericValue = 3) -
 
     :return: Criteria with weights
     """
+    surrogate_weights_validation(ranked_criteria, decimal_place)
+
     n = ranked_criteria.size
     weights = []
     for i in range(1, n + 1):
@@ -56,6 +61,8 @@ def reciprocal_of_ranks(ranked_criteria: RankedCriteria, decimal_place: NumericV
 
     :return: Criteria with weights
     """
+    surrogate_weights_validation(ranked_criteria, decimal_place)
+
     n = ranked_criteria.size
     weights = []
     sigma = 0
@@ -73,6 +80,8 @@ def rank_order_centroid(ranked_criteria: RankedCriteria, decimal_place: NumericV
 
     :return: Criteria with weights
     """
+    surrogate_weights_validation(ranked_criteria, decimal_place)
+
     n = ranked_criteria.size
     weights = []
     for j in range(1, n + 1):

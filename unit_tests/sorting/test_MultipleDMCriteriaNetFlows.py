@@ -94,7 +94,7 @@ def dms_profiles_partial_preferences():
                                                   DM2_g5_profiles_partial_preferences],
                                                  keys=criteria)
 
-    return DM1_profiles_partial_preferences, DM2_profiles_partial_preferences
+    return [DM1_profiles_partial_preferences, DM2_profiles_partial_preferences]
 
 
 @pytest.fixture
@@ -188,7 +188,7 @@ def dms_alternatives_partial_preferences():
                                                       DM2_g5_alternatives_partial_preferences],
                                                      keys=criteria)
 
-    return DM1_alternatives_partial_preferences, DM2_alternatives_partial_preferences
+    return [DM1_alternatives_partial_preferences, DM2_alternatives_partial_preferences]
 
 
 @pytest.fixture
