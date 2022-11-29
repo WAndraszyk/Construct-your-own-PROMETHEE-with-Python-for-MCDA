@@ -6,7 +6,7 @@ import pandas as pd
 from typing import List
 from core.enums import CompareProfiles
 from core.aliases import PerformanceTable
-from core.input_validation.sorting_input_validation import flow_sort_ii_validation
+from core.input_validation import flow_sort_ii_validation
 from core.promethee_check_dominance import check_dominance_condition
 
 __all__ = ["calculate_flowsortII_sorted_alternatives"]

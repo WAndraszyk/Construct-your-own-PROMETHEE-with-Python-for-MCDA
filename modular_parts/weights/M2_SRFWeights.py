@@ -10,7 +10,7 @@ from core.aliases import NumericValue
 
 __all__ = ['calculate_srf_weights']
 
-from core.input_validation.weights_input_validation import srf_weights_validation
+from core.input_validation import srf_weights_validation
 
 
 def _calculate_spaces_between_criteria_ranks(criteria_ranks: pd.Series) -> pd.Series:

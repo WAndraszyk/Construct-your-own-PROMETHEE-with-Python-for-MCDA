@@ -5,7 +5,7 @@ import math
 
 import pandas as pd
 from typing import List, Tuple
-from core.input_validation.sorting_input_validation import alternatives_support_validation
+from core.input_validation import alternatives_support_validation
 
 __all__ = ["calculate_alternatives_support"]
 

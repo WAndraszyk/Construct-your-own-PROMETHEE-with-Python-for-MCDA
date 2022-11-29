@@ -3,7 +3,7 @@
     Allows many Decision Makers to get influence on final flows.
 """
 import pandas as pd
-from core.input_validation.flow_input_validation import promethee_group_ranking_validation
+from core.input_validation import promethee_group_ranking_validation
 
 __all__ = ['calculate_promethee_group_ranking']
 

@@ -5,7 +5,7 @@ from core.aliases import FlowsTable, NetOutrankingFlows
 
 __all__ = ['calculate_net_outranking_flows', 'calculate_net_outranking_flows_for_prometheeII']
 
-from core.input_validation.flow_input_validation import calculate_net_outranking_flows_validation
+from core.input_validation import calculate_net_outranking_flows_validation
 
 
 def calculate_net_outranking_flows(flows: FlowsTable) -> NetOutrankingFlows:

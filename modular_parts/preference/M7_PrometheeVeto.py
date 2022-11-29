@@ -5,7 +5,7 @@ from typing import Tuple, List, Union
 
 __all__ = ["compute_veto"]
 
-from core.input_validation.preference_input_validation import veto_validation
+from core.input_validation import veto_validation
 
 
 def compute_veto(

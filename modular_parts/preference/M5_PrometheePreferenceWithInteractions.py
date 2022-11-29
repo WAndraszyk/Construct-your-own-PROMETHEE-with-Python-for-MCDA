@@ -4,7 +4,7 @@ import pandas as pd
 
 __all__ = ["compute_preference_indices_with_integrations"]
 
-from core.input_validation.preference_input_validation import promethee_interaction_preference_validation
+from core.input_validation import promethee_interaction_preference_validation
 
 
 def compute_preference_indices_with_integrations(

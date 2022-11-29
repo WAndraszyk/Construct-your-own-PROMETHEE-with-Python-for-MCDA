@@ -6,7 +6,7 @@ import numpy as np
 
 from typing import List, Tuple, Dict
 from core.enums import CompareProfiles
-from core.input_validation.sorting_input_validation import flow_sort_gdss_validation
+from core.input_validation import flow_sort_gdss_validation
 from core.preference_commons import directed_alternatives_performances
 from core.promethee_check_dominance import check_dominance_condition_GDSS
 

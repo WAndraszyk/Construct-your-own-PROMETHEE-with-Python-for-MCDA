@@ -5,7 +5,7 @@
 import pandas as pd
 from typing import List, Tuple
 from core.promethee_flow import compute_single_criterion_net_flows
-from core.input_validation.sorting_input_validation import *
+from core.input_validation import promethee_tri_validation
 
 __all__ = ["calculate_prometheetri_sorted_alternatives"]
 

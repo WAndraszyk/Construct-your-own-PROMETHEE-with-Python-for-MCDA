@@ -8,7 +8,7 @@ from core.aliases import NumericValue, PerformanceTable, FlowsTable
 from typing import List, Tuple
 from core.preference_commons import directed_alternatives_performances
 from core.promethee_check_dominance import check_if_profiles_are_strictly_worse
-from core.input_validation.sorting_input_validation import *
+from core.input_validation import prom_sort_validation
 
 __all__ = ["calculate_promsort_sorted_alternatives"]
 

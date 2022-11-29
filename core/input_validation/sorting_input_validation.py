@@ -6,7 +6,8 @@ from core.input_validation.flow_input_validation import _check_flows
 from core.input_validation.alternatives_profiles_input_validation import *
 
 __all__ = ["alternatives_support_validation", "prom_sort_validation", "promethee_tri_validation",
-           "flow_sort_i_validation"]
+           "flow_sort_i_validation", "flow_sort_ii_validation", "flow_sort_gdss_validation",
+           "multiple_dm_criteria_net_flows_validation"]
 
 
 # M22
@@ -410,7 +411,6 @@ def _check_criteria_weights(weights: pd.Series):
 def _check_number_of_dms_gdss(dms_profiles_partial_preferences: List[pd.DataFrame],
                               dms_alternatives_partial_preferences: List[pd.DataFrame],
                               dms_profile_vs_profile_partial_preferences: pd.DataFrame):
-
     if not (len(dms_profiles_partial_preferences[0].index.get_level_values(0).unique()) ==
             len(dms_alternatives_partial_preferences[0].index.get_level_values(0).unique()) ==
             len(dms_profile_vs_profile_partial_preferences.index.get_level_values(0).unique())):

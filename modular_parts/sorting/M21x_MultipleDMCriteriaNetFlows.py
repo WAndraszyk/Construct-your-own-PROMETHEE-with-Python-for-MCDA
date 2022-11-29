@@ -7,7 +7,7 @@ from typing import List, Tuple
 
 __all__ = ["calculate_gdss_flows"]
 
-from core.input_validation.sorting_input_validation import multiple_dm_criteria_net_flows_validation
+from core.input_validation import multiple_dm_criteria_net_flows_validation
 
 
 def _calculate_alternatives_general_net_flows(alternatives: pd.Index, category_profiles: pd.Index,

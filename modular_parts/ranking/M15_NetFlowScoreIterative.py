@@ -5,7 +5,7 @@
 import pandas as pd
 from core.aliases import PreferencesTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
-from core.input_validation.ranking_input_validation import net_flow_score_iterative_validation
+from core.input_validation import net_flow_score_iterative_validation
 from modular_parts.flows import calculate_net_flows_score
 
 __all__ = ['calculate_netflow_score_ranking']

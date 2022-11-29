@@ -6,7 +6,7 @@ import math
 
 import pandas as pd
 from core.aliases import FlowsTable
-from core.input_validation.ranking_input_validation import promethee_i_ranking_validation
+from core.input_validation import promethee_i_ranking_validation
 
 
 __all__ = ["calculate_prometheeI_ranking"]

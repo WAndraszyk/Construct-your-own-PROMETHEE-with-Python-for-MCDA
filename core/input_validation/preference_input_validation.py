@@ -5,7 +5,7 @@ from core.aliases import PerformanceTable, NumericValue
 from core.enums import Direction, InteractionType
 
 __all__ = ["promethee_preference_validation", "reinforced_preference_validation", "discordance_validation",
-           "_check_decimal_place", "_check_if_dataframe"]
+           "_check_decimal_place", "_check_if_dataframe", "promethee_interaction_preference_validation", "veto_validation"]
 
 
 def _check_performances(performance_table: pd.DataFrame, criteria: pd.Index):
@@ -145,8 +145,6 @@ def promethee_preference_validation(alternatives_performances: PerformanceTable,
         _check_performances(profiles_performance, criteria)
 
 
-
-
 def promethee_interaction_preference_validation(alternatives_performances: PerformanceTable,
                                                 preference_thresholds: pd.Series,
                                                 indifference_thresholds: pd.Series, standard_deviations: pd.Series,
@@ -177,10 +175,11 @@ def promethee_interaction_preference_validation(alternatives_performances: Perfo
     _check_generalized_criteria(generalized_criteria, criteria)
     _check_directions(directions, criteria)
     _check_decimal_place(decimal_place)
-    _check_interactions(interactions,criteria)
+    _check_interactions(interactions, criteria)
     _check_minimum_interaction_effect(minimum_interaction_effect)
     if profiles_performance is not None:
         _check_performances(profiles_performance, criteria)
+
 
 def _check_interactions(interactions, criteria):
     if not isinstance(interactions, pd.DataFrame):
@@ -189,15 +188,20 @@ def _check_interactions(interactions, criteria):
     _check_interactions_criteria(interactions['criterion_1'], criteria)
     _check_interactions_criteria(interactions['criterion_2'], criteria)
     _check_interactions_types(interactions['type'])
-    _check_interaction_coefficient(interactions[['type','coefficient']])
+    _check_interaction_coefficient(interactions[['type', 'coefficient']])
+
 
 def _check_interaction_columns(column_names):
     if list(column_names.values) != ['criterion_1', 'criterion_2', 'type', 'coefficient']:
         raise TypeError("Interactions columns should be names as 'criterion_1', 'criterion_2', 'type', 'coefficient'")
-def _check_interactions_criteria(column,criteria):
-     for value in column.values:
-         if value not in list(criteria.values):
+
+
+def _check_interactions_criteria(column, criteria):
+    for value in column.values:
+        if value not in list(criteria.values):
             raise TypeError("Criteria names in interactions are not valid!")
+
+
 def _check_interactions_types(interactions):
     for type in list(interactions.values):
         if type is InteractionType.STN:
@@ -208,6 +212,8 @@ def _check_interactions_types(interactions):
             continue
         else:
             raise ValueError(f"Incorrect interaction type: {type}")
+
+
 def _check_interaction_coefficient(interactions):
     for _, row in interactions.iterrows():
         if row['type'] is InteractionType.WKN:
@@ -329,6 +335,7 @@ def _check_preferences(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
 def _check_full_veto(full_veto: bool):
     if not isinstance(full_veto, bool):
         raise TypeError("Full veto should be a boolean value")
+
 
 def _check_minimum_interaction_effect(minimum_interaction_effect: bool):
     if not isinstance(minimum_interaction_effect, bool):

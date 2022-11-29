@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from core.aliases import PreferencesTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
-from core.input_validation.flow_input_validation import net_flow_score_validation
+from core.input_validation import net_flow_score_validation
 
 
 __all__ = ['calculate_net_flows_score']
