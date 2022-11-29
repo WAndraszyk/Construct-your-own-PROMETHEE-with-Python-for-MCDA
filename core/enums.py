@@ -1,3 +1,5 @@
+# from aenum import Enum
+import enum
 from enum import Enum
 
 
@@ -46,7 +48,7 @@ class InteractionType(Enum):
     # STN = 1  # strengthening
     # WKN = 2  # weakening
     # ANT = 3  # antagonistic
-    STN = 1  # strengthening
+    STN = 2  # strengthening
     WKN = 1  # weakening
     ANT = -1  # antagonistic
 

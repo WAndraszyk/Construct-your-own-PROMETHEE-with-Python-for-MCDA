@@ -38,15 +38,9 @@ def indifference_thresholds(criteria):
 
 
 @pytest.fixture
-def reinforcement_thresholds(criteria):
-    reinforcement_thresholds = [3, 3]
-    return pd.Series(data=reinforcement_thresholds, index=criteria)
-
-
-@pytest.fixture
-def reinforcement_factors(criteria):
-    reinforcement_factors = [5, 5]
-    return pd.Series(data=reinforcement_factors, index=criteria)
+def standard_deviations(criteria):
+    standard_deviations = [3, 3]
+    return pd.Series(data=standard_deviations, index=criteria)
 
 
 @pytest.fixture
@@ -88,10 +82,10 @@ def test_veto_preference(alternatives, alternatives_performances, weights, vetoe
 
 
 def test_overall_preference(alternatives, alternatives_performances, weights, preference_thresholds,
-                            indifference_thresholds, reinforcement_thresholds, generalized_criteria, vetoes,
+                            indifference_thresholds, standard_deviations, generalized_criteria, vetoes,
                             directions):
     preference, _ = compute_preference_indices(alternatives_performances, preference_thresholds,
-                                               indifference_thresholds, reinforcement_thresholds,
+                                               indifference_thresholds, standard_deviations,
                                                generalized_criteria,
                                                directions, weights)
     expected = pd.DataFrame(data=[[0.000, 0.333, 0.000, 0.333, 1.000],
@@ -108,4 +102,4 @@ def test_overall_preference(alternatives, alternatives_performances, weights, pr
 if __name__ == '__main__':
     test_veto_preference(alternatives, alternatives_performances, weights, vetoes, directions)
     test_overall_preference(alternatives, alternatives_performances, weights, preference_thresholds,
-                            indifference_thresholds, reinforcement_thresholds, generalized_criteria, vetoes, directions)
+                            indifference_thresholds, standard_deviations, generalized_criteria, vetoes, directions)

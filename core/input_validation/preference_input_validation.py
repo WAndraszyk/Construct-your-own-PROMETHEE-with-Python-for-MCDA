@@ -2,7 +2,7 @@ from typing import List, Union, Tuple
 
 import pandas as pd
 from core.aliases import PerformanceTable, NumericValue
-from core.enums import Direction
+from core.enums import Direction, InteractionType
 
 __all__ = ["promethee_preference_validation", "reinforced_preference_validation", "discordance_validation",
            "_check_decimal_place", "_check_if_dataframe"]
@@ -88,7 +88,7 @@ def _check_directions(directions: pd.Series, criteria: pd.Index):
         direction = directions[k]
         if direction is Direction.MIN:
             continue
-        if direction is Direction.MAX:
+        elif direction is Direction.MAX:
             continue
         else:
             raise ValueError(f"Incorrect direction: {direction}")
@@ -143,6 +143,78 @@ def promethee_preference_validation(alternatives_performances: PerformanceTable,
     _check_decimal_place(decimal_place)
     if profiles_performance is not None:
         _check_performances(profiles_performance, criteria)
+
+
+
+
+def promethee_interaction_preference_validation(alternatives_performances: PerformanceTable,
+                                                preference_thresholds: pd.Series,
+                                                indifference_thresholds: pd.Series, standard_deviations: pd.Series,
+                                                generalized_criteria: pd.Series, directions: pd.Series,
+                                                weights: pd.Series,
+                                                profiles_performance: PerformanceTable, interactions: PerformanceTable,
+                                                minimum_interaction_effect: bool,
+                                                decimal_place: NumericValue):
+    """
+    Validates input data for Promethee Preference calculation.
+    :param alternatives_performances: Dataframe of alternatives' value at every criterion
+    :param preference_thresholds: preference threshold for each criterion
+    :param indifference_thresholds: indifference threshold for each criterion
+    :param standard_deviations: standard deviation for each criterion
+    :param generalized_criteria: list of preference functions
+    :param directions: directions of preference of criteria
+    :param weights: criteria with weights
+    :param profiles_performance: Dataframe of profiles performance (value) at every criterion
+    :param decimal_place: with this you can choose the decimal_place of the output numbers
+    :return: None
+    """
+    _check_weights(weights)
+    criteria = weights.index
+    _check_performances(alternatives_performances, criteria)
+    _check_preference_thresholds(preference_thresholds, criteria)
+    _check_indifference_thresholds(indifference_thresholds, criteria)
+    _check_standard_deviations(standard_deviations, criteria)
+    _check_generalized_criteria(generalized_criteria, criteria)
+    _check_directions(directions, criteria)
+    _check_decimal_place(decimal_place)
+    _check_interactions(interactions,criteria)
+    _check_minimum_interaction_effect(minimum_interaction_effect)
+    if profiles_performance is not None:
+        _check_performances(profiles_performance, criteria)
+
+def _check_interactions(interactions, criteria):
+    if not isinstance(interactions, pd.DataFrame):
+        raise TypeError("Performances on criteria should be passed as a DataFrame object")
+    _check_interaction_columns(interactions.columns)
+    _check_interactions_criteria(interactions['criterion_1'], criteria)
+    _check_interactions_criteria(interactions['criterion_2'], criteria)
+    _check_interactions_types(interactions['type'])
+    _check_interaction_coefficient(interactions[['type','coefficient']])
+
+def _check_interaction_columns(column_names):
+    if list(column_names.values) != ['criterion_1', 'criterion_2', 'type', 'coefficient']:
+        raise TypeError("Interactions columns should be names as 'criterion_1', 'criterion_2', 'type', 'coefficient'")
+def _check_interactions_criteria(column,criteria):
+     for value in column.values:
+         if value not in list(criteria.values):
+            raise TypeError("Criteria names in interactions are not valid!")
+def _check_interactions_types(interactions):
+    for type in list(interactions.values):
+        if type is InteractionType.STN:
+            continue
+        elif type is InteractionType.WKN:
+            continue
+        elif type is InteractionType.ANT:
+            continue
+        else:
+            raise ValueError(f"Incorrect interaction type: {type}")
+def _check_interaction_coefficient(interactions):
+    for _, row in interactions.iterrows():
+        if row['type'] is InteractionType.WKN:
+            if row['coefficient'] > 0:
+                raise TypeError("Mutual weakening coefficient must be < 0!")
+        elif row['coefficient'] < 0:
+            raise TypeError("Mutual antagonistic and strengthening coefficients must be > 0!")
 
 
 def _check_reinforced_preference_thresholds(reinforced_preference_thresholds: pd.Series, criteria: pd.Index):
@@ -257,6 +329,10 @@ def _check_preferences(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
 def _check_full_veto(full_veto: bool):
     if not isinstance(full_veto, bool):
         raise TypeError("Full veto should be a boolean value")
+
+def _check_minimum_interaction_effect(minimum_interaction_effect: bool):
+    if not isinstance(minimum_interaction_effect, bool):
+        raise TypeError("Minimum interaction effect should be a boolean value")
 
 
 def discordance_validation(criteria: List[str], partial_preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
