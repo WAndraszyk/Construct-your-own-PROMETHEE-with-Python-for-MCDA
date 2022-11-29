@@ -1,8 +1,7 @@
 import numpy
-from pandas._libs.internals import defaultdict
 import core.preference_commons as pc
 from core.clusters_commons import group_alternatives, _calculate_new_profiles
-from core.input_validation.clustering_input_validation import promethee_cluster_validation
+from core.input_validation import promethee_cluster_validation
 from modular_parts.sorting import calculate_prometheetri_sorted_alternatives
 import pandas as pd
 import random

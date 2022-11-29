@@ -1,10 +1,9 @@
 import numpy
 import pandas as pd
-import random
 import core.preference_commons as pc
 from core.enums import CompareProfiles
 from core.clusters_commons import group_alternatives, _calculate_new_profiles, _initialization_of_the_central_profiles
-from core.input_validation.clustering_input_validation import promethee_II_ordered_clustering_validation
+from core.input_validation import promethee_II_ordered_clustering_validation
 from modular_parts.preference import compute_preference_indices
 from modular_parts.sorting.M20_FlowSortII import *
 from modular_parts.flows.M9_PrometheeOutrankingFlows import calculate_prometheeII_outranking_flows
