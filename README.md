@@ -2,16 +2,16 @@
 ![alt text](https://github.com/WAndraszyk/Construct-your-own-PROMETHEE-with-Python-for-MCDA/blob/main/mapa.jpg "Schemat modułów")
 
 ## Implemented modules
-Weighst:
+Weights:
 - M1_SurogateWeights  :heavy_check_mark:
-- M2_SRFWeighst  :heavy_check_mark:
+- M2_SRFWeights  :heavy_check_mark:
 
 Preferences:
 - M3_PrometheePreference  :heavy_check_mark:
 - M4_PrometheeReinforcedPreference  :heavy_check_mark:
 - M5_PrometheePreferenceWithInteractions  :heavy_check_mark:
 - M6_PrometheeDiscordance  :heavy_check_mark:
-- M7__PrometheeVeto  :heavy_check_mark:
+- M7_PrometheeVeto  :heavy_check_mark:
 
 Flows:
 - M8_PrometheeOutrankingFlows  :heavy_check_mark:
@@ -31,7 +31,7 @@ Rankings:
 Sorting:
 - M17_PromSort :heavy_check_mark:
 - M18_PrometheeTri :heavy_check_mark:
-- M19_FlowsSortI :heavy_check_mark:
+- M19_FlowSortI :heavy_check_mark:
 - M20_FlowSortII :heavy_check_mark:
 - M21_FlowSortGDSS :heavy_check_mark:
 - M22_GroupClassAcceptabilities :heavy_check_mark:
