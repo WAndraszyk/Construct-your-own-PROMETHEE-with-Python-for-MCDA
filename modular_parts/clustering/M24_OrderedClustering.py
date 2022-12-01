@@ -8,8 +8,15 @@ import pandas as pd
 __all__ = ["group_into_ordered_clusters"]
 
 
-def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int) -> pd.Series:
-    ordered_clustering_validation(preferences, clusters_no)
+def group_into_ordered_clusters(preferences: PreferencesTable, k: int) -> pd.Series:
+    """
+    Divides alternatives into k ordered clusters based on the preference indices matrix.
+
+    :param preferences: preference indices of alternatives over alternatives
+    :param k: number of clusters
+    :return: alternatives grouped into k ordered clusters
+    """
+    ordered_clustering_validation(preferences, k)
 
     alternatives = preferences.index
     shape = np.shape(preferences)
@@ -24,7 +31,7 @@ def group_into_ordered_clusters(preferences: PreferencesTable, clusters_no: int)
             break
         else:
             graph[i][j] = 1
-            if _check_graph(graph, clusters_no):
+            if _check_graph(graph, k):
                 graph[i][j] = 0
             preferences[i][j] = 0
     while True:
@@ -58,7 +65,7 @@ def _search_max(preferences: List[List[NumericValue]]) -> Tuple[NumericValue, in
     return max_pi, pi_i, pi_j
 
 
-def _check_graph(graph: np.ndarray, K: int) -> bool:
+def _check_graph(graph: np.ndarray, k: int) -> bool:
     g = Graph(len(graph))
     for i in range(len(graph)):
         for j in range(len(graph[0])):
@@ -66,7 +73,7 @@ def _check_graph(graph: np.ndarray, K: int) -> bool:
                 g.add_edge(i, j)
     is_cyclic = g.is_cyclic()
     if not is_cyclic:
-        return g.find_longest_path() >= K - 1
+        return g.find_longest_path() >= k - 1
     else:
         return True
 
