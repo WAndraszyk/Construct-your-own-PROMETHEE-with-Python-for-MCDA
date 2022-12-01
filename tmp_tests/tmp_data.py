@@ -19,9 +19,9 @@ alternatives_performances = pd.DataFrame([[25, 65, 30, 15, 65],
                                           [70, 10, 15, 70, 10]],
                                          index=alternatives, columns=criteria)
 
-profiles_performances = pd.DataFrame([[20, 10, 25, 20, 15],
+profiles_performances = pd.DataFrame([[20, 60, 25, 20, 60],
                                       [40, 35, 40, 50, 40],
-                                      [60, 60, 55, 60, 60]],
+                                      [60, 10, 55, 60, 15]],
                                      index=profiles, columns=criteria)
 
 criteria_directions = pd.Series([Direction.MAX, Direction.MIN, Direction.MAX,

@@ -25,7 +25,7 @@ def _calculate_flow(preferences: Union[Tuple[PreferencesTable, PreferencesTable]
             flows = preferences[1].mean(axis=0)
     else:
         axis = 1 if positive else 0
-        aggregated_preferences = preferences.sum(axis=axis)
+        aggregated_preferences = preferences.sum(axis=axis) / (preferences.shape[0] - 1)
 
         return aggregated_preferences
 
