@@ -1,7 +1,7 @@
 """
 This module computes weights of criteria. It requires the user to specify the
-criteria ranking. In this ranking each criterion is associated with a unique position.
-The ranking should list the criteria from the most to least important.
+criteria ranking. In this ranking each criterion is associated with a rank which represents its importance.
+The lowest and rank is 1, and it represents the highest importance.
 """
 from pandas import Series
 from core.aliases import NumericValue, RankedCriteria
@@ -14,7 +14,17 @@ import pandas as pd
 __all__ = ["surrogate_weights"]
 
 
-def surrogate_weights(ranked_criteria: RankedCriteria, method: SurrogateMethod, decimal_place: NumericValue = 3):
+def surrogate_weights(ranked_criteria: RankedCriteria, method: SurrogateMethod,
+                      decimal_place: NumericValue = 3) -> pd.Series:
+    """
+    Calculates weights with chosen surrogate weights method.
+
+    :param ranked_criteria: criteria with according ranks
+    :param method: chosen method of calculating weights
+    :param decimal_place: with this you can choose the decimal_place of the output numbers
+    :return: Criteria with weights
+    """
+
     def _weight_order(rc: RankedCriteria, weights: List[NumericValue]) -> Series:
         """
         This method assigns weights to according criteria.
