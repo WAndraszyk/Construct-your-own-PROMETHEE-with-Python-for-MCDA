@@ -3,6 +3,14 @@ import enum
 from enum import Enum
 
 
+class SurrogateMethod(Enum):
+    """Enumeration of surrogate weights methods."""
+    EW = 1
+    RS = 2
+    RR = 3
+    ROC = 4
+
+
 class ScoringFunction(Enum):
     """Enumeration of the scoring functions."""
 

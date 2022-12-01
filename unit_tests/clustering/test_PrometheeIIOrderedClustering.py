@@ -1,11 +1,11 @@
 import pytest
 import sys
 import pandas as pd
-from pandas._testing import assert_series_equal
+from pandas.testing import assert_series_equal
 
-from core.enums import PreferenceFunction, Direction
+from core.enums import PreferenceFunction, Direction, SurrogateMethod
 from modular_parts.clustering import promethee_II_ordered_clustering
-from modular_parts.weights import equal_weights
+from modular_parts.weights import surrogate_weights
 
 sys.path.append('../..')
 
@@ -61,7 +61,7 @@ def criteria_directions():
 @pytest.fixture
 def criteria_weights():
     criteria = [f"g{i}" for i in range(1, 7)]
-    return equal_weights(ranked_criteria=pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria))
+    return surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
 
 
 @pytest.fixture

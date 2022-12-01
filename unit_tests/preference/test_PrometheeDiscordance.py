@@ -1,11 +1,12 @@
 from pandas.testing import assert_frame_equal
 from unit_tests.data.Example2Data import *
 from modular_parts.preference import compute_preference_indices, compute_discordance
-from modular_parts.weights import equal_weights
+from core.enums import SurrogateMethod
+from modular_parts.weights import surrogate_weights
 
 
 def test_discordance():
-    weights = equal_weights(ranked_criteria=pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria))
+    weights = surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
 
     _, partial = compute_preference_indices(alternatives_performances, preference_thresholds,
                                             indifference_thresholds, standard_deviations,
@@ -25,7 +26,7 @@ def test_discordance():
 
 
 def test_overall_preference():
-    weights = equal_weights(ranked_criteria=pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria))
+    weights = surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
 
     preference, partial = compute_preference_indices(alternatives_performances, preference_thresholds,
                                                      indifference_thresholds, standard_deviations,

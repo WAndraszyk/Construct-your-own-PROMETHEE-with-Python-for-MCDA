@@ -2,13 +2,14 @@ import sys
 from pandas.testing import assert_frame_equal
 from unit_tests.data.Example2Data import *
 from modular_parts.preference import compute_preference_indices
-from modular_parts.weights import equal_weights
+from modular_parts.weights import surrogate_weights
+from core.enums import SurrogateMethod
 
 sys.path.append('../..')
 
 
 def test_preference():
-    weights = equal_weights(ranked_criteria=pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria))
+    weights = surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
     expected = pd.DataFrame(data=[[0.000, 0.296, 0.250, 0.268, 0.100, 0.185],
                                   [0.462, 0.000, 0.389, 0.333, 0.296, 0.500],
                                   [0.236, 0.180, 0.000, 0.333, 0.056, 0.429],
