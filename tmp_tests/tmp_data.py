@@ -4,6 +4,7 @@ from core.enums import Direction, PreferenceFunction
 
 alternatives = [f"a{i}" for i in range(1, 6)]
 profiles = [f"r{i}" for i in range(1, 4)]
+categories = [f"C{i}" for i in range(1, 4)]
 criteria = [f"g{i}" for i in range(1, 6)]
 
 criteria_ranking = pd.Series([4, 3, 5, 1, 3], index=criteria)
