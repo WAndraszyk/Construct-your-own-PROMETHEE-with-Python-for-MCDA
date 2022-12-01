@@ -1,18 +1,46 @@
 import pandas as pd
 
-alternatives = [f"a{i}" for i in range(1, 13)]
-alternatives_performances = pd.DataFrame([[84, 83, 12, 7, 85], [72, 78, 7, 5, 70],
-                                          [70, 82, 7, 7, 80], [70, 68, 20, 25, 75],
-                                          [70, 95, 15, 5, 95], [90, 85, 30, 32, 85],
-                                          [80, 75, 15, 7, 80], [86, 90, 10, 5, 85],
-                                          [92, 85, 30, 26, 90], [70, 65, 25, 28, 60],
-                                          [75, 85, 30, 32, 65], [92, 90, 8, 5, 90]], index=alternatives)
+from core.enums import Direction, PreferenceFunction
 
-profiles = [f"b{i}" for i in range(1, 4)]
-profiles_performances = pd.DataFrame([[65, 70, 25, 25, 65], [80, 80, 18, 15, 75], [90, 90, 8, 7, 90]], index=profiles)
-
+alternatives = [f"a{i}" for i in range(1, 6)]
+profiles = [f"r{i}" for i in range(1, 4)]
 criteria = [f"g{i}" for i in range(1, 6)]
-preference_thresholds = pd.Series([10, 10, 7, 8, 10], index=criteria)
-indifference_thresholds = pd.Series([0, 0, 0, 0, 5], index=criteria)
+
+criteria_ranking = pd.Series([4, 3, 5, 1, 3], index=criteria)
+criteria_ratio = 3
+
+dms_weights = pd.Series([1, 2], index=['DM1', 'DM2'])
+
+alternatives_performances = pd.DataFrame([[25, 65, 30, 15, 65],
+                                          [30, 65, 30, 10, 65],
+                                          [50, 30, 60, 55, 50],
+                                          [65, 40, 50, 65, 45],
+                                          [70, 10, 15, 70, 10]],
+                                         index=alternatives, columns=criteria)
+
+profiles_performances = pd.DataFrame([[20, 10, 25, 20, 15],
+                                      [40, 35, 40, 50, 40],
+                                      [60, 60, 55, 60, 60]],
+                                     index=profiles, columns=criteria)
+
+criteria_directions = pd.Series([Direction.MAX, Direction.MIN, Direction.MAX,
+                                 Direction.MAX, Direction.MIN], index=criteria)
+generalized_criteria = pd.Series([PreferenceFunction.V_SHAPE, PreferenceFunction.U_SHAPE,
+                                  PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.LEVEL,
+                                  PreferenceFunction.V_SHAPE_INDIFFERENCE], index=criteria)
+criteria_weights = pd.Series([0.35, 0.25, 0.18, 0.07, 0.15], index=criteria)
+
+preference_thresholds = pd.Series([10, 0, 10, 8, 10], index=criteria)
+indifference_thresholds = pd.Series([0, 15, 5, 0, 5], index=criteria)
+standard_deviations = pd.Series([0, 0, 0, 0, 0], index=criteria)
+
+reinforced_preference_thresholds = pd.Series([15, 20, 15, 12, 15], index=criteria)
+reinforcement_factors = pd.Series([1.2, 1.2, 1.2, 1.2, 1.2], index=criteria)
+
+# interactions = pd.DataFrame([[]], index=criteria, columns=criteria)
+
+tau = 2  # ?
+
+# v_list = pd.Series([], index=criteria)
 
 

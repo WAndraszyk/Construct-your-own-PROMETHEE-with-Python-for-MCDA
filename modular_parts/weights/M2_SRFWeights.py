@@ -38,7 +38,7 @@ def _calculate_non_normalized_weights(criteria_ranks: pd.Series,
     """
     non_normalized_weights = pd.Series(dtype=float)
 
-    ranks_without_white_cards = pd.Series()
+    ranks_without_white_cards = pd.Series(dtype=float)
     for i, (criterion, rank) in enumerate(criteria_ranks.sort_values().items()):
         ranks_without_white_cards[criterion] = rank - sum((spaces_between_criteria_ranks - 1)[:i])
 
