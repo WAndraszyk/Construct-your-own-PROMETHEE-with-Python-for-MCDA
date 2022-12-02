@@ -52,7 +52,7 @@ net_flow_score = calculate_net_flows_score(preferences, ScoringFunction.MAX, Sco
 profiles_net_flow_score = calculate_net_flows_score(profiles_preferences, ScoringFunction.MAX,
                                                     ScoringFunctionDirection.IN_FAVOR, avoid_same_scores=True)
 
-net_flow_score2 = calculate_net_flows_score(preferences, ScoringFunction.SUM, ScoringFunctionDirection.AGAINST,
+net_flow_score2 = calculate_net_flows_score(preferences, ScoringFunction.MIN, ScoringFunctionDirection.IN_FAVOR,
                                             avoid_same_scores=True)
 
 print(15 * "~" + "M10_1" + 15 * "~" + "\n", net_flow_score)
@@ -90,7 +90,6 @@ print(15 * "~" + "M12.2" + 15 * "~" + "\n", profiles_general_flows)
 
 alternatives_profiles = calculate_alternatives_profiles(surrogate_ranking, partial_preferences)
 print(15 * "~" + "M13" + 15 * "~" + "\n", alternatives_profiles)
-
 promethee_i_rank = calculate_prometheeI_ranking(outranking_flows, weak_preference=False)
 print(15 * "~" + "M14" + 15 * "~" + "\n", promethee_i_rank)
 
