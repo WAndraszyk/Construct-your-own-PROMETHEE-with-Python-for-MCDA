@@ -147,11 +147,8 @@ assignments, pclust_central_profiles, global_quality_index = cluster_using_pclus
                                                                                   criteria_weights,
                                                                                   n_categories=3)
 
-print(15 * "~" + "M22.assignments" + 15 * "~" + "\n", assignments)
-print(15 * "~" + "M22.central_profiles" + 15 * "~" + "\n", pclust_central_profiles)
-print(15 * "~" + "M22.global_quality_index" + 15 * "~" + "\n", global_quality_index)
+print(15 * "~" + "M27.assignments" + 15 * "~" + "\n", assignments)
+print(15 * "~" + "M27.central_profiles" + 15 * "~" + "\n", pclust_central_profiles)
+print(15 * "~" + "M27.global_quality_index" + 15 * "~" + "\n", global_quality_index)
 
 
-
-
-# TODO Odpalić dla M27
