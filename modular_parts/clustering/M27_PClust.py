@@ -185,7 +185,7 @@ def _calculate_homogenity_index(principal_categories: Dict[str, List[str]],
 
     :return: Series with homogenity index for every cluster.
     """
-    homogenity_indices = pd.Series(index=categories)
+    homogenity_indices = pd.Series(index=categories, dtype=float)
 
     for category in categories:
         alternatives_in_category = principal_categories[category]
@@ -323,7 +323,7 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
 
     global_quality_index = _calculate_global_quality_index(homogenity_indices, heterogenity_indices)
 
-    assignments = pd.Series(index=alternatives_performances.index)
+    assignments = pd.Series(index=alternatives_performances.index, dtype=str)
     for category, alternatives in principal_categories.items():
         for alternative in alternatives:
             assignments.loc[alternative] = category

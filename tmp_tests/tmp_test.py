@@ -7,6 +7,7 @@ from modular_parts.flows import *
 from modular_parts.alternatives_profiles import *
 from modular_parts.ranking import *
 from modular_parts.sorting import *
+from modular_parts.clustering import *
 
 surrogate_ranking = rank_order_centroid(criteria_ranking)
 print(15 * "~" + "M1" + 15 * "~" + "\n", surrogate_ranking)
@@ -63,6 +64,30 @@ dms_flows = pd.DataFrame({'DM1': net_flow_score.values,
 aggregated_flows = calculate_promethee_group_ranking(dms_flows, dms_weights)
 print(15 * "~" + "M11" + 15 * "~" + "\n", aggregated_flows)
 
+# --------- 2nd DM ---------
+## alternatives vs profiles
+alter_prof_preferences_DM2, alter_prof_partial_preferences_DM2 = \
+    compute_reinforced_preference(alternatives_performances, preference_thresholds, indifference_thresholds,
+                                  generalized_criteria, criteria_directions, reinforced_preference_thresholds,
+                                  reinforcement_factors, criteria_weights, profiles_performances)
+
+# all profiles vs all profiles
+all_DMs_profiles = pd.concat([profiles_performances, profiles_performances_DM2], axis=0, keys=['DM1', 'DM2'])
+all_DMs_profiles_preferences, all_DMs_profiles_partial_preferences = \
+    compute_preference_indices(all_DMs_profiles, preference_thresholds, indifference_thresholds,
+                               standard_deviations, generalized_criteria, criteria_directions, criteria_weights)
+
+dms_a_vs_p_pp = [alter_prof_partial_preferences[0], alter_prof_partial_preferences_DM2[0]]
+dms_p_vs_a_pp = [alter_prof_partial_preferences[1], alter_prof_partial_preferences_DM2[1]]
+
+
+alternatives_general_flows, profiles_general_flows = calculate_gdss_flows(dms_p_vs_a_pp, dms_a_vs_p_pp,
+                                                                          all_DMs_profiles_partial_preferences,
+                                                                          criteria_weights)
+
+print(15 * "~" + "M12.1" + 15 * "~" + "\n", alternatives_general_flows)
+print(15 * "~" + "M12.2" + 15 * "~" + "\n", profiles_general_flows)
+
 alternatives_profiles = calculate_alternatives_profiles(surrogate_ranking, partial_preferences)
 print(15 * "~" + "M13" + 15 * "~" + "\n", alternatives_profiles)
 
@@ -87,4 +112,46 @@ flow_sort_i = calculate_flowsortI_sorted_alternatives(categories, profiles_perfo
                                                       CompareProfiles.CENTRAL_PROFILES)
 print(15 * "~" + "M19" + 15 * "~" + "\n", flow_sort_i)
 
-# TODO Odpalić dla M12, M20, M21, M22, M27
+# Promethee II flows
+
+promethee_ii_flows = calculate_prometheeII_outranking_flows(alter_prof_preferences, profiles_preferences)
+# add net flows
+promethee_ii_flows = calculate_net_outranking_flows_for_prometheeII(promethee_ii_flows)
+
+flow_sort_ii = calculate_flowsortII_sorted_alternatives(categories, profiles_performances, criteria_directions,
+                                                        promethee_ii_flows, CompareProfiles.CENTRAL_PROFILES)
+
+print(15 * "~" + "M20" + 15 * "~" + "\n", flow_sort_ii)
+
+flow_sort_gdss_first_step, flow_sort_gdss_final_step = calculate_flowsort_gdss_sorted_alternatives(
+    alternatives_general_flows, profiles_general_flows,
+    categories, criteria_directions,
+    [profiles_performances, profiles_performances_DM2],
+    dms_weights, CompareProfiles.CENTRAL_PROFILES)
+
+print(15 * "~" + "M21.1" + 15 * "~" + "\n", flow_sort_gdss_first_step)
+print(15 * "~" + "M21.2" + 15 * "~" + "\n", flow_sort_gdss_final_step)
+
+group_class_acceptabilities, group_class_acceptabilities_unimodal = \
+    calculate_alternatives_support(categories, [prom_sort[0], flow_sort_gdss_first_step])
+
+print(15 * "~" + "M22.1" + 15 * "~" + "\n", group_class_acceptabilities)
+print(15 * "~" + "M22.2" + 15 * "~" + "\n", group_class_acceptabilities_unimodal)
+
+assignments, pclust_central_profiles, global_quality_index = cluster_using_pclust(alternatives_performances,
+                                                                                  preference_thresholds,
+                                                                                  indifference_thresholds,
+                                                                                  standard_deviations,
+                                                                                  generalized_criteria,
+                                                                                  criteria_directions,
+                                                                                  criteria_weights,
+                                                                                  n_categories=3)
+
+print(15 * "~" + "M22.assignments" + 15 * "~" + "\n", assignments)
+print(15 * "~" + "M22.central_profiles" + 15 * "~" + "\n", pclust_central_profiles)
+print(15 * "~" + "M22.global_quality_index" + 15 * "~" + "\n", global_quality_index)
+
+
+
+
+# TODO Odpalić dla M27

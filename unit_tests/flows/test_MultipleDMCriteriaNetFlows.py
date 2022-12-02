@@ -2,7 +2,7 @@ import pytest
 import sys
 import pandas as pd
 from pandas.testing import assert_series_equal, assert_frame_equal
-from modular_parts.sorting import calculate_gdss_flows
+from modular_parts.flows import calculate_gdss_flows
 
 sys.path.append('../..')
 
