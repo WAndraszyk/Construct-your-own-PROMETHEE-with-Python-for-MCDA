@@ -2,7 +2,6 @@
     This module computes the assignments of given alternatives to categories using FlowSort procedure based on
     PrometheeI flows.
 """
-import math
 
 import pandas as pd
 from typing import List, Hashable
@@ -109,7 +108,7 @@ def _boundary_profiles_sorting(categories: List[str], category_profiles: Perform
                             alternative_row['negative'] > category_row['negative']:
                         negative_flow_category = categories[i]
             if positive_flow_category and negative_flow_category:
-                _append_to_classification(categories, classification, positive_flow_category, negative_flow_category,
+                _append_to_classification(categories, classification, negative_flow_category, positive_flow_category,
                                           alternative)
                 break
 
@@ -165,7 +164,7 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
                             (category_row['negative'] + category_profiles_flows.iloc[i + 1]['negative']) / 2:
                         negative_flow_category = categories[i]
             if positive_flow_category and negative_flow_category:
-                _append_to_classification(categories, classification, positive_flow_category, negative_flow_category,
+                _append_to_classification(categories, classification, negative_flow_category, positive_flow_category,
                                           alternative)
                 break
     return classification
