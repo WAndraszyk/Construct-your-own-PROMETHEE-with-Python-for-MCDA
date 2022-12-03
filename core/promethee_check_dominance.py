@@ -1,5 +1,6 @@
 import pandas as pd
 from typing import List
+from core.preference_commons import directed_alternatives_performances
 
 
 def check_dominance_condition(criteria_directions: pd.Series, category_profiles: pd.DataFrame):
@@ -8,9 +9,11 @@ def check_dominance_condition(criteria_directions: pd.Series, category_profiles:
 
     :raise ValueError: if any profile is not strictly worse in any criterion than anny better profile
     """
+    directed_category_profiles = directed_alternatives_performances(category_profiles, criteria_directions)
+
     for (criterion, _) in criteria_directions.items():
-        for i, (_, profile_i) in enumerate(category_profiles.iloc[:-1].iterrows()):
-            profile_j = category_profiles.iloc[i + 1]
+        for i, (_, profile_i) in enumerate(directed_category_profiles.iloc[:-1].iterrows()):
+            profile_j = directed_category_profiles.iloc[i + 1]
             if profile_j[criterion] < profile_i[criterion]:
                 raise ValueError("Profiles don't fulfill the dominance condition")
 

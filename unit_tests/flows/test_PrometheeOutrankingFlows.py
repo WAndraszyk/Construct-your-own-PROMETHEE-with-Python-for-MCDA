@@ -99,8 +99,8 @@ def profiles_preferences():
 
 def test_prometheeI_outranking_flows(alternatives_preferences):
     alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
-    expected = pd.DataFrame({'positive': [0.20756, 0.60942, 1.34350, 3.04672, 1.30291, 0.18260],
-                             'negative': [2.49446, 1.11018, 0.42635, 0.25125, 0.44664, 1.96382]
+    expected = pd.DataFrame({'positive': [0.041512, 0.121882, 0.269248, 0.609344, 0.260582, 0.03652],
+                             'negative': [0.49944, 0.222036, 0.08527, 0.05025, 0.089328, 0.392764]
                              }, index=alternatives)
 
     actual = calculate_prometheeI_outranking_flows(alternatives_preferences)

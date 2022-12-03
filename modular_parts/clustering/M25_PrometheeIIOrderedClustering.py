@@ -6,8 +6,8 @@ from core.clusters_commons import group_alternatives, _calculate_new_profiles, _
 from core.input_validation import promethee_II_ordered_clustering_validation
 from modular_parts.preference import compute_preference_indices
 from modular_parts.sorting.M20_FlowSortII import *
-from modular_parts.flows.M9_PrometheeOutrankingFlows import calculate_prometheeII_outranking_flows
-from modular_parts.flows.M12_NetOutrankingFlow import calculate_net_outranking_flows_for_prometheeII
+from modular_parts.flows.M8_PrometheeOutrankingFlows import calculate_prometheeII_outranking_flows
+from modular_parts.flows.M9_NetOutrankingFlow import calculate_net_outranking_flows_for_prometheeII
 
 __all__ = ['promethee_II_ordered_clustering']
 

@@ -100,7 +100,7 @@ def _calculate_profiles_general_net_flows(alternatives: pd.Index, category_profi
                            profiles_vs_alternatives_partial_preferences.T.iterrows()):
                 for (_, alternative_vs_profile_partial_preference), \
                     (criterion_and_profile, profile_vs_alternative_partial_preference) \
-                        in zip(alternative_i_row.iteritems(), profile_j_col.iteritems()):
+                        in zip(alternative_i_row.items(), profile_j_col.items()):
                     profile = criterion_and_profile[1]
                     profiles_flows.loc[(criterion, dm, profile), alternative_i] = \
                         (alternative_vs_profile_partial_preference - profile_vs_alternative_partial_preference +
