@@ -41,7 +41,7 @@ class CompareProfiles(Enum):
     LIMITING_PROFILES = 3
 
 
-class PreferenceFunction(Enum):
+class GeneralCriterion(Enum):
     """Enumeration of the preference functions."""
 
     USUAL = 1

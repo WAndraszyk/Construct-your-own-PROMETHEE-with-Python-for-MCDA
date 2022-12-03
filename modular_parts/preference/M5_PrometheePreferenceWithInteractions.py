@@ -2,12 +2,12 @@ from core.aliases import NumericValue, PerformanceTable
 import core.preference_commons as pc
 import pandas as pd
 
-__all__ = ["compute_preference_indices_with_integrations"]
+__all__ = ["compute_preference_indices_with_interactions"]
 
 from core.input_validation import promethee_interaction_preference_validation
 
 
-def compute_preference_indices_with_integrations(
+def compute_preference_indices_with_interactions(
         alternatives_performances: PerformanceTable,
         weights: pd.Series,
         preference_thresholds: pd.Series,

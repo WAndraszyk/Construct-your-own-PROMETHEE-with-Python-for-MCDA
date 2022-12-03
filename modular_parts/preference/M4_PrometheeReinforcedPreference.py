@@ -1,5 +1,5 @@
 from typing import List, Tuple, Union
-from core.preference_commons import PreferenceFunction
+from core.preference_commons import GeneralCriterion
 from core.aliases import NumericValue, PerformanceTable
 from core.input_validation import reinforced_preference_validation
 import core.generalized_criteria as gc
@@ -123,13 +123,13 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series, preference_thr
                     Frp = 1
                 else:
                     Frp = 0
-                    if method is PreferenceFunction.USUAL:
+                    if method is GeneralCriterion.USUAL:
                         alternativeIndex = gc.usual_criterion(deviations[k][i][j])
-                    elif method is PreferenceFunction.U_SHAPE:
+                    elif method is GeneralCriterion.U_SHAPE:
                         alternativeIndex = gc.u_shape_criterion(deviations[k][i][j], q)
-                    elif method is PreferenceFunction.V_SHAPE:
+                    elif method is GeneralCriterion.V_SHAPE:
                         alternativeIndex = gc.v_shape_criterion(deviations[k][i][j], p)
-                    elif method is PreferenceFunction.LEVEL:
+                    elif method is GeneralCriterion.LEVEL:
                         if q > p:
                             raise ValueError(
                                 "incorrect threshold : q "
@@ -138,7 +138,7 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series, preference_thr
                                 + str(p)
                             )
                         alternativeIndex = gc.level_criterion(deviations[k][i][j], p, q)
-                    elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
+                    elif method is GeneralCriterion.V_SHAPE_INDIFFERENCE:
                         if q > p:
                             raise ValueError(
                                 "incorrect threshold : q "

@@ -2,7 +2,7 @@ import copy
 from typing import List, Tuple, Union
 
 from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable, NumericValue
-from core.enums import PreferenceFunction, Direction
+from core.enums import GeneralCriterion, Direction
 import core.generalized_criteria as gc
 
 import pandas as pd
@@ -76,13 +76,13 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd
         for i in range(i_iter.shape[0]):
             alternativeIndices = []
             for j in range(j_iter.shape[0]):
-                if method is PreferenceFunction.USUAL:
+                if method is GeneralCriterion.USUAL:
                     alternativeIndices.append(gc.usual_criterion(deviations[k][i][j]))
-                elif method is PreferenceFunction.U_SHAPE:
+                elif method is GeneralCriterion.U_SHAPE:
                     alternativeIndices.append(gc.u_shape_criterion(deviations[k][i][j], q))
-                elif method is PreferenceFunction.V_SHAPE:
+                elif method is GeneralCriterion.V_SHAPE:
                     alternativeIndices.append(gc.v_shape_criterion(deviations[k][i][j], p))
-                elif method is PreferenceFunction.LEVEL:
+                elif method is GeneralCriterion.LEVEL:
                     if q > p:
                         raise ValueError(
                             "incorrect threshold : q "
@@ -91,7 +91,7 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd
                             + str(p)
                         )
                     alternativeIndices.append(gc.level_criterion(deviations[k][i][j], p, q))
-                elif method is PreferenceFunction.V_SHAPE_INDIFFERENCE:
+                elif method is GeneralCriterion.V_SHAPE_INDIFFERENCE:
                     if q > p:
                         raise ValueError(
                             "incorrect threshold : q "
@@ -101,7 +101,7 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd
                         )
                     alternativeIndices.append(gc.v_shape_indifference_criterion(deviations[k][i][j],
                                                                                 p, q))
-                elif method is PreferenceFunction.GAUSSIAN:
+                elif method is GeneralCriterion.GAUSSIAN:
                     alternativeIndices.append(gc.gaussian_criterion(deviations[k][i][j], s))
                 else:
                     raise ValueError(

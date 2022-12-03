@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 from pandas.testing import assert_series_equal
 
-from core.enums import PreferenceFunction, Direction, SurrogateMethod
+from core.enums import GeneralCriterion, Direction, SurrogateMethod
 from modular_parts.clustering import promethee_II_ordered_clustering
 from modular_parts.weights import surrogate_weights
 
@@ -45,10 +45,10 @@ def standard_deviations():
 @pytest.fixture
 def generalized_criteria():
     criteria = [f"g{i}" for i in range(1, 7)]
-    return pd.Series([PreferenceFunction.U_SHAPE, PreferenceFunction.V_SHAPE,
-                      PreferenceFunction.V_SHAPE_INDIFFERENCE,
-                      PreferenceFunction.LEVEL, PreferenceFunction.USUAL,
-                      PreferenceFunction.GAUSSIAN], index=criteria)
+    return pd.Series([GeneralCriterion.U_SHAPE, GeneralCriterion.V_SHAPE,
+                      GeneralCriterion.V_SHAPE_INDIFFERENCE,
+                      GeneralCriterion.LEVEL, GeneralCriterion.USUAL,
+                      GeneralCriterion.GAUSSIAN], index=criteria)
 
 
 @pytest.fixture

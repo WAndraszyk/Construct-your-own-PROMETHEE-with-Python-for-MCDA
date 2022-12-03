@@ -1,7 +1,7 @@
 import pytest
 import sys
 import pandas as pd
-from core.enums import PreferenceFunction, Direction
+from core.enums import GeneralCriterion, Direction
 from pandas.testing import assert_frame_equal
 from modular_parts.clustering import cluster_using_pclust
 
@@ -40,11 +40,11 @@ def standard_deviations():
 @pytest.fixture
 def generalized_criteria():
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.Series([PreferenceFunction.V_SHAPE,
-                      PreferenceFunction.V_SHAPE,
-                      PreferenceFunction.V_SHAPE,
-                      PreferenceFunction.GAUSSIAN,
-                      PreferenceFunction.V_SHAPE_INDIFFERENCE], index=criteria)
+    return pd.Series([GeneralCriterion.V_SHAPE,
+                      GeneralCriterion.V_SHAPE,
+                      GeneralCriterion.V_SHAPE,
+                      GeneralCriterion.GAUSSIAN,
+                      GeneralCriterion.V_SHAPE_INDIFFERENCE], index=criteria)
 
 
 @pytest.fixture
