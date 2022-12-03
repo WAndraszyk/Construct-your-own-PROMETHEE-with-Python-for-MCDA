@@ -189,4 +189,4 @@ def criteria_series(criteria: pd.Index, weights: List[float]) -> pd.Series:
 
     :return: dictionary of connection.
     """
-    return pd.Series(weights, criteria)
+    return pd.Series(weights, criteria, name="weights")
