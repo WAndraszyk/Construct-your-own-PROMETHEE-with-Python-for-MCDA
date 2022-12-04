@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from modular_parts.preference import compute_reinforced_preference
-from core.enums import PreferenceFunction, Direction
+from core.enums import GeneralCriterion, Direction
 
 
 @pytest.fixture
@@ -61,7 +61,7 @@ def reinforcement_factors(criteria):
 
 @pytest.fixture
 def generalized_criteria(criteria):
-    generalized_criteria_list = [PreferenceFunction.V_SHAPE, PreferenceFunction.V_SHAPE]
+    generalized_criteria_list = [GeneralCriterion.V_SHAPE, GeneralCriterion.V_SHAPE]
     return pd.Series(data=generalized_criteria_list, index=criteria)
 
 

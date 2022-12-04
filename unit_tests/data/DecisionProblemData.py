@@ -1,5 +1,5 @@
 import pandas as pd
-from core.preference_commons import PreferenceFunction
+from core.preference_commons import GeneralCriterion
 # from core.Interactions_between_criteria import *
 from core.enums import *
 alternatives_performances = [[35.8, 67.0, 19.7, 0.0, 0.0, 5.0, 4.0],
@@ -78,9 +78,9 @@ criteria_ranks = [5, 1, 2, 4, 3, 7, 6]
 
 veto_thr = [None, 4, None, 4, None, None, 4]
 
-generalized_criteria = [PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.U_SHAPE,
-                        PreferenceFunction.LEVEL, PreferenceFunction.V_SHAPE,
-                        PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.USUAL, PreferenceFunction.USUAL]
+generalized_criteria = [GeneralCriterion.V_SHAPE_INDIFFERENCE, GeneralCriterion.U_SHAPE,
+                        GeneralCriterion.LEVEL, GeneralCriterion.V_SHAPE,
+                        GeneralCriterion.V_SHAPE_INDIFFERENCE, GeneralCriterion.USUAL, GeneralCriterion.USUAL]
 
 df_alternatives = pd.DataFrame(alternatives_performances, index=alternatives, columns=criteria)
 

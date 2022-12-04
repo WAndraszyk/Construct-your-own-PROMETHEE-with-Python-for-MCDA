@@ -1,5 +1,5 @@
 from tmp_data import *
-from core.enums import ScoringFunction, ScoringFunctionDirection, CompareProfiles
+from core.enums import ScoringFunction, ScoringFunctionDirection, CompareProfiles, SurrogateMethod
 
 from modular_parts.weights import *
 from modular_parts.preference import *
@@ -9,7 +9,7 @@ from modular_parts.ranking import *
 from modular_parts.sorting import *
 from modular_parts.clustering import *
 
-surrogate_ranking = rank_order_centroid(criteria_ranking)
+surrogate_ranking = surrogate_weights(criteria_ranking, SurrogateMethod.ROC)
 print(15 * "~" + "M1" + 15 * "~" + "\n", surrogate_ranking)
 
 print(15 * "~" + "M2" + 15 * "~" + "\n", calculate_srf_weights(criteria_ranking, criteria_ratio))

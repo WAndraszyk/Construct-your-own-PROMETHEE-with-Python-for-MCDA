@@ -1,8 +1,8 @@
 import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
-from modular_parts.preference import compute_preference_indices_with_integrations, compute_preference_indices
-from core.enums import PreferenceFunction, Direction, InteractionType
+from modular_parts.preference import compute_preference_indices_with_interactions, compute_preference_indices
+from core.enums import GeneralCriterion, Direction, InteractionType
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ def standard_deviations(criteria):
 
 @pytest.fixture
 def generalized_criteria(criteria):
-    generalized_criteria_list = [PreferenceFunction.U_SHAPE, PreferenceFunction.V_SHAPE, PreferenceFunction.V_SHAPE]
+    generalized_criteria_list = [GeneralCriterion.U_SHAPE, GeneralCriterion.V_SHAPE, GeneralCriterion.V_SHAPE]
     return pd.Series(data=generalized_criteria_list, index=criteria)
 
 
@@ -78,7 +78,7 @@ def test_interactions_preference(alternatives, alternatives_performances, prefer
             [0.71, 0.710, 0.710, 0.000, 0.500],
             [1.00, 1.000, 0.167, 0.444, 0.000]]
     expected = pd.DataFrame(data=data, columns=alternatives, index=alternatives)
-    actual, _ = compute_preference_indices_with_integrations(alternatives_performances=alternatives_performances,
+    actual, _ = compute_preference_indices_with_interactions(alternatives_performances=alternatives_performances,
                                                              preference_thresholds=preference_thresholds,
                                                              indifference_thresholds=indifference_thresholds,
                                                              standard_deviations=standard_deviations,

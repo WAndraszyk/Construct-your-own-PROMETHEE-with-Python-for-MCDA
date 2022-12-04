@@ -32,7 +32,7 @@ def surrogate_weights(ranked_criteria: RankedCriteria, method: SurrogateMethod,
         :return: Criteria with weights
         """
         rank_summed = rc.replace([i + 1 for i in range(len(weights))], weights)
-        return rank_summed
+        return criteria_series(rank_summed.index, rank_summed.values)
 
     def equal_weights(rc: RankedCriteria, dp: NumericValue = 3) -> pd.Series:
         """
@@ -45,7 +45,7 @@ def surrogate_weights(ranked_criteria: RankedCriteria, method: SurrogateMethod,
         wi = round(1 / n, dp)
         for i in range(1, n + 1):
             weights.append(wi)
-        return criteria_series(rc.keys(), weights)
+        return criteria_series(rc.index, weights)
 
     def rank_sum(rc: RankedCriteria, dp: NumericValue = 3) -> Series:
         """

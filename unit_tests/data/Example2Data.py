@@ -1,6 +1,6 @@
 import pandas as pd
 
-from core.preference_commons import PreferenceFunction
+from core.preference_commons import GeneralCriterion
 from core.enums import *
 
 alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
@@ -14,10 +14,10 @@ alternatives_performances = [
     [94, 96, 7, 3.6, 5, 6]
 ]
 
-generalized_criterion = [PreferenceFunction.U_SHAPE, PreferenceFunction.V_SHAPE,
-                         PreferenceFunction.V_SHAPE_INDIFFERENCE,
-                         PreferenceFunction.LEVEL, PreferenceFunction.USUAL,
-                         PreferenceFunction.GAUSSIAN]
+generalized_criterion = [GeneralCriterion.U_SHAPE, GeneralCriterion.V_SHAPE,
+                         GeneralCriterion.V_SHAPE_INDIFFERENCE,
+                         GeneralCriterion.LEVEL, GeneralCriterion.USUAL,
+                         GeneralCriterion.GAUSSIAN]
 criteria_directions = [Direction.MIN, Direction.MAX, Direction.MIN, Direction.MIN, Direction.MIN, Direction.MAX]
 
 preference_thresholds = [None, 30, 5, 6, None, None]

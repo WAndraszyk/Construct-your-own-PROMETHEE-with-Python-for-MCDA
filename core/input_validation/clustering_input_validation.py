@@ -1,6 +1,6 @@
 import pandas as pd
 
-from core.enums import PreferenceFunction, Direction
+from core.enums import GeneralCriterion, Direction
 from core.input_validation import _check_if_dataframe
 
 __all__ = ["pclust_validation", "ordered_clustering_validation", "promethee_II_ordered_clustering_validation",
@@ -26,10 +26,10 @@ def _check_thresholds(thresholds: pd.Series, thresholds_name: str):
 def _check_generalized_criteria(generalized_criteria: pd.Series):
     if not isinstance(generalized_criteria, pd.Series):
         raise ValueError("Generalized criteria should be passed as a Series")
-    if not (generalized_criteria.values.all() in [PreferenceFunction.USUAL, PreferenceFunction.U_SHAPE,
-                                                  PreferenceFunction.V_SHAPE, PreferenceFunction.LEVEL,
-                                                  PreferenceFunction.V_SHAPE_INDIFFERENCE,
-                                                  PreferenceFunction.GAUSSIAN]):
+    if not (generalized_criteria.values.all() in [GeneralCriterion.USUAL, GeneralCriterion.U_SHAPE,
+                                                  GeneralCriterion.V_SHAPE, GeneralCriterion.LEVEL,
+                                                  GeneralCriterion.V_SHAPE_INDIFFERENCE,
+                                                  GeneralCriterion.GAUSSIAN]):
         raise ValueError("Generalized criteria should be core.enums.PreferenceFunction enums")
 
 
