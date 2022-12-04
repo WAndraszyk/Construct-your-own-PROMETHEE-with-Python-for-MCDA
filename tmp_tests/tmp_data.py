@@ -1,6 +1,6 @@
 import pandas as pd
 
-from core.enums import Direction, PreferenceFunction
+from core.enums import Direction, GeneralCriterion
 
 alternatives = [f"a{i}" for i in range(1, 6)]
 profiles = [f"r{i}" for i in range(1, 4)]
@@ -31,9 +31,9 @@ profiles_performances_DM2 = pd.DataFrame([[20, 65, 25, 30, 60],
 
 criteria_directions = pd.Series([Direction.MAX, Direction.MIN, Direction.MAX,
                                  Direction.MAX, Direction.MIN], index=criteria)
-generalized_criteria = pd.Series([PreferenceFunction.V_SHAPE, PreferenceFunction.U_SHAPE,
-                                  PreferenceFunction.V_SHAPE_INDIFFERENCE, PreferenceFunction.LEVEL,
-                                  PreferenceFunction.V_SHAPE_INDIFFERENCE], index=criteria)
+generalized_criteria = pd.Series([GeneralCriterion.V_SHAPE, GeneralCriterion.U_SHAPE,
+                                  GeneralCriterion.V_SHAPE_INDIFFERENCE, GeneralCriterion.LEVEL,
+                                  GeneralCriterion.V_SHAPE_INDIFFERENCE], index=criteria)
 criteria_weights = pd.Series([0.35, 0.25, 0.18, 0.07, 0.15], index=criteria)
 
 preference_thresholds = pd.Series([10, 0, 10, 8, 10], index=criteria)
