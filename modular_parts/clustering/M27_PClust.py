@@ -289,8 +289,8 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
                                                        alternatives_performances, central_profiles_performances,
                                                        categories, criteria_directions)
 
-    heterogenity_indices = prev_heterogenity_indices = _calculate_heterogenity_index(central_profiles_preferences,
-                                                                                     categories)
+    prev_principal_categories = principal_categories
+    prev_interval_categories = interval_categories
 
     while iteration < max_iterations and iteration_without_change < 10:
         prometheeII_flows, central_profiles_preferences = _calculate_prometheeII_flows(central_profiles_performances,
@@ -309,16 +309,16 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
                                                            alternatives_performances, central_profiles_performances,
                                                            categories, criteria_directions)
 
-        heterogenity_indices = _calculate_heterogenity_index(central_profiles_preferences, categories)
-
-        if np.allclose(heterogenity_indices, prev_heterogenity_indices, atol=0.006):  # math.isclose
+        if prev_principal_categories == principal_categories and prev_interval_categories == interval_categories:
             iteration_without_change += 1
         else:
             iteration_without_change = 0
-            prev_heterogenity_indices = heterogenity_indices
+            prev_principal_categories = principal_categories
+            prev_interval_categories = interval_categories
 
         iteration += 1
 
+    heterogenity_indices = _calculate_heterogenity_index(central_profiles_preferences, categories)
     homogenity_indices = _calculate_homogenity_index(principal_categories, alternatives_preferences, categories)
 
     global_quality_index = _calculate_global_quality_index(homogenity_indices, heterogenity_indices)
