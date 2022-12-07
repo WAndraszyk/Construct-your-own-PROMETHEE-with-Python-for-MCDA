@@ -1,10 +1,10 @@
 import pandas as pd
-import numpy as np
 import random
 from typing import List, Tuple, Dict
 
 from core.input_validation import pclust_validation
-from modular_parts.flows import calculate_prometheeII_outranking_flows
+from core.enums import FlowType
+from modular_parts.flows import calculate_promethee_outranking_flows
 from modular_parts.preference import compute_preference_indices
 
 __all__ = ['cluster_using_pclust']
@@ -64,8 +64,9 @@ def _calculate_prometheeII_flows(central_profiles_performances: pd.DataFrame,
                                                          directions,
                                                          weights)
 
-    prometheeII_flows = calculate_prometheeII_outranking_flows(alternatives_vs_profiles_preferences,
-                                                               profiles_preferences)
+    prometheeII_flows = calculate_promethee_outranking_flows(alternatives_vs_profiles_preferences,
+                                                             FlowType.PROMETHEE_II,
+                                                             profiles_preferences)
 
     return prometheeII_flows, profiles_preferences
 

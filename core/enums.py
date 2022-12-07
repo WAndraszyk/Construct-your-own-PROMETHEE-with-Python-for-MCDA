@@ -1,5 +1,3 @@
-# from aenum import Enum
-import enum
 from enum import Enum
 
 
@@ -64,3 +62,8 @@ class InteractionType(Enum):
 class Direction(Enum):
     MAX = 1
     MIN = 0
+
+
+class FlowType(Enum):
+    PROMETHEE_I = 1
+    PROMETHEE_II = 2

@@ -4,11 +4,11 @@ from enum import Enum
 from typing import Tuple, Union
 
 from core.aliases import FlowsTable
-from core.enums import ScoringFunction, ScoringFunctionDirection
+from core.enums import ScoringFunction, ScoringFunctionDirection, FlowType
 
 __all__ = ["net_flow_score_validation", "promethee_group_ranking_validation", "_check_flows",
            "prometheeI_outranking_flows_validation", "prometheeII_outranking_flows_validation",
-           "calculate_net_outranking_flows_validation"]
+           "calculate_net_outranking_flows_validation", "check_outranking_flows_type"]
 
 
 def _check_flows(flows: pd.DataFrame):
@@ -148,3 +148,8 @@ def prometheeII_outranking_flows_validation(preferences: Union[Tuple[pd.DataFram
 
 def calculate_net_outranking_flows_validation(flows: FlowsTable):
     _check_flows(flows)
+
+
+def check_outranking_flows_type(flow_type: FlowType):
+    if flow_type not in [FlowType.PROMETHEE_I, FlowType.PROMETHEE_II]:
+        raise ValueError("Flow type should be either PROMETHEE_I or PROMETHEE_II")

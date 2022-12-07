@@ -56,8 +56,6 @@ def _boundary_profiles_sorting(categories: List[str], prometheeII_flows: pd.Data
     correctly class.
 
     :param categories: List of categories names (strings only)
-    :param category_profiles: DataFrame with category profiles performances
-    :param prometheeII_net_flows: Series with Promethee II net flows
 
     :return: Series with alternatives classification
     """

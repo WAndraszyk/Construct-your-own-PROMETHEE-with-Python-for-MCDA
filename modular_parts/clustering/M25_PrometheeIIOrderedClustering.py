@@ -1,12 +1,12 @@
 import numpy
 import pandas as pd
 import core.preference_commons as pc
-from core.enums import CompareProfiles
+from core.enums import CompareProfiles, FlowType
 from core.clusters_commons import group_alternatives, _calculate_new_profiles, _initialization_of_the_central_profiles
 from core.input_validation import promethee_II_ordered_clustering_validation
 from modular_parts.preference import compute_preference_indices
 from modular_parts.sorting.M20_FlowSortII import *
-from modular_parts.flows.M8_PrometheeOutrankingFlows import calculate_prometheeII_outranking_flows
+from modular_parts.flows.M8_PrometheeOutrankingFlows import calculate_promethee_outranking_flows
 from modular_parts.flows.M9_NetOutrankingFlow import calculate_net_outranking_flows_for_prometheeII
 
 __all__ = ['promethee_II_ordered_clustering']
@@ -82,8 +82,8 @@ def _sort_alternatives_to_categories(alternatives_performances, preference_thres
                                                         indifference_thresholds, standard_deviations,
                                                         generalized_criteria, directions, weights)
 
-    prometheeII_flows = calculate_prometheeII_outranking_flows(alternatives_preference,
-                                                               profiles_preference)
+    prometheeII_flows = calculate_promethee_outranking_flows(alternatives_preference, FlowType.PROMETHEE_II,
+                                                             profiles_preference)
     prometheeII_flows = calculate_net_outranking_flows_for_prometheeII(prometheeII_flows)
 
     sorted = calculate_flowsortII_sorted_alternatives(categories.tolist(), central_profiles, directions,

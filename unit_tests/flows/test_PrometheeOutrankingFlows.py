@@ -2,7 +2,8 @@ import pytest
 import sys
 import pandas as pd
 from pandas.testing import assert_frame_equal
-from modular_parts.flows import calculate_prometheeI_outranking_flows, calculate_prometheeII_outranking_flows
+from modular_parts.flows import calculate_promethee_outranking_flows
+from core.enums import FlowType
 
 sys.path.append('../..')
 
@@ -103,7 +104,7 @@ def test_prometheeI_outranking_flows(alternatives_preferences):
                              'negative': [0.49944, 0.222036, 0.08527, 0.05025, 0.089328, 0.392764]
                              }, index=alternatives)
 
-    actual = calculate_prometheeI_outranking_flows(alternatives_preferences)
+    actual = calculate_promethee_outranking_flows(alternatives_preferences, FlowType.PROMETHEE_I)
 
     assert_frame_equal(expected, actual, atol=0.006)
 
@@ -126,8 +127,8 @@ def test_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII, pr
                                           0.84, 0.5, 0.25, 0.0, 0.74,
                                           1.0, 0.65, 0.35, 0.0, 0.4]}, index=flows_index)
 
-    actual = calculate_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII,
-                                                    profiles_preferences)
+    actual = calculate_promethee_outranking_flows(alternatives_vs_profiles_preferencesII,
+                                                  FlowType.PROMETHEE_II, profiles_preferences)
     assert_frame_equal(expected, actual, atol=0.006)
 
 
@@ -142,14 +143,16 @@ def test_prometheeI_outranking_flows_for_alternatives_vs_profiles(alternatives_v
                                           0.352688997142961, 0.768693354515415, 0.632973944293259, 0.0]
                              }, index=alternatives)
 
-    actual_alternatives = calculate_prometheeI_outranking_flows(alternatives_vs_profiles_preferences)
+    actual_alternatives = calculate_promethee_outranking_flows(alternatives_vs_profiles_preferences,
+                                                               FlowType.PROMETHEE_I)
     assert_frame_equal(expected_alternatives, actual_alternatives, atol=0.006)
 
     expected_profiles = pd.DataFrame(
         {'positive': [0.0999772141492737, 0.340708295896975, 0.582659478885894],
          'negative': [0.721660676849356, 0.452530697813716, 0.078265825253163]
          }, index=profiles)
-    actual_profiles = calculate_prometheeI_outranking_flows(alternatives_vs_profiles_preferences[::-1])
+    actual_profiles = calculate_promethee_outranking_flows(alternatives_vs_profiles_preferences[::-1],
+                                                           flow_type=FlowType.PROMETHEE_I)
     assert_frame_equal(expected_profiles, actual_profiles, atol=0.006)
 
 
