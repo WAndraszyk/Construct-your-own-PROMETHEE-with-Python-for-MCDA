@@ -145,15 +145,6 @@ def _check_enum(profiles: Enum):
         raise ValueError(f"Incorrect profiles type: {profiles}")
 
 
-def _check_enum_gdss(profiles: Enum):
-    if profiles is CompareProfiles.BOUNDARY_PROFILES:
-        pass
-    elif profiles is CompareProfiles.CENTRAL_PROFILES:
-        pass
-    else:
-        raise ValueError(f"Incorrect profiles type: {profiles}")
-
-
 # M19
 def flow_sort_i_validation(categories: List[str],
                            category_profiles: pd.DataFrame,
@@ -292,7 +283,6 @@ def flow_sort_ii_validation(categories: List[str],
     _check_category_profiles(category_profiles)
     _check_criteria_directions(criteria_directions)
     _check_prometheeII_flows(prometheeII_flows, category_profiles)
-    _check_enum_gdss(comparison_with_profiles)
     _check_compare_profiles_type_and_profiles_and_categories_length(comparison_with_profiles, categories,
                                                                     category_profiles)
     _check_if_criteria_are_the_same(category_profiles, criteria_directions.index, "Profiles preferences")
