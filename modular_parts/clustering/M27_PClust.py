@@ -3,7 +3,7 @@ import random
 from typing import List, Tuple, Dict
 
 from core.input_validation import pclust_validation
-from core.enums import FlowType
+from core.enums import FlowType, Direction
 from modular_parts.flows import calculate_promethee_outranking_flows
 from modular_parts.preference import compute_preference_indices
 
@@ -145,17 +145,27 @@ def _update_of_the_central_profiles(principal_categories: Dict[str, List[str]],
                     central_profiles.loc[category] = performances
 
             elif i == len(categories) - 1:
-                performances = []
-                for criterion, direction in zip(central_profiles.columns, directions):
-                    if direction == 1:  # Maximization
-                        min_range = central_profiles.iloc[-2][criterion]
-                        max_range = alternatives_performances[criterion].max()
-                    else:  # Minimization
-                        min_range = alternatives_performances[criterion].min()
-                        max_range = central_profiles.iloc[-2][criterion]
-                    performances.append(random.uniform(min_range, max_range))
+                alternatives_in_interval = 0
+                new_profile_performances = pd.Series([0 for _ in alternatives_performances.columns],
+                                                     index=alternatives_performances.columns)
+                for subcategory, alternatives in interval_categories[category].items():
+                    alternatives_in_interval += len(alternatives)
+                    new_profile_performances += alternatives_performances.loc[alternatives].sum()
 
-                central_profiles.loc[category] = performances
+                if alternatives_in_interval > 0:
+                    central_profiles.loc[category] = new_profile_performances / alternatives_in_interval
+                else:
+                    performances = []
+                    for criterion, direction in zip(central_profiles.columns, directions):
+                        if direction == 1:  # Maximization
+                            min_range = central_profiles.iloc[-2][criterion]
+                            max_range = alternatives_performances[criterion].max()
+                        else:  # Minimization
+                            min_range = alternatives_performances[criterion].min()
+                            max_range = central_profiles.iloc[-2][criterion]
+                        performances.append(random.uniform(min_range, max_range))
+
+                    central_profiles.loc[category] = performances
             else:
                 performances = []
                 for criterion, direction in zip(central_profiles.columns, directions):
@@ -170,7 +180,8 @@ def _update_of_the_central_profiles(principal_categories: Dict[str, List[str]],
                 central_profiles.loc[category] = performances
 
     for criterion, direction in zip(central_profiles.columns, directions):
-        central_profiles[criterion] = sorted(central_profiles[criterion], reverse=not direction)
+        reverse = (direction == Direction.MIN)
+        central_profiles[criterion] = sorted(central_profiles[criterion], reverse=reverse)
 
     return central_profiles
 
