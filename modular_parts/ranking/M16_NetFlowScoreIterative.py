@@ -3,7 +3,6 @@
     each alternative and then assign to each alternative proper position in the ranking.
 """
 import pandas as pd
-from core.aliases import PreferencesTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
 from core.input_validation import net_flow_score_iterative_validation
 from modular_parts.flows import calculate_net_flows_score
@@ -11,7 +10,7 @@ from modular_parts.flows import calculate_net_flows_score
 __all__ = ['calculate_netflow_score_ranking']
 
 
-def calculate_netflow_score_ranking(preferences: PreferencesTable,
+def calculate_netflow_score_ranking(preferences: pd.DataFrame,
                                     function: ScoringFunction,
                                     direction: ScoringFunctionDirection,
                                     avoid_same_scores: bool = True) -> pd.Series:

@@ -5,14 +5,14 @@ and preferences.
 from typing import List, Tuple
 
 import pandas as pd
-from core.aliases import FlowsTable, PreferencesTable, NumericValue
+from core.aliases import NumericValue
 from core.input_validation import promethee_iii_ranking_validation
 import numpy as np
 
 __all__ = ["calculate_promethee_iii_ranking"]
 
 
-def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesTable, alpha: NumericValue,
+def calculate_promethee_iii_ranking(flows: pd.DataFrame, preferences: pd.DataFrame, alpha: NumericValue,
                                     decimal_place: NumericValue = 3) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Calculates intervals and outranking pairs:
@@ -50,7 +50,7 @@ def calculate_promethee_iii_ranking(flows: FlowsTable, preferences: PreferencesT
     return intervals, pairs
 
 
-def _calculate_intervals(alternatives, flow: pd.Series, preferences: PreferencesTable, alpha: NumericValue,
+def _calculate_intervals(alternatives, flow: pd.Series, preferences: pd.DataFrame, alpha: NumericValue,
                          decimal_place: NumericValue = 3) -> Tuple[List[List[NumericValue]], pd.DataFrame]:
     """
     Calculates intervals used in alternatives comparison.

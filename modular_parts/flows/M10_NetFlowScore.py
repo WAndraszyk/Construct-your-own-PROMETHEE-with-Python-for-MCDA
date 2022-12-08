@@ -6,7 +6,6 @@ import math
 
 import numpy as np
 import pandas as pd
-from core.aliases import PreferencesTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
 from core.input_validation import net_flow_score_validation
 
@@ -14,7 +13,7 @@ from core.input_validation import net_flow_score_validation
 __all__ = ['calculate_net_flows_score']
 
 
-def _calculate_score(preferences: PreferencesTable,
+def _calculate_score(preferences: pd.Series,
                      function: ScoringFunction,
                      direction: ScoringFunctionDirection) -> np.array:
     """
@@ -54,7 +53,7 @@ def _find_duplicates_values(array: np.ndarray) -> set:
     return duplicated_values
 
 
-def calculate_net_flows_score(preferences: PreferencesTable,
+def calculate_net_flows_score(preferences: pd.DataFrame,
                               function: ScoringFunction,
                               direction: ScoringFunctionDirection,
                               avoid_same_scores: bool = False) -> pd.Series:

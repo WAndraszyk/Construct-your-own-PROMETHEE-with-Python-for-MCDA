@@ -3,7 +3,6 @@ from enum import Enum
 
 from typing import Tuple, Union
 
-from core.aliases import FlowsTable
 from core.enums import ScoringFunction, ScoringFunctionDirection, FlowType
 
 __all__ = ["net_flow_score_validation", "promethee_group_ranking_validation", "_check_flows",
@@ -146,7 +145,7 @@ def prometheeII_outranking_flows_validation(preferences: Union[Tuple[pd.DataFram
     _check_if_alternatives_vs_alternatives(profiles_preferences, "Profiles preferences")
 
 
-def calculate_net_outranking_flows_validation(flows: FlowsTable):
+def calculate_net_outranking_flows_validation(flows: pd.DataFrame):
     _check_flows(flows)
 
 

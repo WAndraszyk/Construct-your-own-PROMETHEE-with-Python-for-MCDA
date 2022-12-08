@@ -1,6 +1,7 @@
 import random
 import pandas as pd
 from pandas._libs.internals import defaultdict
+# from collections import defaultdict
 
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:
@@ -20,7 +21,7 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
     return cluster
 
 
-def _calculate_new_profiles(central_profiles, alternatives_performances, sorted, method):
+def calculate_new_profiles(central_profiles, alternatives_performances, sorted, method):
     """
     Redefines profile's performance based on alternatives assigned to it.
 
@@ -39,9 +40,9 @@ def _calculate_new_profiles(central_profiles, alternatives_performances, sorted,
     return central_profiles_out
 
 
-def _initialization_of_the_central_profiles(alternatives_performances: pd.DataFrame,
-                                            categories: pd.Index,
-                                            directions: pd.Series) -> pd.DataFrame:
+def initialization_of_the_central_profiles(alternatives_performances: pd.DataFrame,
+                                           categories: pd.Index,
+                                           directions: pd.Series) -> pd.DataFrame:
     """
     First step of clustering. Initialization of the central profiles. Profiles features have random values, but they
     keep the rule of not being worse than the worse profile.

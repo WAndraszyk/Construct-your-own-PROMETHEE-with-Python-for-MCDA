@@ -1,4 +1,3 @@
-from core.aliases import NetOutrankingFlows
 from core.constraint import Constraint
 from core.linear_solver import solve_linear_problem
 from core.input_validation import decision_validation
@@ -8,7 +7,7 @@ import pandas as pd
 __all__ = ["compute_decision"]
 
 
-def compute_decision(flows: NetOutrankingFlows, constraints: List[Constraint]) -> pd.Series:
+def compute_decision(flows: pd.Series, constraints: List[Constraint]) -> pd.Series:
     """
     Computes decision by solving a linear problem.
 

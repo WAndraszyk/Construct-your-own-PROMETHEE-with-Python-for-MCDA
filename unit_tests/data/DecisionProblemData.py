@@ -1,7 +1,7 @@
 import pandas as pd
-from core.preference_commons import GeneralCriterion
-# from core.Interactions_between_criteria import *
-from core.enums import *
+from core.enums import InteractionType, Direction, GeneralCriterion
+
+
 alternatives_performances = [[35.8, 67.0, 19.7, 0.0, 0.0, 5.0, 4.0],
                              [16.4, 14.5, 59.8, 7.5, 5.2, 5.0, 3.0],
                              [35.8, 24.0, 64.9, 2.1, 4.5, 5.0, 4.0],

@@ -4,7 +4,7 @@
 import math
 
 import pandas as pd
-from core.aliases import NumericValue, PerformanceTable, FlowsTable
+from core.aliases import NumericValue
 from typing import List, Tuple
 from core.preference_commons import directed_alternatives_performances
 from core.promethee_check_dominance import check_if_profiles_are_strictly_worse
@@ -40,7 +40,7 @@ def _define_outranking_relation(positive_flow_a: NumericValue, negative_flow_a: 
         return "?"
 
 
-def _check_if_all_profiles_are_preferred_to_alternative(category_profiles_flows: FlowsTable,
+def _check_if_all_profiles_are_preferred_to_alternative(category_profiles_flows: pd.DataFrame,
                                                         alternative_positive_flow: NumericValue,
                                                         alternative_negative_flow: NumericValue) -> bool:
     """
@@ -59,8 +59,8 @@ def _check_if_all_profiles_are_preferred_to_alternative(category_profiles_flows:
     return outranking_relations.str.contains('P').all()
 
 
-def _calculate_first_step_assignments(categories: List[str], alternatives_flows: FlowsTable,
-                                      category_profiles_flows: FlowsTable) -> pd.DataFrame:
+def _calculate_first_step_assignments(categories: List[str], alternatives_flows: pd.DataFrame,
+                                      category_profiles_flows: pd.DataFrame) -> pd.DataFrame:
     """
     Calculates first step of assignments alternatives to categories.
     This function calculates outranking relations alternative to each boundary profile, then:
@@ -113,7 +113,7 @@ def _calculate_first_step_assignments(categories: List[str], alternatives_flows:
     return pd.DataFrame.from_dict(classification, orient='index', columns=['worse', 'better'])
 
 
-def _calculate_final_assignments(alternatives_flows: FlowsTable, classification: pd.DataFrame,
+def _calculate_final_assignments(alternatives_flows: pd.DataFrame, classification: pd.DataFrame,
                                  cut_point: NumericValue, assign_to_better_class: bool = True) -> pd.Series:
     """
     Used assigned categories to assign the unassigned ones. Based on positive and negative distance,
@@ -177,10 +177,10 @@ def _calculate_final_assignments(alternatives_flows: FlowsTable, classification:
 
 
 def calculate_promsort_sorted_alternatives(categories: List[str],
-                                           alternatives_flows: FlowsTable,
-                                           category_profiles_flows: FlowsTable,
+                                           alternatives_flows: pd.DataFrame,
+                                           category_profiles_flows: pd.DataFrame,
                                            criteria_thresholds: pd.Series,
-                                           category_profiles: PerformanceTable,
+                                           category_profiles: pd.DataFrame,
                                            criteria_directions: pd.Series,
                                            cut_point: NumericValue,
                                            assign_to_better_class: bool = True) -> Tuple[pd.DataFrame, pd.Series]:

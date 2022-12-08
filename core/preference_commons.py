@@ -1,7 +1,7 @@
 import copy
 from typing import List, Tuple, Union
 
-from core.aliases import PerformanceTable, PreferencePartialTable, DeviationsTable, NumericValue
+from core.aliases import NumericValue
 from core.enums import GeneralCriterion, Direction
 import core.generalized_criteria as gc
 
@@ -28,7 +28,7 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame,
 
 def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
                profile_performance_table: pd.DataFrame = None
-               ) -> DeviationsTable:
+               ) -> List[Union[List[List[NumericValue]], List[List[List[NumericValue]]]]]:
     """
     Compares alternatives on criteria.
 
@@ -64,8 +64,10 @@ def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
 
 
 def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd.Series,
-            generalized_criteria: pd.Series, deviations: DeviationsTable, i_iter: PerformanceTable,
-            j_iter: PerformanceTable) -> pd.DataFrame:
+            generalized_criteria: pd.Series,
+            deviations: List[Union[List[List[NumericValue]], List[List[List[NumericValue]]]]],
+            i_iter: pd.DataFrame,
+            j_iter: pd.DataFrame) -> pd.DataFrame:
     ppIndices = []
     for k in range(len(criteria)):
         method = generalized_criteria[k]
@@ -121,8 +123,9 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd
 
 def partial_preference(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series, s_list: pd.Series,
                        generalized_criteria: pd.Series, categories_profiles: pd.Index,
-                       alternatives_performances: PerformanceTable,
-                       profile_performance_table: PerformanceTable) -> PreferencePartialTable:
+                       alternatives_performances: pd.DataFrame,
+                       profile_performance_table: pd.DataFrame) -> Union[pd.DataFrame,
+                                                                         Tuple[pd.DataFrame, pd.DataFrame]]:
     """
     Calculates partial preference of every alternative over other alternatives
     or profiles at every criterion based on deviations using a method chosen by user.

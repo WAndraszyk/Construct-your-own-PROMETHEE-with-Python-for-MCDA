@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from core.aliases import PreferencesTable, NumericValue
+from core.aliases import NumericValue
 from core.input_validation import ordered_clustering_validation
 from core.Graph import Graph
 import numpy as np
@@ -8,7 +8,7 @@ import pandas as pd
 __all__ = ["group_into_ordered_clusters"]
 
 
-def group_into_ordered_clusters(preferences: PreferencesTable, k: int) -> pd.Series:
+def group_into_ordered_clusters(preferences: pd.DataFrame, k: int) -> pd.Series:
     """
     Divides alternatives into k ordered clusters based on the preference indices matrix.
 

@@ -3,7 +3,6 @@
 """
 
 import pandas as pd
-from core.aliases import PreferencesTable
 from core.promethee_flow import compute_single_criterion_net_flows
 from core.input_validation import *
 
@@ -24,7 +23,7 @@ def _calculate_net_flows(criteria_weights: pd.Series, criteria_net_flows: pd.Dat
     return net_flows
 
 
-def calculate_alternatives_profiles(criteria_weights: pd.Series, partial_preferences: PreferencesTable) -> pd.Series:
+def calculate_alternatives_profiles(criteria_weights: pd.Series, partial_preferences: pd.DataFrame) -> pd.Series:
     """
     Calculate the alternatives profiles.
 

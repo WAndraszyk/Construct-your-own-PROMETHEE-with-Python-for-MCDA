@@ -1,14 +1,12 @@
 import pandas as pd
 from pandas import DataFrame
 
-from core.aliases import FlowsTable, NetOutrankingFlows
-
 __all__ = ['calculate_net_outranking_flows', 'calculate_net_outranking_flows_for_prometheeII']
 
 from core.input_validation import calculate_net_outranking_flows_validation
 
 
-def calculate_net_outranking_flows(flows: FlowsTable) -> NetOutrankingFlows:
+def calculate_net_outranking_flows(flows: pd.DataFrame) -> pd.Series:
     """
     Computes net outranking flow based on positive and negative flows.
     'Net outranking flow' is a difference between positive and negative flow for each alternative.
@@ -26,7 +24,7 @@ def calculate_net_outranking_flows(flows: FlowsTable) -> NetOutrankingFlows:
     return pd.Series(data=flow_data, index=alternatives, name='Net outranking flow')
 
 
-def calculate_net_outranking_flows_for_prometheeII(flows: FlowsTable) -> DataFrame:
+def calculate_net_outranking_flows_for_prometheeII(flows: pd.DataFrame) -> DataFrame:
     """
     Computes net outranking flow based on positive and negative flows.
     'Net outranking flow' is a difference between positive and negative flow for each alternative.

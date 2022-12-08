@@ -1,4 +1,4 @@
-from core.aliases import NumericValue, PerformanceTable
+from core.aliases import NumericValue
 import core.preference_commons as pc
 import pandas as pd
 
@@ -8,15 +8,15 @@ from core.input_validation import promethee_interaction_preference_validation
 
 
 def compute_preference_indices_with_interactions(
-        alternatives_performances: PerformanceTable,
+        alternatives_performances: pd.DataFrame,
         weights: pd.Series,
         preference_thresholds: pd.Series,
         indifference_thresholds: pd.Series,
         standard_deviations: pd.Series,
         generalized_criteria: pd.Series,
         directions: pd.Series,
-        interactions: PerformanceTable,
-        profiles_performance: PerformanceTable = None,
+        interactions: pd.DataFrame,
+        profiles_performance: pd.DataFrame = None,
         decimal_place: NumericValue = 3,
         minimum_interaction_effect: bool = False) -> tuple:
     """
@@ -69,7 +69,7 @@ def compute_preference_indices_with_interactions(
                 ), partialPref
 
 
-def _preferences(interaction_effects: NumericValue, interactions: PerformanceTable, weights: pd.Series,
+def _preferences(interaction_effects: NumericValue, interactions: pd.DataFrame, weights: pd.Series,
                  criteria: pd.Index, partialPref: pd.Series, decimal_place: NumericValue, i_iter: pd.Index,
                  j_iter: pd.Index = None) -> pd.DataFrame:
     if j_iter is None:

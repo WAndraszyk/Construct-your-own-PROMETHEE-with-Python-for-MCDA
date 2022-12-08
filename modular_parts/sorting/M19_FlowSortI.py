@@ -6,7 +6,6 @@
 import pandas as pd
 from typing import List, Hashable
 from core.enums import CompareProfiles
-from core.aliases import PerformanceTable, FlowsTable
 from core.preference_commons import directed_alternatives_performances
 from core.promethee_check_dominance import check_dominance_condition
 from core.input_validation import flow_sort_i_validation
@@ -27,8 +26,8 @@ def _append_to_classification(categories: List[str], classification: pd.DataFram
         classification.loc[alternative_name, pessimistic_category] = True
 
 
-def _limiting_profiles_sorting(categories: List[str], alternatives_flows: FlowsTable,
-                               category_profiles_flows: FlowsTable) -> pd.DataFrame:
+def _limiting_profiles_sorting(categories: List[str], alternatives_flows: pd.DataFrame,
+                               category_profiles_flows: pd.DataFrame) -> pd.DataFrame:
     """
     Comparing positive and negative flows of each alternative with all limiting profiles and assign them to
     correctly class.
@@ -65,8 +64,8 @@ def _limiting_profiles_sorting(categories: List[str], alternatives_flows: FlowsT
     return classification
 
 
-def _boundary_profiles_sorting(categories: List[str], category_profiles: PerformanceTable,
-                               alternatives_flows: FlowsTable, category_profiles_flows: FlowsTable) -> pd.DataFrame:
+def _boundary_profiles_sorting(categories: List[str], category_profiles: pd.DataFrame,
+                               alternatives_flows: pd.DataFrame, category_profiles_flows: pd.DataFrame) -> pd.DataFrame:
     """
     Comparing positive and negative flows of each alternative with all boundary profiles and assign them to
     correctly class.
@@ -115,8 +114,8 @@ def _boundary_profiles_sorting(categories: List[str], category_profiles: Perform
     return classification
 
 
-def _central_profiles_sorting(categories: List[str], category_profiles: PerformanceTable,
-                              alternatives_flows: FlowsTable, category_profiles_flows: FlowsTable) -> pd.DataFrame:
+def _central_profiles_sorting(categories: List[str], category_profiles: pd.DataFrame,
+                              alternatives_flows: pd.DataFrame, category_profiles_flows: pd.DataFrame) -> pd.DataFrame:
     """
     Comparing positive and negative flows of each alternative with all central profiles and assign them to
     correctly class.
@@ -171,10 +170,10 @@ def _central_profiles_sorting(categories: List[str], category_profiles: Performa
 
 
 def calculate_flowsortI_sorted_alternatives(categories: List[str],
-                                            category_profiles: PerformanceTable,
+                                            category_profiles: pd.DataFrame,
                                             criteria_directions: pd.Series,
-                                            alternatives_flows: FlowsTable,
-                                            category_profiles_flows: FlowsTable,
+                                            alternatives_flows: pd.DataFrame,
+                                            category_profiles_flows: pd.DataFrame,
                                             comparison_with_profiles: CompareProfiles) -> pd.DataFrame:
     """
     Sort alternatives to proper categories.

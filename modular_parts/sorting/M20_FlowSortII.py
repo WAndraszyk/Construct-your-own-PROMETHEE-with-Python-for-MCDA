@@ -5,7 +5,6 @@
 import pandas as pd
 from typing import List
 from core.enums import CompareProfiles
-from core.aliases import PerformanceTable
 from core.input_validation import flow_sort_ii_validation
 from core.promethee_check_dominance import check_dominance_condition
 
@@ -131,7 +130,7 @@ def _central_profiles_sorting(categories: List[str], prometheeII_flows: pd.DataF
 
 
 def calculate_flowsortII_sorted_alternatives(categories: List[str],
-                                             category_profiles: PerformanceTable,
+                                             category_profiles: pd.DataFrame,
                                              criteria_directions: pd.Series,
                                              prometheeII_flows: pd.DataFrame,
                                              comparison_with_profiles: CompareProfiles) -> pd.DataFrame:

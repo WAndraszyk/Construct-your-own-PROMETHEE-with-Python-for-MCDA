@@ -1,4 +1,4 @@
-from core.aliases import NumericValue, PerformanceTable
+from core.aliases import NumericValue
 import core.preference_commons as pc
 from core.input_validation import promethee_preference_validation
 import pandas as pd
@@ -6,10 +6,10 @@ import pandas as pd
 __all__ = ["compute_preference_indices"]
 
 
-def compute_preference_indices(alternatives_performances: PerformanceTable, preference_thresholds: pd.Series,
+def compute_preference_indices(alternatives_performances: pd.DataFrame, preference_thresholds: pd.Series,
                                indifference_thresholds: pd.Series, standard_deviations: pd.Series,
                                generalized_criteria: pd.Series, directions: pd.Series, weights: pd.Series,
-                               profiles_performance: PerformanceTable = None,
+                               profiles_performance: pd.DataFrame = None,
                                decimal_place: NumericValue = 3) -> tuple:
     """
     Calculates preference of every alternative over other alternatives

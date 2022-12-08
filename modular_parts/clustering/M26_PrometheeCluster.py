@@ -1,11 +1,11 @@
-import numpy
+import numpy as np
 import core.preference_commons as pc
-from core.clusters_commons import group_alternatives, _calculate_new_profiles
+from core.clusters_commons import group_alternatives, calculate_new_profiles
 from core.input_validation import promethee_cluster_validation
 from modular_parts.sorting import calculate_prometheetri_sorted_alternatives
 import pandas as pd
 import random
-from modular_parts.preference.M3_PrometheePreference import *
+from modular_parts.preference.M3_PrometheePreference import compute_preference_indices
 
 __all__ = ['promethee_cluster']
 
@@ -83,9 +83,9 @@ def _calculate_sorted_alternatives(alternatives_performances, preference_thresho
                                                          indifference_thresholds, standard_deviations,
                                                          generalized_criteria, directions, weights)
 
-    assignment = calculate_prometheetri_sorted_alternatives(profiles.index.tolist(), weights, (partial_prefe),
+    assignment = calculate_prometheetri_sorted_alternatives(profiles.index.tolist(), weights, partial_prefe,
                                                             profile_partial_pref, True)
 
-    profiles_return = _calculate_new_profiles(profiles, alternatives_performances, assignment, numpy.median)
+    profiles_return = calculate_new_profiles(profiles, alternatives_performances, assignment, np.median)
 
     return assignment, profiles_return

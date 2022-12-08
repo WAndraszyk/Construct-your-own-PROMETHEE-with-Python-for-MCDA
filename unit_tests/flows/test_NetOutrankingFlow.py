@@ -1,7 +1,6 @@
 import pytest
 import sys
 import pandas as pd
-from pandas._testing import assert_frame_equal
 from pandas.testing import assert_series_equal
 from modular_parts.flows import calculate_net_outranking_flows, calculate_net_outranking_flows_for_prometheeII
 

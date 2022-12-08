@@ -1,7 +1,7 @@
 from typing import List, Union, Tuple
 
 import pandas as pd
-from core.aliases import PerformanceTable, NumericValue
+from core.aliases import NumericValue
 from core.enums import Direction, InteractionType
 
 __all__ = ["promethee_preference_validation", "reinforced_preference_validation", "discordance_validation",
@@ -114,10 +114,10 @@ def _compare_criteria(criteria_from_series: pd.Index, criteria_from_df: pd.Index
         raise ValueError("Criteria do not match in all inputs")
 
 
-def promethee_preference_validation(alternatives_performances: PerformanceTable, preference_thresholds: pd.Series,
+def promethee_preference_validation(alternatives_performances: pd.DataFrame, preference_thresholds: pd.Series,
                                     indifference_thresholds: pd.Series, standard_deviations: pd.Series,
                                     generalized_criteria: pd.Series, directions: pd.Series, weights: pd.Series,
-                                    profiles_performance: PerformanceTable,
+                                    profiles_performance: pd.DataFrame,
                                     decimal_place: NumericValue):
     """
     Validates input data for Promethee Preference calculation.
@@ -145,12 +145,12 @@ def promethee_preference_validation(alternatives_performances: PerformanceTable,
         _check_performances(profiles_performance, criteria)
 
 
-def promethee_interaction_preference_validation(alternatives_performances: PerformanceTable,
+def promethee_interaction_preference_validation(alternatives_performances: pd.DataFrame,
                                                 preference_thresholds: pd.Series,
                                                 indifference_thresholds: pd.Series, standard_deviations: pd.Series,
                                                 generalized_criteria: pd.Series, directions: pd.Series,
                                                 weights: pd.Series,
-                                                profiles_performance: PerformanceTable, interactions: PerformanceTable,
+                                                profiles_performance: pd.DataFrame, interactions: pd.DataFrame,
                                                 minimum_interaction_effect: bool,
                                                 decimal_place: NumericValue):
     """
@@ -366,8 +366,8 @@ def discordance_validation(criteria: List[str], partial_preferences: Union[pd.Da
     _check_categories_profiles(categories_profiles)
 
 
-def veto_validation(alternatives_performances: PerformanceTable, weights: pd.Series, veto_thresholds: pd.Series,
-                    directions: pd.Series, full_veto: bool, profiles_performance: PerformanceTable,
+def veto_validation(alternatives_performances: pd.DataFrame, weights: pd.Series, veto_thresholds: pd.Series,
+                    directions: pd.Series, full_veto: bool, profiles_performance: pd.DataFrame,
                     decimal_place: NumericValue, preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
     _check_weights(weights)
     criteria = weights.index

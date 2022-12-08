@@ -1,6 +1,6 @@
 from typing import List, Tuple, Union
 from core.preference_commons import GeneralCriterion
-from core.aliases import NumericValue, PerformanceTable
+from core.aliases import NumericValue
 from core.input_validation import reinforced_preference_validation
 import core.generalized_criteria as gc
 import core.preference_commons as pc
@@ -9,7 +9,7 @@ import pandas as pd
 __all__ = ['compute_reinforced_preference']
 
 
-def compute_reinforced_preference(alternatives_performances: PerformanceTable,
+def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
                                   preference_thresholds: pd.Series,
                                   indifference_thresholds: pd.Series,
                                   generalized_criteria: pd.Series,
@@ -17,7 +17,7 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
                                   reinforced_preference_thresholds: pd.Series,
                                   reinforcement_factors: pd.Series,
                                   weights: pd.Series,
-                                  profiles_performance: PerformanceTable = None,
+                                  profiles_performance: pd.DataFrame = None,
                                   decimal_place: NumericValue = 3) -> Union[Tuple[pd.DataFrame, pd.DataFrame],
                                                                             Tuple[Tuple[pd.DataFrame, pd.DataFrame],
                                                                                   pd.DataFrame]]:
@@ -73,8 +73,8 @@ def compute_reinforced_preference(alternatives_performances: PerformanceTable,
 
 def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series, preference_thresholds: pd.Series,
                         indifference_thresholds: pd.Series, reinforced_preference_thresholds: pd.Series,
-                        reinforcement_factors: pd.Series, alternatives_performances: PerformanceTable,
-                        profile_performance_table: PerformanceTable, categories_profiles: pd.Index
+                        reinforcement_factors: pd.Series, alternatives_performances: pd.DataFrame,
+                        profile_performance_table: pd.DataFrame, categories_profiles: pd.Index
                         ) -> Tuple[pd.DataFrame, Union[List[List[List[List[int]]]], List[List[int]]]]:
     """
     Calculates partial preference of every alternative over others at every criterion

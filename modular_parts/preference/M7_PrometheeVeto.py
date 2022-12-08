@@ -1,4 +1,4 @@
-from core.aliases import NumericValue, PerformanceTable, PreferencePartialTable, DeviationsTable
+from core.aliases import NumericValue
 import core.preference_commons as pc
 import pandas as pd
 from typing import Tuple, List, Union
@@ -9,12 +9,12 @@ from core.input_validation import veto_validation
 
 
 def compute_veto(
-        alternatives_performances: PerformanceTable,
+        alternatives_performances: pd.DataFrame,
         weights: pd.Series,
         veto_thresholds: pd.Series,
         directions: pd.Series,
         full_veto: bool = True,
-        profiles_performance: PerformanceTable = None,
+        profiles_performance: pd.DataFrame = None,
         decimal_place: NumericValue = 3,
         preferences=None) -> Union[Tuple[Union[pd.DataFrame, List[pd.DataFrame]],
                                          Union[pd.DataFrame, List[pd.DataFrame]]],
@@ -67,7 +67,8 @@ def compute_veto(
         return veto, partial_veto
 
 
-def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool, partial_veto: PreferencePartialTable,
+def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool,
+            partial_veto: Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
             decimal_place: NumericValue,
             i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
     if j_iter is None:
@@ -93,8 +94,9 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool, partial_vet
     return pd.DataFrame(data=Vetoes, index=index, columns=columns)
 
 
-def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index, alternatives_performances: PerformanceTable,
-                  profile_performance_table: PerformanceTable, categories_profiles: pd.Index) -> PreferencePartialTable:
+def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index, alternatives_performances: pd.DataFrame,
+                  profile_performance_table: pd.DataFrame, categories_profiles: pd.Index
+                  ) -> Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]:
     """
     Calculates partial veto of every alternative over other alternatives
     or profiles at every criterion based on deviations.
@@ -119,8 +121,9 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index, alternatives_p
     return pvetos
 
 
-def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index, deviations: DeviationsTable, i_iter: PerformanceTable,
-               j_iter: PerformanceTable) -> pd.DataFrame:
+def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
+               deviations: List[Union[List[List[NumericValue]], List[List[List[NumericValue]]]]],
+               i_iter: pd.DataFrame, j_iter: pd.DataFrame) -> pd.DataFrame:
     pvetos = []
     for k in range(criteria.size):
         v = veto_thresholds[k]

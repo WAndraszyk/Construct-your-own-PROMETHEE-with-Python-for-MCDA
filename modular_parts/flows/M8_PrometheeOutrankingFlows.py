@@ -2,7 +2,6 @@
     This class computes positive and negative outranking flows based on preferences.
 """
 import pandas as pd
-from core.aliases import PreferencesTable, FlowsTable
 from core.enums import FlowType
 from typing import Tuple, Union
 
@@ -12,7 +11,7 @@ from core.input_validation import prometheeI_outranking_flows_validation, promet
     check_outranking_flows_type
 
 
-def _calculate_flow(preferences: Union[Tuple[PreferencesTable, PreferencesTable], PreferencesTable],
+def _calculate_flow(preferences: Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame],
                     positive: bool = True) -> pd.Series:
     """
     Calculate positive or negative outranking flow.
@@ -34,8 +33,8 @@ def _calculate_flow(preferences: Union[Tuple[PreferencesTable, PreferencesTable]
     return flows
 
 
-def _calculate_prometheeII_style_flow(preferences: Tuple[PreferencesTable, PreferencesTable],
-                                      profiles_preferences: PreferencesTable, positive: bool = True) -> pd.Series:
+def _calculate_prometheeII_style_flow(preferences: Tuple[pd.DataFrame, pd.DataFrame],
+                                      profiles_preferences: pd.DataFrame, positive: bool = True) -> pd.Series:
     """
     Calculate positive or negative outranking flow in PrometheeII style.
 
@@ -60,8 +59,8 @@ def _calculate_prometheeII_style_flow(preferences: Tuple[PreferencesTable, Prefe
     return pd.concat(alternatives_groups_flows, keys=alternatives_groups_names)
 
 
-def calculate_promethee_outranking_flows(preferences: Union[Tuple[PreferencesTable, PreferencesTable],
-                                                            PreferencesTable],
+def calculate_promethee_outranking_flows(preferences: Union[Tuple[pd.DataFrame, pd.DataFrame],
+                                                            pd.DataFrame],
                                          flow_type: FlowType, profiles_preferences: pd.DataFrame = None) -> pd.DataFrame:
     check_outranking_flows_type(flow_type)
     if flow_type == FlowType.PROMETHEE_I:

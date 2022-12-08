@@ -1,11 +1,11 @@
-import numpy
+import numpy as np
 import pandas as pd
 import core.preference_commons as pc
 from core.enums import CompareProfiles, FlowType
-from core.clusters_commons import group_alternatives, _calculate_new_profiles, _initialization_of_the_central_profiles
+from core.clusters_commons import group_alternatives, calculate_new_profiles, initialization_of_the_central_profiles
 from core.input_validation import promethee_II_ordered_clustering_validation
 from modular_parts.preference import compute_preference_indices
-from modular_parts.sorting.M20_FlowSortII import *
+from modular_parts.sorting.M20_FlowSortII import calculate_flowsortII_sorted_alternatives
 from modular_parts.flows.M8_PrometheeOutrankingFlows import calculate_promethee_outranking_flows
 from modular_parts.flows.M9_NetOutrankingFlow import calculate_net_outranking_flows_for_prometheeII
 
@@ -49,7 +49,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
     def which_profile():
         return CompareProfiles.CENTRAL_PROFILES
 
-    central_profiles = _initialization_of_the_central_profiles(alternatives_performances, categories, directions)
+    central_profiles = initialization_of_the_central_profiles(alternatives_performances, categories, directions)
     sorted = _sort_alternatives_to_categories(alternatives_performances, preference_thresholds, indifference_thresholds,
                                               standard_deviations, generalized_criteria, directions, weights,
                                               central_profiles, categories, which_profile)
@@ -94,7 +94,7 @@ def _sort_alternatives_to_categories(alternatives_performances, preference_thres
 
 
 def _calculate_new_profiles_median(profiles, alternatives_performances, sorted):
-    profiles = _calculate_new_profiles(profiles, alternatives_performances, sorted, numpy.mean)
+    profiles = calculate_new_profiles(profiles, alternatives_performances, sorted, np.mean)
     profiles.fillna(0, inplace=True)
     profiles = profiles.apply(lambda x: x.sort_values().values)
     return profiles
@@ -116,7 +116,7 @@ def _force_alternative_to_empty_category(sorted: pd.Series, categories: pd.Index
         if list(set(categories.values) - set(unique_category)) == []:
             break
         if item.values in old_value:
-            sorted_copy[item.keys()] = numpy.random.choice(list(set(categories) - set(unique_category)))
+            sorted_copy[item.keys()] = np.random.choice(list(set(categories) - set(unique_category)))
         else:
             old_value += [item.values[0]]
     return sorted_copy

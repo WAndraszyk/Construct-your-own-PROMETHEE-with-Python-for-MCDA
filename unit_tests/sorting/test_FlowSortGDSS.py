@@ -2,7 +2,7 @@ import pytest
 import sys
 import pandas as pd
 from pandas.testing import assert_series_equal
-from core.enums import CompareProfiles,Direction
+from core.enums import CompareProfiles, Direction
 from modular_parts.sorting import calculate_flowsort_gdss_sorted_alternatives
 
 sys.path.append('../..')

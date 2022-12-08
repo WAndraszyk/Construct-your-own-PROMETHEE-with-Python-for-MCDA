@@ -4,9 +4,7 @@ import pandas as pd
 from pandas.testing import assert_series_equal
 from modular_parts.weights import calculate_srf_weights
 
-
 sys.path.append('../..')
-
 
 
 @pytest.fixture

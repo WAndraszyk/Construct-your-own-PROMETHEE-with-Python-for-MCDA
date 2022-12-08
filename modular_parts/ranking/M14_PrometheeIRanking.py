@@ -5,14 +5,13 @@
 import math
 
 import pandas as pd
-from core.aliases import FlowsTable
 from core.input_validation import promethee_i_ranking_validation
 
 
 __all__ = ["calculate_prometheeI_ranking"]
 
 
-def calculate_prometheeI_ranking(flows: FlowsTable,
+def calculate_prometheeI_ranking(flows: pd.DataFrame,
                                  weak_preference=True
                                  ) -> pd.DataFrame:
     """
