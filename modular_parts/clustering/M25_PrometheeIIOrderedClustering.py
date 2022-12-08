@@ -85,8 +85,8 @@ def _sort_alternatives_to_categories(alternatives_performances, preference_thres
     prometheeII_flows = calculate_promethee_outranking_flows(alternatives_preference, FlowType.PROMETHEE_II,
                                                              profiles_preference)
     prometheeII_flows = calculate_net_outranking_flows_for_prometheeII(prometheeII_flows)
-
-    sorted = calculate_flowsortII_sorted_alternatives(categories.tolist(), central_profiles, directions,
+    redirected_profiles = pc.directed_alternatives_performances(central_profiles, directions)
+    sorted = calculate_flowsortII_sorted_alternatives(categories.tolist(), redirected_profiles, directions,
                                                       prometheeII_flows, which_profile())['negative']
     sorted = _force_alternative_to_empty_category(sorted, central_profiles.index)
 
