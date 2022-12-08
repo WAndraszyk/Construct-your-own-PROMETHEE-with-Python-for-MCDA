@@ -17,13 +17,11 @@ def _append_to_classification(categories: List[str], classification: pd.DataFram
                               optimistic_category: str, alternative_name: Hashable) -> None:
     pessimistic_category_index = categories.index(pessimistic_category)
     optimistic_category_index = categories.index(optimistic_category)
-
     if pessimistic_category_index > optimistic_category_index:
-        classification.loc[alternative_name, optimistic_category: pessimistic_category] = True
-    elif pessimistic_category_index < optimistic_category_index:
-        classification.loc[alternative_name, pessimistic_category: optimistic_category] = True
-    else:  # positive_category_index = negative_category_index i.e. precise assignment to a specific category
-        classification.loc[alternative_name, pessimistic_category] = True
+        pessimistic_category, optimistic_category = optimistic_category, pessimistic_category
+
+    classification.loc[alternative_name, 'worse'] = pessimistic_category
+    classification.loc[alternative_name, 'better'] = optimistic_category
 
 
 def _limiting_profiles_sorting(categories: List[str], alternatives_flows: pd.DataFrame,
@@ -39,8 +37,7 @@ def _limiting_profiles_sorting(categories: List[str], alternatives_flows: pd.Dat
     :return: DataFrame with alternatives assigned to proper classes
     """
 
-    classification = pd.DataFrame([[False for _ in categories] for __ in alternatives_flows.index],
-                                  index=alternatives_flows.index, columns=categories)
+    classification = pd.DataFrame(index=alternatives_flows.index, columns=['worse', 'better'], dtype=str)
 
     for alternative, alternative_row in alternatives_flows.iterrows():
         positive_flow_category = ''
@@ -77,8 +74,7 @@ def _boundary_profiles_sorting(categories: List[str], category_profiles: pd.Data
 
     :return: DataFrame with alternatives assigned to proper classes
     """
-    classification = pd.DataFrame([[False for _ in categories] for __ in alternatives_flows.index],
-                                  index=alternatives_flows.index, columns=categories)
+    classification = pd.DataFrame(index=alternatives_flows.index, columns=['worse', 'better'], dtype=str)
 
     for alternative, alternative_row in alternatives_flows.iterrows():
         positive_flow_category = ''
@@ -127,8 +123,7 @@ def _central_profiles_sorting(categories: List[str], category_profiles: pd.DataF
 
     :return: DataFrame with alternatives assigned to proper classes
     """
-    classification = pd.DataFrame([[False for _ in categories] for __ in alternatives_flows.index],
-                                  index=alternatives_flows.index, columns=categories)
+    classification = pd.DataFrame(index=alternatives_flows.index, columns=['worse', 'better'], dtype=str)
 
     for alternative, alternative_row in alternatives_flows.iterrows():
         positive_flow_category = ''

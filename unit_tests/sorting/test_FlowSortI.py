@@ -10,7 +10,7 @@ sys.path.append('../..')
 
 @pytest.fixture
 def categories():
-    return [f"c{i}" for i in range(1, 5)]
+    return [f"C{i}" for i in range(1, 5)]
 
 
 @pytest.fixture
@@ -57,10 +57,8 @@ def test(categories, category_profiles_performances, criteria_directions, altern
                                                                     criteria_directions, alternatives_flows,
                                                                     category_profiles_flows, comparison_with_profiles)
 
-    expected_classification = pd.DataFrame([[True, True, False, False], [True, False, False, False],
-                                            [True, True, False, False]],
-                                           index=alternatives_flows.index, columns=categories)
-
+    expected_classification = pd.DataFrame({'worse': ['C1', 'C1', 'C1'], 'better': ['C2', 'C1', 'C2']},
+                                           index=alternatives_flows.index)
     assert_frame_equal(expected_classification, actual_classification)
 
 
