@@ -86,18 +86,6 @@ def _calculate_first_step_assignments(alternatives: pd.Index, dms: pd.Index, alt
                     elif alternative_general_net_flow <= profile_net_flow:
                         alternative_assignments[DM] = categories[profile_i]
                         break
-            elif comparison_with_profiles == CompareProfiles.LIMITING_PROFILES:
-                profile_distances = [profile_net_flow > alternative_general_net_flow for profile_net_flow in
-                                     DM_profiles_general_net_flows_for_alternative.values]
-                print(profile_distances)
-
-                if profile_distances[-1]:
-                    alternative_assignments[DM] = categories[-1]
-                elif True in profile_distances:
-                    category_index = profile_distances.index(True) + 1
-                    alternative_assignments[DM] = categories[category_index]
-                else:
-                    alternative_assignments[DM] = categories[0]
             else:
                 category_pos = np.argmin(np.abs(
                     DM_profiles_general_net_flows_for_alternative.values - alternative_general_net_flow))
@@ -159,7 +147,7 @@ def _calculate_final_assignments(alternatives_general_net_flows: pd.Series,
         better_category_profiles_general_net_flows = \
             profiles_general_net_flows.loc[(better_category_voters, better_category_profile), alternative]
 
-        if comparison_with_profiles in [CompareProfiles.BOUNDARY_PROFILES, CompareProfiles.LIMITING_PROFILES]:
+        if comparison_with_profiles == CompareProfiles.BOUNDARY_PROFILES:
             worse_category_distance = np.sum(
                 (alternatives_general_net_flows[alternative] - worse_category_profiles_general_net_flows) *
                 worse_category_voters_weights)

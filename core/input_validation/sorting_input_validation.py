@@ -164,8 +164,11 @@ def flow_sort_i_validation(categories: List[str],
 
 def _check_compare_profiles_type_and_profiles_and_categories_length(compare_profiles: Enum,
                                                                     categories: List[str],
-                                                                    category_profiles: pd.DataFrame):
+                                                                    category_profiles: pd.DataFrame,
+                                                                    gdss: bool = False):
     if compare_profiles is CompareProfiles.LIMITING_PROFILES:
+        if gdss:
+            raise ValueError("Limiting profiles are not available for FlowSortGDSS method")
         if len(categories) != len(category_profiles) - 1:
             raise ValueError("Number of categories should be equals to number of limiting profiles minus 1")
     elif compare_profiles is CompareProfiles.BOUNDARY_PROFILES:
@@ -306,7 +309,7 @@ def flow_sort_gdss_validation(alternatives_general_net_flows: pd.Series,
     _check_dms_weights(dms_weights, profiles_general_net_flows)
     _check_enum(comparison_with_profiles)
     _check_compare_profiles_type_and_profiles_and_categories_length(comparison_with_profiles, categories,
-                                                                    profiles_performances[0])
+                                                                    profiles_performances[0], True)
     _check_assign_to_better(assign_to_better_class)
 
 
