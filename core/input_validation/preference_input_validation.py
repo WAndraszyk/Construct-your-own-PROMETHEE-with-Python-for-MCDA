@@ -251,11 +251,11 @@ def _check_reinforcement_factors(reinforcement_factors: pd.Series, criteria: pd.
                 raise ValueError("Reinforcement factors need to be >1")
 
 
-def reinforced_preference_validation(alternatives_performances: PerformanceTable, preference_thresholds: pd.Series,
+def reinforced_preference_validation(alternatives_performances: pd.DataFrame, preference_thresholds: pd.Series,
                                      indifference_thresholds: pd.Series, generalized_criteria: pd.Series,
                                      directions: pd.Series, reinforced_preference_thresholds: pd.Series,
                                      reinforcement_factors: pd.Series, weights: pd.Series,
-                                     profiles_performance: PerformanceTable,
+                                     profiles_performance: pd.DataFrame,
                                      decimal_place: NumericValue):
     """
     Validates input data for Reinforced Preference calculation.

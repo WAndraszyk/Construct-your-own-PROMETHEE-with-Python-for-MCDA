@@ -1,7 +1,6 @@
 import random
 import pandas as pd
-from pandas._libs.internals import defaultdict
-# from collections import defaultdict
+from collections import defaultdict
 
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:

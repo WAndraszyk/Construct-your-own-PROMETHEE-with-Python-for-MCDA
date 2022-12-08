@@ -104,8 +104,8 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series, pre
 
 def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series, preference_thresholds: pd.Series,
              indifference_thresholds: pd.Series, reinforced_preference_thresholds: pd.Series,
-             reinforcement_factors: pd.Series, deviations: List[List[List[NumericValue]]], i_iter: PerformanceTable,
-             j_iter: PerformanceTable) -> Tuple[pd.DataFrame, List[List[List[int]]]]:
+             reinforcement_factors: pd.Series, deviations: List[List[List[NumericValue]]], i_iter: pd.DataFrame,
+             j_iter: pd.DataFrame) -> Tuple[pd.DataFrame, List[List[List[int]]]]:
     ppIndices = []
     FrpList = []
     for k in range(len(criteria)):
@@ -168,8 +168,8 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series, preference_thr
 
 
 def _preferences(criteria: pd.Index, weights: pd.Series, reinforcement_factors: pd.Series, partialPref: pd.DataFrame,
-                 decimal_place: int, Frp: Union[List[List[List[int]]], List[List[int]]], i_perf: PerformanceTable,
-                 j_perf: PerformanceTable = None) -> pd.DataFrame:
+                 decimal_place: int, Frp: Union[List[List[List[int]]], List[List[int]]], i_perf: pd.DataFrame,
+                 j_perf: pd.DataFrame = None) -> pd.DataFrame:
     i_iter = i_perf.index
     if j_perf is None:
         j_iter = i_iter
