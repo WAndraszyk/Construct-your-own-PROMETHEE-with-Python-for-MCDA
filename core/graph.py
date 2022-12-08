@@ -2,15 +2,26 @@ from collections import defaultdict
 
 
 class Graph:
+    """
+        The Graph class represents a directed graph data structure
+    """
     def __init__(self, vertices):
+        """
+            Constructs a new Graph instance with the given number of vertices.
+        """
         self.graph = defaultdict(list)
         self.V = vertices
 
     def add_edge(self, u, v):
+        """
+            Adds a directed edge from vertex u to vertex v in the graph.
+        """
         self.graph[u].append(v)
 
     def __is_cyclic_util__(self, v, visited, recStack):
-
+        """
+            Checks for a given vertex if a cycle occurs.
+        """
         visited[v] = True
         recStack[v] = True
 
@@ -25,6 +36,9 @@ class Graph:
         return False
 
     def is_cyclic(self):
+        """
+            Returns True if the graph contains a cycle, and False otherwise.
+        """
         visited = [False] * (self.V + 1)
         recStack = [False] * (self.V + 1)
         for node in range(self.V):
@@ -34,6 +48,9 @@ class Graph:
         return False
 
     def find_longest_path(self):
+        """
+            Returns the length of the longest path in the graph.
+        """
         n = self.V
         dp = [0] * (n + 1)
 
@@ -51,7 +68,9 @@ class Graph:
         return ans
 
     def __dfs__(self, node, adj, dp, vis):
-
+        """
+            Depth-first search (DFS) algorithm.
+        """
         vis[node] = True
 
         for i in range(0, len(adj[node])):
