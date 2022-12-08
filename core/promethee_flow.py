@@ -5,10 +5,10 @@ from typing import Union, Tuple
 def compute_single_criterion_net_flows(partial_preferences: Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]
                                        ) -> pd.DataFrame:
     """
-    Compute the single criterion net flows for alternatives.
+        Compute the single criterion net flows for alternatives.
 
-    :param partial_preferences: DataFrame with MultiIndex of criterion and alternative and alternative as columns.
-    return: DataFrame with single criterion net flows
+        :param partial_preferences: DataFrame with MultiIndex of criterion and alternative and alternative as columns.
+        return: DataFrame with single criterion net flows
     """
     single_criterion_net_flows = pd.DataFrame(dtype=float)
 
@@ -25,7 +25,6 @@ def compute_single_criterion_net_flows(partial_preferences: Union[pd.DataFrame, 
                            criterion_preferences2.droplevel(0).T.iterrows()):
                 single_criterion_net_flows.loc[object_i, criterion] = (object_i_row - object_j_col).sum() / n
 
-        # single_criterion_net_flows.index = object_names
     else:
         object_names = partial_preferences.columns.tolist()
         n = len(object_names)

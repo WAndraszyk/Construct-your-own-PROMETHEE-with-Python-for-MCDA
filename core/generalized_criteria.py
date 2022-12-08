@@ -1,9 +1,7 @@
 import math
-
 from core.aliases import NumericValue
 
 
-# GENERALIZED_CRITERIA:
 def usual_criterion(d: NumericValue) -> NumericValue:
     """
     Returns 0 if difference is less or equal to 0, if not it returns 1.

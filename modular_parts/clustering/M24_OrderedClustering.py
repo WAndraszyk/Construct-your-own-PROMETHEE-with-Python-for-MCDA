@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from core.aliases import NumericValue
 from core.input_validation import ordered_clustering_validation
-from core.Graph import Graph
+from core.graph import Graph
 import numpy as np
 import pandas as pd
 
