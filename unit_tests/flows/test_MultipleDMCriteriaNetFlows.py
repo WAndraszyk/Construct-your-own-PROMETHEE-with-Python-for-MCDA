@@ -8,7 +8,7 @@ sys.path.append('../..')
 
 
 @pytest.fixture
-def dms_profiles_partial_preferences():
+def dms_partial_preferences():
     alternatives = [f"a{i}" for i in range(1, 13)]
     profiles = [f"p{i}" for i in range(1, 4)]
     criteria = [f"g{i}" for i in range(1, 6)]
@@ -54,55 +54,6 @@ def dms_profiles_partial_preferences():
                                                   DM1_g5_profiles_partial_preferences],
                                                  keys=criteria)
 
-    DM2_g1_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                                                        [0.0, 0.3, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0],
-                                                        [1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 0.9, 0.3, 1.0, 1.0, 0.3]],
-                                                       index=profiles, columns=alternatives)
-
-    DM2_g2_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                                                        [0.0, 0.0, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-                                                        [1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 0.5]],
-                                                       index=profiles, columns=alternatives)
-
-    DM2_g3_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.285714285714286,
-                                                         0.0, 0.0, 0.285714285714286, 0.0, 0.285714285714286, 0.0],
-                                                        [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-                                                         0.714285714285714, 1.0, 0.0],
-                                                        [0.714285714285714, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-                                                         0.428571428571429, 1.0, 1.0, 1.0, 0.142857142857143]],
-                                                       index=profiles, columns=alternatives)
-
-    DM2_g4_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.999664537372098, 0.0, 0.0, 0.0,
-                                                         0.0, 0.999664537372098, 0.0],
-                                                        [0.0, 0.0, 0.0, 0.999999999999987, 0.0, 1.0, 0.0, 0.0,
-                                                         1.0, 1.0, 1.0, 0.0],
-                                                        [0.393469340287367, 0.0, 0.393469340287367, 1.0, 0.0, 1.0,
-                                                         0.393469340287367, 0.0, 1.0, 1.0, 1.0, 0.0]],
-                                                       index=profiles, columns=alternatives)
-
-    DM2_g5_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                                                        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-                                                         0.166666666666667, 0.0],
-                                                        [0.0, 1.0, 0.166666666666667, 1.0, 0.0, 0.0,
-                                                         0.166666666666667, 0.0, 0.0, 1.0, 1.0, 0.0]],
-                                                       index=profiles, columns=alternatives)
-
-    DM2_profiles_partial_preferences = pd.concat([DM2_g1_profiles_partial_preferences,
-                                                  DM2_g2_profiles_partial_preferences,
-                                                  DM2_g3_profiles_partial_preferences,
-                                                  DM2_g4_profiles_partial_preferences,
-                                                  DM2_g5_profiles_partial_preferences],
-                                                 keys=criteria)
-
-    return [DM1_profiles_partial_preferences, DM2_profiles_partial_preferences]
-
-
-@pytest.fixture
-def dms_alternatives_partial_preferences():
-    alternatives = [f"a{i}" for i in range(1, 13)]
-    profiles = [f"p{i}" for i in range(1, 4)]
-    criteria = [f"g{i}" for i in range(1, 6)]
-
     DM1_g1_alternatives_partial_preferences = pd.DataFrame([[1.0, 0.4, 0.0], [0.7, 0.0, 0.0], [0.5, 0.0, 0.0],
                                                             [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [1.0, 1.0, 0.0],
                                                             [1.0, 0.0, 0.0], [1.0, 0.6, 0.0], [1.0, 1.0, 0.2],
@@ -146,6 +97,48 @@ def dms_alternatives_partial_preferences():
                                                       DM1_g5_alternatives_partial_preferences],
                                                      keys=criteria)
 
+    DM1_partial_preferences = (DM1_alternatives_partial_preferences, DM1_profiles_partial_preferences)
+
+    DM2_g1_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                                        [0.0, 0.3, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0],
+                                                        [1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 0.9, 0.3, 1.0, 1.0, 0.3]],
+                                                       index=profiles, columns=alternatives)
+
+    DM2_g2_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                                        [0.0, 0.0, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+                                                        [1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 0.5]],
+                                                       index=profiles, columns=alternatives)
+
+    DM2_g3_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.285714285714286,
+                                                         0.0, 0.0, 0.285714285714286, 0.0, 0.285714285714286, 0.0],
+                                                        [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+                                                         0.714285714285714, 1.0, 0.0],
+                                                        [0.714285714285714, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+                                                         0.428571428571429, 1.0, 1.0, 1.0, 0.142857142857143]],
+                                                       index=profiles, columns=alternatives)
+
+    DM2_g4_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.999664537372098, 0.0, 0.0, 0.0,
+                                                         0.0, 0.999664537372098, 0.0],
+                                                        [0.0, 0.0, 0.0, 0.999999999999987, 0.0, 1.0, 0.0, 0.0,
+                                                         1.0, 1.0, 1.0, 0.0],
+                                                        [0.393469340287367, 0.0, 0.393469340287367, 1.0, 0.0, 1.0,
+                                                         0.393469340287367, 0.0, 1.0, 1.0, 1.0, 0.0]],
+                                                       index=profiles, columns=alternatives)
+
+    DM2_g5_profiles_partial_preferences = pd.DataFrame([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                                        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+                                                         0.166666666666667, 0.0],
+                                                        [0.0, 1.0, 0.166666666666667, 1.0, 0.0, 0.0,
+                                                         0.166666666666667, 0.0, 0.0, 1.0, 1.0, 0.0]],
+                                                       index=profiles, columns=alternatives)
+
+    DM2_profiles_partial_preferences = pd.concat([DM2_g1_profiles_partial_preferences,
+                                                  DM2_g2_profiles_partial_preferences,
+                                                  DM2_g3_profiles_partial_preferences,
+                                                  DM2_g4_profiles_partial_preferences,
+                                                  DM2_g5_profiles_partial_preferences],
+                                                 keys=criteria)
+
     DM2_g1_alternatives_partial_preferences = pd.DataFrame([[1.0, 0.9, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0],
                                                             [1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0],
                                                             [1.0, 0.5, 0.0], [1.0, 1.0, 0.0], [1.0, 1.0, 0.0],
@@ -188,7 +181,9 @@ def dms_alternatives_partial_preferences():
                                                       DM2_g5_alternatives_partial_preferences],
                                                      keys=criteria)
 
-    return [DM1_alternatives_partial_preferences, DM2_alternatives_partial_preferences]
+    DM2_partial_preferences = (DM2_alternatives_partial_preferences, DM2_profiles_partial_preferences)
+
+    return [DM1_partial_preferences, DM2_partial_preferences]
 
 
 @pytest.fixture
@@ -254,8 +249,7 @@ def criteria_weights():
                      index=criteria)
 
 
-def test_calculate_gdss_flows(dms_profiles_partial_preferences, dms_alternatives_partial_preferences,
-                              dms_profile_vs_profile_partial_preferences, criteria_weights):
+def test_calculate_gdss_flows(dms_partial_preferences, dms_profile_vs_profile_partial_preferences, criteria_weights):
     alternatives = [f"a{i}" for i in range(1, 13)]
     dms = ['DM1', 'DM2']
     profiles = [f"p{i}" for i in range(1, 4)]
@@ -295,13 +289,11 @@ def test_calculate_gdss_flows(dms_profiles_partial_preferences, dms_alternatives
                                                        index=profiles_general_net_flows_index, columns=alternatives)
 
     actual_alternatives_general_net_flows, actual_profiles_general_net_flows = \
-        calculate_gdss_flows(dms_profiles_partial_preferences, dms_alternatives_partial_preferences,
-                             dms_profile_vs_profile_partial_preferences, criteria_weights)
+        calculate_gdss_flows(dms_partial_preferences, dms_profile_vs_profile_partial_preferences, criteria_weights)
 
     assert_series_equal(expected_alternatives_general_net_flows, actual_alternatives_general_net_flows, atol=0.006)
     assert_frame_equal(expected_profiles_general_net_flows, actual_profiles_general_net_flows, atol=0.006)
 
 
 if __name__ == '__main__':
-    test_calculate_gdss_flows(dms_profiles_partial_preferences, dms_alternatives_partial_preferences,
-                              dms_profile_vs_profile_partial_preferences, criteria_weights)
+    test_calculate_gdss_flows(dms_partial_preferences, dms_profile_vs_profile_partial_preferences, criteria_weights)

@@ -116,18 +116,13 @@ def _calculate_profiles_general_net_flows(alternatives: pd.Index, category_profi
     return profiles_global_net_flows
 
 
-def calculate_gdss_flows(dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
-                         dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
+def calculate_gdss_flows(dms_partial_preferences: List[Tuple[pd.DataFrame, pd.DataFrame]],
                          dms_profile_vs_profile_partial_preferences: pd.DataFrame,  # P(r_i,r_j)
                          criteria_weights: pd.Series) -> Tuple[pd.Series, pd.DataFrame]:
     """
     Calculate alternatives general net flows and profiles general net flows which are necessary
     in FlowSortGDSS method.
-
-    :param dms_profiles_partial_preferences: List of partial preferences profiles vs alternatives.
-     MultiIndex: DM, criterion, profile; Column: alternative
-    :param dms_alternatives_partial_preferences: List of partial preferences alternatives vs profiles.
-     Nesting order: DM, criterion, alternative, profile
+    :param dms_partial_preferences: List of partial preferences alternatives vs preferences.
     :param dms_profile_vs_profile_partial_preferences: DataFrame with partial preferences profiles vs profiles
      between any DM. Nesting order: DM, criterion, profile_i, profile_j
     :param criteria_weights: List of numeric value weights for each criterion
@@ -135,6 +130,10 @@ def calculate_gdss_flows(dms_profiles_partial_preferences: List[pd.DataFrame],  
     :return: alternatives general net flows(List of net flows for each alternative) \
     and profiles general net flows(3D List of net flows for each alternative, DM and category_profile)
     """
+    dms_alternatives_partial_preferences, dms_profiles_partial_preferences = zip(*dms_partial_preferences)
+    dms_profiles_partial_preferences = list(dms_profiles_partial_preferences)
+    dms_alternatives_partial_preferences = list(dms_alternatives_partial_preferences)
+
     multiple_dm_criteria_net_flows_validation(dms_profiles_partial_preferences,
                                               dms_alternatives_partial_preferences,
                                               dms_profile_vs_profile_partial_preferences,
