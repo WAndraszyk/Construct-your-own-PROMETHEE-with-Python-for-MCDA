@@ -25,22 +25,23 @@ Alternatives Profiles:
 
 Rankings:
 - M14_PrometheeIRanking :heavy_check_mark:
-- M15_PrometheeIIIRanking :heavy_check_mark:
-- M16_NetFlowScoreIterative :heavy_check_mark:
+- M15_PrometheeIIRanking :heavy_check_mark:
+- M16_PrometheeIIIRanking :heavy_check_mark:
+- M17_NetFlowScoreIterative :heavy_check_mark:
 
 Sorting:
-- M17_PromSort :heavy_check_mark:
-- M18_PrometheeTri :heavy_check_mark:
-- M19_FlowSortI :heavy_check_mark:
-- M20_FlowSortII :heavy_check_mark:
-- M21_FlowSortGDSS :heavy_check_mark:
-- M22_GroupClassAcceptabilities :heavy_check_mark:
+- M18_PromSort :heavy_check_mark:
+- M19_PrometheeTri :heavy_check_mark:
+- M20_FlowSortI :heavy_check_mark:
+- M21_FlowSortII :heavy_check_mark:
+- M22_FlowSortGDSS :heavy_check_mark:
+- M23_GroupClassAcceptabilities :heavy_check_mark:
 
 Choice:
-- M23_PrometheeV :heavy_check_mark:
+- M24_PrometheeV :heavy_check_mark:
 
 Clustering:
-- M24_OrderedClustering :heavy_check_mark:
-- M25_PrometheeIIOrderedClustering :heavy_check_mark:
-- M26_PrometheeCluster :heavy_check_mark:
-- M27_PClust :heavy_check_mark:
+- M25_OrderedClustering :heavy_check_mark:
+- M26_PrometheeIIOrderedClustering :heavy_check_mark:
+- M27_PrometheeCluster :heavy_check_mark:
+- M28_PClust :heavy_check_mark:

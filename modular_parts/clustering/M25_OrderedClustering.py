@@ -49,7 +49,9 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int) -> pd.Series:
                 _delete_node(graph, i)
                 deleted_nodes.append(i)
         clusters.append(cluster)
-    return pd.Series(clusters, name='Alternatives in clusters')
+    clusters_fin = pd.Series(clusters, name='Alternatives in clusters')
+    clusters_fin.index += 1
+    return clusters_fin
 
 
 def _search_max(preferences: List[List[NumericValue]]) -> Tuple[NumericValue, int, int]:
