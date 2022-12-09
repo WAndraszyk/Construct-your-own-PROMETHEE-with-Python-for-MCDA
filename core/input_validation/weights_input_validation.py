@@ -30,7 +30,8 @@ def _check_criteria_ranks(criteria_ranks: pd.Series):
         raise ValueError("Criteria ranks must start from rank 1")
 
 
-def srf_weights_validation(criteria_ranks: pd.Series, criteria_weight_ratio: NumericValue,
+def srf_weights_validation(criteria_ranks: pd.Series,
+                           criteria_weight_ratio: NumericValue,
                            decimal_place: int):
     """
     Validate input data for SRF weights calculation.
@@ -44,7 +45,8 @@ def srf_weights_validation(criteria_ranks: pd.Series, criteria_weight_ratio: Num
     _check_criteria_ranks(criteria_ranks)
 
 
-def surrogate_weights_validation(criteria_ranks: pd.Series, decimal_place: int):
+def surrogate_weights_validation(criteria_ranks: pd.Series,
+                                 decimal_place: int):
     """
    Validate input data for surrogate weights calculation.
    :param criteria_ranks: Series with ranks of criteria

@@ -40,7 +40,8 @@ def v_shape_criterion(d: NumericValue, p: NumericValue) -> NumericValue:
         return 1
 
 
-def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue) -> NumericValue:
+def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue
+                    ) -> NumericValue:
     """
     Returns: 0 for d<=q
              0.5 for q<d<=p
@@ -58,7 +59,8 @@ def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue) -> Numeri
         return 1
 
 
-def v_shape_indifference_criterion(d: NumericValue, p: NumericValue, q: NumericValue) -> NumericValue:
+def v_shape_indifference_criterion(d: NumericValue, p: NumericValue,
+                                   q: NumericValue) -> NumericValue:
     """
     Returns 0 if difference is less or equal to q, 1 if it is greater than p.
     Else it calculates the number between 0 and 1 based on the difference.
@@ -79,8 +81,10 @@ def gaussian_criterion(d: NumericValue, s: NumericValue) -> NumericValue:
     """
     Calculates preference based on nonlinear gaussian function.
 
-    :param s: intermediate value between q and p. Defines the inflection point of the preference function.
-    :param d: difference between two alternatives on a specified criterion
+    :param s: intermediate value between q and p. Defines the inflection
+    point of the preference function.
+    :param d: difference between two
+    alternatives on a specified criterion
     """
     e = math.e
     if d <= 0:

@@ -53,11 +53,11 @@ class GeneralCriterion(Enum):
 
 class InteractionType(Enum):
     """
-        The InteractionType class represents the type of interaction between two variables in a mathematical model.
-        It is an enumeration (Enum) with three possible values:
-            STN: represents a strengthening interaction,
-            WKN: represents a weakening interaction,
-            ANT: represents an antagonistic interaction.
+    The InteractionType class represents the type of interaction between
+    two variables in a mathematical model. It is an enumeration (Enum) with
+    three possible values: STN: represents a strengthening interaction,
+    WKN: represents a weakening interaction, ANT: represents an
+    antagonistic interaction.
     """
     STN = 2
     WKN = 1

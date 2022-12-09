@@ -5,12 +5,12 @@ from core.aliases import NumericValue
 
 class Relation(Enum):
     """
-        The Relation class represents a mathematical comparison operator,
-        such as equality (=), greater than or equal (>=), or less than or equal(<=).
-        It is an enumeration (Enum) with three possible values:
-            EQ: represents the equality operator (=),
-            GEQ: represents the greater than or equal operator (>=),
-            LEQ: represents the less than or equal operator (<=).
+    The Relation class represents a mathematical comparison operator,
+    such as equality (=), greater than or equal (>=), or less than or
+    equal(<=). It is an enumeration (Enum) with three possible values: EQ:
+    represents the equality operator (=), GEQ: represents the greater than
+    or equal operator (>=), LEQ: represents the less than or equal operator
+    (<=).
     """
     EQ = 1
     GEQ = 2
@@ -19,11 +19,12 @@ class Relation(Enum):
 
 class Constraint:
     """
-        The Constraint class represents a mathematical constraint of the form A relation b,
-        where A is a list of multipliers, relation is a comparison operator (e.g. <, >=, etc.),
-        and b is a constant value.
+    The Constraint class represents a mathematical constraint of the form A
+    relation b, where A is a list of multipliers, relation is a comparison
+    operator (e.g. <, >=, etc.), and b is a constant value.
     """
-    def __init__(self, A: List[NumericValue], relation: Relation, b: NumericValue):
+    def __init__(self, A: List[NumericValue], relation: Relation,
+                 b: NumericValue):
         """
         :param A: list of multipliers of left side of the condition
         :param relation: relation between left and right side of the condition

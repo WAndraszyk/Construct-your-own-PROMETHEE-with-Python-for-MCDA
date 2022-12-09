@@ -20,7 +20,8 @@ class Graph:
         """
         self.graph[u].append(v)
 
-    def __is_cyclic_util__(self, v: int, visited: List[bool], recStack: List[bool]):
+    def __is_cyclic_util__(self, v: int, visited: List[bool],
+                           recStack: List[bool]):
         """
             Checks for a given vertex if a cycle occurs.
         """
@@ -69,7 +70,8 @@ class Graph:
 
         return ans
 
-    def __dfs__(self, node: int, adj: defaultdict[Any, list], dp: List[NumericValue], vis: List[bool]):
+    def __dfs__(self, node: int, adj: defaultdict[Any, list],
+                dp: List[NumericValue], vis: List[bool]):
         """
             Depth-first search (DFS) algorithm.
         """

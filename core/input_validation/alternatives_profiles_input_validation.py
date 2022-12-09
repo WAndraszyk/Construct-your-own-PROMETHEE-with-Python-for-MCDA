@@ -1,15 +1,18 @@
 import pandas as pd
 
-__all__ = ["alternatives_profiles_validation", "_check_weights", "_check_partial_preferences"]
+__all__ = ["alternatives_profiles_validation", "_check_weights",
+           "_check_partial_preferences"]
 
 
 # M10
 def _check_weights(weights: pd.Series, criteria_num: int):
     if not isinstance(weights, pd.Series):
-        raise ValueError("Criteria weights should be passed as a Series object")
+        raise ValueError("Criteria weights should be passed as a"
+                         " Series object")
 
     if len(weights) != criteria_num:
-        raise ValueError("Number of weights should be equals to number of criteria")
+        raise ValueError("Number of weights should be equals "
+                         "to number of criteria")
 
     for weight in weights:
         if not isinstance(weight, (int, float)):
@@ -21,15 +24,19 @@ def _check_weights(weights: pd.Series, criteria_num: int):
 
 def _check_partial_preferences(partial_preferences: pd.DataFrame):
     if not isinstance(partial_preferences, pd.DataFrame):
-        raise ValueError("Partial preferences should be passed as a DataFrame object")
+        raise ValueError("Partial preferences should be passed"
+                         " as a DataFrame object")
 
 
-def _check_criteria(criteria_from_series: pd.Index, criteria_from_df: pd.Index):
+def _check_criteria(criteria_from_series: pd.Index,
+                    criteria_from_df: pd.Index):
     if not criteria_from_series.equals(criteria_from_df):
-        raise ValueError("Criteria defined in criteria weights should be the same as in partial preferences")
+        raise ValueError("Criteria defined in criteria weights should be "
+                         "the same as in partial preferences")
 
 
-def alternatives_profiles_validation(criteria_weights: pd.Series, partial_preferences: pd.DataFrame):
+def alternatives_profiles_validation(criteria_weights: pd.Series,
+                                     partial_preferences: pd.DataFrame):
     criteria_from_df = partial_preferences.index.get_level_values(0).unique()
     criteria_from_series = criteria_weights.index
 
