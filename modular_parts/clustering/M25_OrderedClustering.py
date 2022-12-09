@@ -8,9 +8,11 @@ import pandas as pd
 __all__ = ["group_into_ordered_clusters"]
 
 
-def group_into_ordered_clusters(preferences: pd.DataFrame, k: int) -> pd.Series:
+def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
+                                ) -> pd.Series:
     """
-    Divides alternatives into k ordered clusters based on the preference indices matrix.
+    Divides alternatives into k ordered clusters based on the preference
+    indices matrix.
 
     :param preferences: preference indices of alternatives over alternatives
     :param k: number of clusters
@@ -54,7 +56,8 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int) -> pd.Series:
     return clusters_fin
 
 
-def _search_max(preferences: List[List[NumericValue]]) -> Tuple[NumericValue, int, int]:
+def _search_max(preferences: List[List[NumericValue]]
+                ) -> Tuple[NumericValue, int, int]:
     max_pi = 0
     pi_i = 0
     pi_j = 0

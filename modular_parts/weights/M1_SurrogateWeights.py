@@ -1,6 +1,7 @@
 """
 This module computes weights of criteria. It requires the user to specify the
-criteria ranking. In this ranking each criterion is associated with a rank which represents its importance.
+criteria ranking. In this ranking each criterion is associated with a rank
+which represents its importance.
 The lowest and rank is 1, and it represents the highest importance.
 """
 from pandas import Series
@@ -21,7 +22,8 @@ def surrogate_weights(ranked_criteria: pd.Series, method: SurrogateMethod,
 
     :param ranked_criteria: criteria with according ranks
     :param method: chosen method of calculating weights
-    :param decimal_place: with this you can choose the decimal_place of the output numbers
+    :param decimal_place: with this you can choose the decimal_place of the
+     output numbers
     :return: Criteria with weights
     """
 
@@ -31,12 +33,14 @@ def surrogate_weights(ranked_criteria: pd.Series, method: SurrogateMethod,
 
         :return: Criteria with weights
         """
-        rank_summed = rc.replace([i + 1 for i in range(len(weights))], weights)
+        rank_summed = rc.replace([i + 1 for i in range(len(weights))],
+                                 weights)
         return criteria_series(rank_summed.index, rank_summed.values)
 
     def equal_weights(rc: pd.Series, dp: NumericValue = 3) -> pd.Series:
         """
-        In this method all weights are computed with the same value and sum up to 1.
+        In this method all weights are computed with the same value and sum
+        up to 1.
 
         :return: Criteria with weights
         """
@@ -49,7 +53,8 @@ def surrogate_weights(ranked_criteria: pd.Series, method: SurrogateMethod,
 
     def rank_sum(rc: pd.Series, dp: NumericValue = 3) -> Series:
         """
-        In this method the more important the criterion is, the greater its weight.
+        In this method the more important the criterion is, the greater
+         its weight.
 
         :return: Criteria with weights
         """
@@ -61,7 +66,8 @@ def surrogate_weights(ranked_criteria: pd.Series, method: SurrogateMethod,
 
     def reciprocal_of_ranks(rc: pd.Series, dp: NumericValue = 3) -> Series:
         """
-        This method computes weights by dividing each reciprocal of rank by the sum of these
+        This method computes weights by dividing each reciprocal of rank by
+        the sum of these
         reciprocals for all criteria.
 
         :return: Criteria with weights
@@ -77,7 +83,8 @@ def surrogate_weights(ranked_criteria: pd.Series, method: SurrogateMethod,
 
     def rank_order_centroid(rc: pd.Series, dp: NumericValue = 3) -> Series:
         """
-        The weights in this method reflect the centroid of the simplex defined by ranking of
+        The weights in this method reflect the centroid of the simplex
+        defined by ranking of
         the criteria.
 
         :return: Criteria with weights

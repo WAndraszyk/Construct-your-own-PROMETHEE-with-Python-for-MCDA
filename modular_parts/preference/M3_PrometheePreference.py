@@ -6,58 +6,78 @@ import pandas as pd
 __all__ = ["compute_preference_indices"]
 
 
-def compute_preference_indices(alternatives_performances: pd.DataFrame, preference_thresholds: pd.Series,
-                               indifference_thresholds: pd.Series, standard_deviations: pd.Series,
-                               generalized_criteria: pd.Series, directions: pd.Series, weights: pd.Series,
+def compute_preference_indices(alternatives_performances: pd.DataFrame,
+                               preference_thresholds: pd.Series,
+                               indifference_thresholds: pd.Series,
+                               standard_deviations: pd.Series,
+                               generalized_criteria: pd.Series,
+                               directions: pd.Series,
+                               weights: pd.Series,
                                profiles_performance: pd.DataFrame = None,
                                decimal_place: NumericValue = 3) -> tuple:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences
     
-    :param alternatives_performances: Dataframe of alternatives' value at every criterion
+    :param alternatives_performances: Dataframe of alternatives' value at
+    every criterion
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
     :param standard_deviations: standard deviation for each criterion
     :param generalized_criteria: list of preference functions
     :param directions: directions of preference of criteria
     :param weights: criteria with weights
-    :param profiles_performance: Dataframe of profiles performance (value) at every criterion
-    :param decimal_place: with this you can choose the decimal_place of the output numbers
+    :param profiles_performance: Dataframe of profiles performance (value)
+    at every criterion
+    :param decimal_place: with this you can choose the decimal_place of the
+     output numbers
 
     :return: preferences
     :return: partial preferences
     """
-    promethee_preference_validation(alternatives_performances, preference_thresholds, indifference_thresholds,
-                                    standard_deviations, generalized_criteria, directions, weights,
-                                    profiles_performance, decimal_place)
+    promethee_preference_validation(alternatives_performances,
+                                    preference_thresholds,
+                                    indifference_thresholds,
+                                    standard_deviations,
+                                    generalized_criteria, directions,
+                                    weights, profiles_performance,
+                                    decimal_place)
 
     alternatives = alternatives_performances.index
     criteria = weights.index
 
-    alternatives_performances = pc.directed_alternatives_performances(alternatives_performances, directions)
+    alternatives_performances = pc.directed_alternatives_performances(
+        alternatives_performances, directions)
     if profiles_performance is not None:
         categories_profiles = profiles_performance.index
-        profile_performance_table = pc.directed_alternatives_performances(profiles_performance, directions)
+        profile_performance_table = pc.directed_alternatives_performances(
+            profiles_performance, directions)
     else:
         categories_profiles = None
         profile_performance_table = None
 
-    partialPref = pc.partial_preference(criteria=criteria, p_list=preference_thresholds,
-                                        q_list=indifference_thresholds, s_list=standard_deviations,
-                                        generalized_criteria=generalized_criteria,
-                                        categories_profiles=categories_profiles,
-                                        alternatives_performances=alternatives_performances,
-                                        profile_performance_table=profile_performance_table)
+    partialPref = pc.partial_preference(
+        criteria=criteria,
+        p_list=preference_thresholds,
+        q_list=indifference_thresholds,
+        s_list=standard_deviations,
+        generalized_criteria=generalized_criteria,
+        categories_profiles=categories_profiles,
+        alternatives_performances=alternatives_performances,
+        profile_performance_table=profile_performance_table)
     if categories_profiles is None:
-        return _preferences(weights, criteria, decimal_place, partialPref, alternatives), partialPref
+        return _preferences(weights, criteria, decimal_place, partialPref,
+                            alternatives), partialPref
     else:
-        return (_preferences(weights, criteria, decimal_place, partialPref[0], alternatives, categories_profiles),
-                _preferences(weights, criteria, decimal_place, partialPref[1], categories_profiles, alternatives)
+        return (_preferences(weights, criteria, decimal_place, partialPref[0],
+                             alternatives, categories_profiles),
+                _preferences(weights, criteria, decimal_place, partialPref[1],
+                             categories_profiles, alternatives)
                 ), partialPref
 
 
-def _preferences(weights: pd.Series, criteria: pd.Index, decimal_place: NumericValue, partialPref: pd.DataFrame,
+def _preferences(weights: pd.Series, criteria: pd.Index,
+                 decimal_place: NumericValue, partialPref: pd.DataFrame,
                  i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
     weight_sum = sum(weights.values)
     if j_iter is None:

@@ -7,7 +7,8 @@ import pandas as pd
 __all__ = ["compute_decision"]
 
 
-def compute_decision(flows: pd.Series, constraints: List[Constraint]) -> pd.Series:
+def compute_decision(flows: pd.Series, constraints: List[Constraint]
+                     ) -> pd.Series:
     """
     Computes decision by solving a linear problem.
 
