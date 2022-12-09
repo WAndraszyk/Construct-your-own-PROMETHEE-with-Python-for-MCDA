@@ -1,24 +1,26 @@
 from collections import defaultdict
+from typing import List, Any
+from core.aliases import NumericValue
 
 
 class Graph:
     """
         The Graph class represents a directed graph data structure
     """
-    def __init__(self, vertices):
+    def __init__(self, vertices: int):
         """
             Constructs a new Graph instance with the given number of vertices.
         """
         self.graph = defaultdict(list)
         self.V = vertices
 
-    def add_edge(self, u, v):
+    def add_edge(self, u: int, v: int):
         """
             Adds a directed edge from vertex u to vertex v in the graph.
         """
         self.graph[u].append(v)
 
-    def __is_cyclic_util__(self, v, visited, recStack):
+    def __is_cyclic_util__(self, v: int, visited: List[bool], recStack: List[bool]):
         """
             Checks for a given vertex if a cycle occurs.
         """
@@ -67,7 +69,7 @@ class Graph:
 
         return ans
 
-    def __dfs__(self, node, adj, dp, vis):
+    def __dfs__(self, node: int, adj: defaultdict[Any, list], dp: List[NumericValue], vis: List[bool]):
         """
             Depth-first search (DFS) algorithm.
         """
