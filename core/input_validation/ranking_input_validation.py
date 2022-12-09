@@ -2,7 +2,8 @@ from enum import Enum
 
 import pandas as pd
 
-__all__ = ["promethee_i_ranking_validation", "promethee_iii_ranking_validation", "net_flow_score_iterative_validation"]
+__all__ = ["promethee_i_ranking_validation", "promethee_iii_ranking_validation", "net_flow_score_iterative_validation",
+           "promethee_ii_ranking_validation"]
 
 from core.aliases import NumericValue
 # M11
@@ -13,6 +14,19 @@ from core.input_validation.preference_input_validation import _check_decimal_pla
 def _check_weak_preference(weak_pref: bool):
     if not isinstance(weak_pref, bool):
         raise ValueError("Weak preference parameter should have value True or False")
+
+
+def _check_net_flowsII(net_flows: pd.DataFrame):
+    if not isinstance(net_flows, pd.DataFrame):
+        raise TypeError(f"Net Flows should be passed as a DataFrame object")
+    if 'net' not in net_flows.columns:
+        raise ValueError(f'No "net" flow in given DataFrame columns')
+    if net_flows['net'].dtype not in ['int64', 'float64']:
+        raise ValueError(f"Net Flow should be passed with numeric values")
+
+
+def promethee_ii_ranking_validation(net_flow: pd.DataFrame):
+    _check_net_flowsII(net_flow)
 
 
 def promethee_i_ranking_validation(flows: pd.DataFrame, weak_preference: bool):
