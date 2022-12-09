@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List, Any
+from typing import List, Any, DefaultDict
 from core.aliases import NumericValue
 
 
@@ -70,7 +70,7 @@ class Graph:
 
         return ans
 
-    def __dfs__(self, node: int, adj: defaultdict[Any, list],
+    def __dfs__(self, node: int, adj: DefaultDict[Any, list],
                 dp: List[NumericValue], vis: List[bool]):
         """
             Depth-first search (DFS) algorithm.
