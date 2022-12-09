@@ -5,6 +5,7 @@ from modular_parts.preference import compute_preference_indices
 from core.enums import SurrogateMethod, GeneralCriterion, Direction
 from modular_parts.weights import surrogate_weights
 
+
 @pytest.fixture
 def criteria():
     return ['g1', 'g2', 'g3', 'g4', 'g5', 'g6']
@@ -25,7 +26,8 @@ def alternatives_performances(alternatives, criteria):
         [52, 72, 6, 2.0, 3, 8],
         [94, 96, 7, 3.6, 5, 6]
     ]
-    return pd.DataFrame(data=performances, index=alternatives, columns=criteria)
+    return pd.DataFrame(data=performances, index=alternatives,
+                        columns=criteria)
 
 
 @pytest.fixture
@@ -48,7 +50,8 @@ def standard_deviations(criteria):
 
 @pytest.fixture
 def generalized_criteria(criteria):
-    generalized_criterion = [GeneralCriterion.U_SHAPE, GeneralCriterion.V_SHAPE,
+    generalized_criterion = [GeneralCriterion.U_SHAPE,
+                             GeneralCriterion.V_SHAPE,
                              GeneralCriterion.V_SHAPE_INDIFFERENCE,
                              GeneralCriterion.LEVEL, GeneralCriterion.USUAL,
                              GeneralCriterion.GAUSSIAN]
@@ -57,32 +60,42 @@ def generalized_criteria(criteria):
 
 @pytest.fixture
 def criteria_directions(criteria):
-    criteria_directions = [Direction.MIN, Direction.MAX, Direction.MIN, Direction.MIN, Direction.MIN, Direction.MAX]
+    criteria_directions = [Direction.MIN, Direction.MAX, Direction.MIN,
+                           Direction.MIN, Direction.MIN, Direction.MAX]
     return pd.Series(data=criteria_directions, index=criteria)
 
 
 @pytest.fixture
 def weights(criteria):
-    return surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
+    return surrogate_weights(
+        pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria),
+        SurrogateMethod.EW)
 
 
-def test_preference(criteria, alternatives, alternatives_performances, preference_thresholds, weights,
-                     indifference_thresholds, standard_deviations, generalized_criteria, criteria_directions):
+def test_preference(criteria, alternatives, alternatives_performances,
+                    preference_thresholds, weights,
+                    indifference_thresholds, standard_deviations,
+                    generalized_criteria, criteria_directions):
     expected = pd.DataFrame(data=[[0.000, 0.296, 0.250, 0.268, 0.100, 0.185],
                                   [0.462, 0.000, 0.389, 0.333, 0.296, 0.500],
                                   [0.236, 0.180, 0.000, 0.333, 0.056, 0.429],
                                   [0.399, 0.505, 0.305, 0.000, 0.223, 0.212],
                                   [0.444, 0.515, 0.487, 0.380, 0.000, 0.448],
-                                  [0.286, 0.399, 0.250, 0.432, 0.133, 0.000]], columns=alternatives, index=alternatives)
+                                  [0.286, 0.399, 0.250, 0.432, 0.133, 0.000]],
+                            columns=alternatives, index=alternatives)
 
-    actual, _ = compute_preference_indices(alternatives_performances, preference_thresholds,
-                                            indifference_thresholds, standard_deviations,
-                                            generalized_criteria,
-                                            criteria_directions, weights)
+    actual, _ = compute_preference_indices(alternatives_performances,
+                                           preference_thresholds,
+                                           indifference_thresholds,
+                                           standard_deviations,
+                                           generalized_criteria,
+                                           criteria_directions, weights)
 
     assert_frame_equal(actual, expected, atol=0.006)
 
 
 if __name__ == '__main__':
-    test_preference(criteria, alternatives, alternatives_performances, preference_thresholds, weights,
-                     indifference_thresholds, standard_deviations, generalized_criteria, criteria_directions)
+    test_preference(criteria, alternatives, alternatives_performances,
+                    preference_thresholds, weights,
+                    indifference_thresholds, standard_deviations,
+                    generalized_criteria, criteria_directions)

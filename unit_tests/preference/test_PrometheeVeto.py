@@ -45,7 +45,8 @@ def standard_deviations(criteria):
 
 @pytest.fixture
 def generalized_criteria(criteria):
-    generalized_criteria_list = [GeneralCriterion.U_SHAPE, GeneralCriterion.V_SHAPE]
+    generalized_criteria_list = [GeneralCriterion.U_SHAPE,
+                                 GeneralCriterion.V_SHAPE]
     return pd.Series(data=generalized_criteria_list, index=criteria)
 
 
@@ -67,39 +68,51 @@ def vetoes(criteria):
     return pd.Series(data=veto_thresholds, index=criteria)
 
 
-def test_veto_preference(alternatives, alternatives_performances, weights, vetoes, directions):
+def test_veto_preference(alternatives, alternatives_performances, weights,
+                         vetoes, directions):
     data = [[0, 0, 1, 0, 0],
             [0, 0, 1, 0, 0],
             [1, 0, 0, 0, 1],
             [1, 0, 1, 0, 1],
             [0, 1, 1, 1, 0]]
-    expected = pd.DataFrame(data=data, columns=alternatives, index=alternatives)
-    actual, _ = compute_veto(alternatives_performances=alternatives_performances, weights=weights,
-                             veto_thresholds=vetoes,
-                             directions=directions)
+    expected = pd.DataFrame(data=data, columns=alternatives,
+                            index=alternatives)
+    actual, _ = compute_veto(
+        alternatives_performances=alternatives_performances, weights=weights,
+        veto_thresholds=vetoes,
+        directions=directions)
 
     assert_frame_equal(actual, expected, atol=0.006)
 
 
-def test_overall_preference(alternatives, alternatives_performances, weights, preference_thresholds,
-                            indifference_thresholds, standard_deviations, generalized_criteria, vetoes,
+def test_overall_preference(alternatives, alternatives_performances, weights,
+                            preference_thresholds,
+                            indifference_thresholds, standard_deviations,
+                            generalized_criteria, vetoes,
                             directions):
-    preference, _ = compute_preference_indices(alternatives_performances, preference_thresholds,
-                                               indifference_thresholds, standard_deviations,
+    preference, _ = compute_preference_indices(alternatives_performances,
+                                               preference_thresholds,
+                                               indifference_thresholds,
+                                               standard_deviations,
                                                generalized_criteria,
                                                directions, weights)
     expected = pd.DataFrame(data=[[0.000, 0.333, 0.000, 0.333, 1.000],
                                   [0.667, 0.000, 0.000, 0.333, 0.667],
                                   [0.000, 0.667, 0.000, 0.667, 0.000],
                                   [0.000, 0.000, 0.000, 0.000, 0.000],
-                                  [0.000, 0.000, 0.000, 0.000, 0.000]], columns=alternatives, index=alternatives)
-    actual = compute_veto(alternatives_performances=alternatives_performances, weights=weights, veto_thresholds=vetoes,
+                                  [0.000, 0.000, 0.000, 0.000, 0.000]],
+                            columns=alternatives, index=alternatives)
+    actual = compute_veto(alternatives_performances=alternatives_performances,
+                          weights=weights, veto_thresholds=vetoes,
                           directions=directions, preferences=preference)
 
     assert_frame_equal(actual, expected, atol=0.006)
 
 
 if __name__ == '__main__':
-    test_veto_preference(alternatives, alternatives_performances, weights, vetoes, directions)
-    test_overall_preference(alternatives, alternatives_performances, weights, preference_thresholds,
-                            indifference_thresholds, standard_deviations, generalized_criteria, vetoes, directions)
+    test_veto_preference(alternatives, alternatives_performances, weights,
+                         vetoes, directions)
+    test_overall_preference(alternatives, alternatives_performances, weights,
+                            preference_thresholds,
+                            indifference_thresholds, standard_deviations,
+                            generalized_criteria, vetoes, directions)

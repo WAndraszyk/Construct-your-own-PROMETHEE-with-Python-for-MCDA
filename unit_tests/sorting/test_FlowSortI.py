@@ -17,15 +17,18 @@ def categories():
 def category_profiles_performances():
     profiles = [f"r{i}" for i in range(1, 6)]
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.DataFrame([[0, 0, 0, 0, 0], [25, 25, 25, 25, 25], [50, 50, 50, 50, 50],
-                         [75, 75, 75, 75, 75], [100, 100, 100, 100, 100]],
-                        index=profiles, columns=criteria)
+    return pd.DataFrame(
+        [[0, 0, 0, 0, 0], [25, 25, 25, 25, 25], [50, 50, 50, 50, 50],
+         [75, 75, 75, 75, 75], [100, 100, 100, 100, 100]],
+        index=profiles, columns=criteria)
 
 
 @pytest.fixture
 def criteria_directions():
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.Series([Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX], index=criteria)
+    return pd.Series(
+        [Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX,
+         Direction.MAX], index=criteria)
 
 
 @pytest.fixture
@@ -51,17 +54,21 @@ def comparison_with_profiles():
     return CompareProfiles.LIMITING_PROFILES
 
 
-def test(categories, category_profiles_performances, criteria_directions, alternatives_flows,
+def test(categories, category_profiles_performances, criteria_directions,
+         alternatives_flows,
          category_profiles_flows, comparison_with_profiles):
-    actual_classification = calculate_flowsortI_sorted_alternatives(categories, category_profiles_performances,
-                                                                    criteria_directions, alternatives_flows,
-                                                                    category_profiles_flows, comparison_with_profiles)
+    actual_classification = calculate_flowsortI_sorted_alternatives(
+        categories, category_profiles_performances,
+        criteria_directions, alternatives_flows,
+        category_profiles_flows, comparison_with_profiles)
 
-    expected_classification = pd.DataFrame({'worse': ['C1', 'C1', 'C1'], 'better': ['C2', 'C1', 'C2']},
-                                           index=alternatives_flows.index)
+    expected_classification = pd.DataFrame(
+        {'worse': ['C1', 'C1', 'C1'], 'better': ['C2', 'C1', 'C2']},
+        index=alternatives_flows.index)
     assert_frame_equal(expected_classification, actual_classification)
 
 
 if __name__ == '__main__':
-    test(categories, category_profiles_performances, criteria_directions, alternatives_flows,
+    test(categories, category_profiles_performances, criteria_directions,
+         alternatives_flows,
          category_profiles_flows, comparison_with_profiles)

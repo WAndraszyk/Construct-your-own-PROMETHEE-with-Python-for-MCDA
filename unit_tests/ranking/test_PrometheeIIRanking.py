@@ -18,7 +18,8 @@ def net_outranking_flows():
 
 
 def test_prometheeII_ranking(net_outranking_flows):
-    expected = pd.Series(data=['a4', 'a2', 'a5', 'a1', 'a3', 'a6'], index=[1, 2, 3, 4, 5, 6], name='ranking')
+    expected = pd.Series(data=['a4', 'a2', 'a5', 'a1', 'a3', 'a6'],
+                         index=[1, 2, 3, 4, 5, 6], name='ranking')
     actual = calculate_promethee_ii_ranking(net_outranking_flows)
     assert_series_equal(expected, actual, atol=0.006)
 

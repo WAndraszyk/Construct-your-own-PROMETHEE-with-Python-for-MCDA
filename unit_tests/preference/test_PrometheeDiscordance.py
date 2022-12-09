@@ -1,7 +1,8 @@
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
-from modular_parts.preference import compute_preference_indices, compute_discordance
+from modular_parts.preference import compute_preference_indices, \
+    compute_discordance
 from core.enums import SurrogateMethod, GeneralCriterion, Direction
 from modular_parts.weights import surrogate_weights
 
@@ -26,7 +27,8 @@ def alternatives_performances(alternatives, criteria):
         [52, 72, 6, 2.0, 3, 8],
         [94, 96, 7, 3.6, 5, 6]
     ]
-    return pd.DataFrame(data=performances, index=alternatives, columns=criteria)
+    return pd.DataFrame(data=performances, index=alternatives,
+                        columns=criteria)
 
 
 @pytest.fixture
@@ -49,7 +51,8 @@ def standard_deviations(criteria):
 
 @pytest.fixture
 def generalized_criteria(criteria):
-    generalized_criterion = [GeneralCriterion.U_SHAPE, GeneralCriterion.V_SHAPE,
+    generalized_criterion = [GeneralCriterion.U_SHAPE,
+                             GeneralCriterion.V_SHAPE,
                              GeneralCriterion.V_SHAPE_INDIFFERENCE,
                              GeneralCriterion.LEVEL, GeneralCriterion.USUAL,
                              GeneralCriterion.GAUSSIAN]
@@ -58,19 +61,26 @@ def generalized_criteria(criteria):
 
 @pytest.fixture
 def criteria_directions(criteria):
-    criteria_directions = [Direction.MIN, Direction.MAX, Direction.MIN, Direction.MIN, Direction.MIN, Direction.MAX]
+    criteria_directions = [Direction.MIN, Direction.MAX, Direction.MIN,
+                           Direction.MIN, Direction.MIN, Direction.MAX]
     return pd.Series(data=criteria_directions, index=criteria)
 
 
 @pytest.fixture
 def weights(criteria):
-    return surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
+    return surrogate_weights(
+        pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria),
+        SurrogateMethod.EW)
 
 
-def test_discordance(criteria, alternatives, alternatives_performances, preference_thresholds, weights,
-                     indifference_thresholds, standard_deviations, generalized_criteria, criteria_directions):
-    _, partial = compute_preference_indices(alternatives_performances, preference_thresholds,
-                                            indifference_thresholds, standard_deviations,
+def test_discordance(criteria, alternatives, alternatives_performances,
+                     preference_thresholds, weights,
+                     indifference_thresholds, standard_deviations,
+                     generalized_criteria, criteria_directions):
+    _, partial = compute_preference_indices(alternatives_performances,
+                                            preference_thresholds,
+                                            indifference_thresholds,
+                                            standard_deviations,
                                             generalized_criteria,
                                             criteria_directions, weights)
 
@@ -79,28 +89,35 @@ def test_discordance(criteria, alternatives, alternatives_performances, preferen
                                   [1.000, 1.000, 0.000, 1.000, 1.000, 1.000],
                                   [0.728, 1.000, 1.000, 0.000, 1.000, 1.000],
                                   [0.368, 1.000, 0.184, 1.000, 0.000, 0.553],
-                                  [1.000, 1.000, 1.000, 1.000, 1.000, 0.000]], columns=alternatives, index=alternatives)
+                                  [1.000, 1.000, 1.000, 1.000, 1.000, 0.000]],
+                            columns=alternatives, index=alternatives)
 
     actual, _ = compute_discordance(criteria, partial, 3)
 
     assert_frame_equal(actual, expected, atol=0.006)
 
 
-def test_overall_preference(criteria, alternatives, alternatives_performances, preference_thresholds, weights,
-                            indifference_thresholds, standard_deviations, generalized_criteria, criteria_directions):
-    weights = surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
+def test_overall_preference(criteria, alternatives, alternatives_performances,
+                            preference_thresholds, weights,
+                            indifference_thresholds, standard_deviations,
+                            generalized_criteria, criteria_directions):
+    weights = surrogate_weights(
+        pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria),
+        SurrogateMethod.EW)
 
-    preference, partial = compute_preference_indices(alternatives_performances, preference_thresholds,
-                                                     indifference_thresholds, standard_deviations,
-                                                     generalized_criteria,
-                                                     criteria_directions, weights)
+    preference, partial = compute_preference_indices(
+        alternatives_performances, preference_thresholds,
+        indifference_thresholds, standard_deviations,
+        generalized_criteria,
+        criteria_directions, weights)
 
     expected = pd.DataFrame(data=[[0.000, 0.000, 0.000, 0.000, 0.000, 0.000],
                                   [0.000, 0.000, 0.186, 0.000, 0.000, 0.000],
                                   [0.000, 0.000, 0.000, 0.000, 0.000, 0.000],
                                   [0.109, 0.000, 0.000, 0.000, 0.000, 0.000],
                                   [0.281, 0.000, 0.397, 0.000, 0.000, 0.200],
-                                  [0.000, 0.000, 0.000, 0.000, 0.000, 0.000]], columns=alternatives, index=alternatives)
+                                  [0.000, 0.000, 0.000, 0.000, 0.000, 0.000]],
+                            columns=alternatives, index=alternatives)
 
     actual = compute_discordance(criteria, partial, 3, 3, preference)
 
@@ -108,5 +125,7 @@ def test_overall_preference(criteria, alternatives, alternatives_performances, p
 
 
 if __name__ == '__main__':
-    test_discordance(criteria, alternatives, alternatives_performances, preference_thresholds, weights,
-                     indifference_thresholds, standard_deviations, generalized_criteria, criteria_directions)
+    test_discordance(criteria, alternatives, alternatives_performances,
+                     preference_thresholds, weights,
+                     indifference_thresholds, standard_deviations,
+                     generalized_criteria, criteria_directions)

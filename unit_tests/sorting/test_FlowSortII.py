@@ -1,7 +1,7 @@
 import pytest
 import sys
 import pandas as pd
-from core.enums import CompareProfiles,Direction
+from core.enums import CompareProfiles, Direction
 from pandas.testing import assert_frame_equal
 from modular_parts.sorting import calculate_flowsortII_sorted_alternatives
 
@@ -22,24 +22,28 @@ def categories_central():
 def category_profiles_performances_limiting():
     profiles = [f"r{i}" for i in range(1, 6)]
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.DataFrame([[0, 0, 0, 0, 0], [25, 25, 25, 25, 25], [50, 50, 50, 50, 50],
-                         [75, 75, 75, 75, 75], [100, 100, 100, 100, 100]],
-                        index=profiles, columns=criteria)
+    return pd.DataFrame(
+        [[0, 0, 0, 0, 0], [25, 25, 25, 25, 25], [50, 50, 50, 50, 50],
+         [75, 75, 75, 75, 75], [100, 100, 100, 100, 100]],
+        index=profiles, columns=criteria)
 
 
 @pytest.fixture
 def category_profiles_performances_central():
     profiles = [f"r{i}" for i in range(1, 5)]
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.DataFrame([[10, 5, 10, 10, 15], [40, 35, 35, 30, 33], [56, 62, 58, 61, 52],
-                         [80, 90, 90, 75, 82]],
-                        index=profiles, columns=criteria)
+    return pd.DataFrame(
+        [[10, 5, 10, 10, 15], [40, 35, 35, 30, 33], [56, 62, 58, 61, 52],
+         [80, 90, 90, 75, 82]],
+        index=profiles, columns=criteria)
 
 
 @pytest.fixture
 def criteria_directions():
     criteria = [f"g{i}" for i in range(1, 6)]
-    return pd.Series([Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX], index=criteria)
+    return pd.Series(
+        [Direction.MAX, Direction.MAX, Direction.MAX, Direction.MAX,
+         Direction.MAX], index=criteria)
 
 
 @pytest.fixture
@@ -90,36 +94,48 @@ def prometheeII_flows_central():
                         index=flows_index)
 
 
-def test_flowsortII_limiting(categories_limiting, category_profiles_performances_limiting, criteria_directions,
+def test_flowsortII_limiting(categories_limiting,
+                             category_profiles_performances_limiting,
+                             criteria_directions,
                              prometheeII_flows_limiting):
-    actual_classification = calculate_flowsortII_sorted_alternatives(categories_limiting,
-                                                                     category_profiles_performances_limiting,
-                                                                     criteria_directions, prometheeII_flows_limiting,
-                                                                     CompareProfiles.LIMITING_PROFILES)
+    actual_classification = calculate_flowsortII_sorted_alternatives(
+        categories_limiting,
+        category_profiles_performances_limiting,
+        criteria_directions, prometheeII_flows_limiting,
+        CompareProfiles.LIMITING_PROFILES)
 
     alternatives = [f"a{i}" for i in range(1, 4)]
     expected_classification = pd.DataFrame({'positive': ['C2', 'C1', 'C2'],
                                             'negative': ['C2', 'C1', 'C3'],
-                                            'net': ['C2', 'C1', 'C3']}, index=alternatives)
+                                            'net': ['C2', 'C1', 'C3']},
+                                           index=alternatives)
     assert_frame_equal(actual_classification, expected_classification)
 
 
-def test_flowsortII_central(categories_central, category_profiles_performances_central, criteria_directions,
+def test_flowsortII_central(categories_central,
+                            category_profiles_performances_central,
+                            criteria_directions,
                             prometheeII_flows_central):
-    actual_classification = calculate_flowsortII_sorted_alternatives(categories_central,
-                                                                     category_profiles_performances_central,
-                                                                     criteria_directions, prometheeII_flows_central,
-                                                                     CompareProfiles.CENTRAL_PROFILES)
+    actual_classification = calculate_flowsortII_sorted_alternatives(
+        categories_central,
+        category_profiles_performances_central,
+        criteria_directions, prometheeII_flows_central,
+        CompareProfiles.CENTRAL_PROFILES)
 
     alternatives = [f"a{i}" for i in range(1, 4)]
     expected_classification = pd.DataFrame({'positive': ['C3', 'C1', 'C3'],
                                             'negative': ['C3', 'C1', 'C3'],
-                                            'net': ['C3', 'C1', 'C3']}, index=alternatives)
+                                            'net': ['C3', 'C1', 'C3']},
+                                           index=alternatives)
     assert_frame_equal(actual_classification, expected_classification)
 
 
 if __name__ == '__main__':
-    test_flowsortII_limiting(categories_limiting, category_profiles_performances_limiting, criteria_directions,
+    test_flowsortII_limiting(categories_limiting,
+                             category_profiles_performances_limiting,
+                             criteria_directions,
                              prometheeII_flows_limiting)
-    test_flowsortII_central(categories_central, category_profiles_performances_central, criteria_directions,
+    test_flowsortII_central(categories_central,
+                            category_profiles_performances_central,
+                            criteria_directions,
                             prometheeII_flows_central)

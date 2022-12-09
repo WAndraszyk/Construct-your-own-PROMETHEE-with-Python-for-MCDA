@@ -16,14 +16,16 @@ def preferences(alternatives):
                          [0.5586, 0.23632, 0, 0.05462, 0.04697, 0.44973],
                          [0.92353, 0.56030, 0.36767, 0, 0.39967, 0.79555],
                          [0.52386, 0.22617, 0.03683, 0.07647, 0, 0.43958],
-                         [0.12798, 0.02185, 0, 0.03277, 0, 0]], index=alternatives, columns=alternatives)
+                         [0.12798, 0.02185, 0, 0.03277, 0, 0]],
+                        index=alternatives, columns=alternatives)
 
 
 @pytest.fixture
 def flows(alternatives):
-    return pd.DataFrame({'positive': [0.20756, 0.60942, 1.34350, 3.04672, 1.30291, 0.18260],
-                         'negative': [2.49446, 1.11018, 0.42635, 0.25125, 0.44664, 1.96382]
-                         }, index=alternatives)
+    return pd.DataFrame(
+        {'positive': [0.20756, 0.60942, 1.34350, 3.04672, 1.30291, 0.18260],
+         'negative': [2.49446, 1.11018, 0.42635, 0.25125, 0.44664, 1.96382]
+         }, index=alternatives)
 
 
 def test_promethee_iii_ranking(flows, preferences, alternatives):
@@ -32,13 +34,15 @@ def test_promethee_iii_ranking(flows, preferences, alternatives):
                                       [0.509, 1.326],
                                       [1.622, 3.969],
                                       [0.471, 1.241],
-                                      [-2.537, -1.025]], index=alternatives, columns=["x", "y"])
+                                      [-2.537, -1.025]], index=alternatives,
+                                     columns=["x", "y"])
     expected_pairs = pd.DataFrame([['I', '?', '?', '?', '?', 'I'],
                                    ['P', 'I', '?', '?', '?', 'P'],
                                    ['P', 'P', 'I', '?', 'I', 'P'],
                                    ['P', 'P', 'P', 'I', 'P', 'P'],
                                    ['P', 'P', 'I', '?', 'I', 'P'],
-                                   ['I', '?', '?', '?', '?', 'I']], index=alternatives, columns=alternatives)
+                                   ['I', '?', '?', '?', '?', 'I']],
+                                  index=alternatives, columns=alternatives)
 
     interval, pairs = calculate_promethee_iii_ranking(flows, preferences, 0.5)
 
