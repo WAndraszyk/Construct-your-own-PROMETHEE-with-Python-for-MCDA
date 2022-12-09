@@ -6,15 +6,15 @@ from core.aliases import NumericValue
 class Relation(Enum):
     """
         The Relation class represents a mathematical comparison operator,
-        such as equality (=), greater than (>), or less than (<).
+        such as equality (=), greater than or equal (>=), or less than or equal(<=).
         It is an enumeration (Enum) with three possible values:
             EQ: represents the equality operator (=),
-            MT: represents the greater than operator (>),
-            LT: represents the less than operator (<).
+            GEQ: represents the greater than or equal operator (>=),
+            LEQ: represents the less than or equal operator (<=).
     """
     EQ = 1
-    MT = 2
-    LT = 3
+    GEQ = 2
+    LEQ = 3
 
 
 class Constraint:

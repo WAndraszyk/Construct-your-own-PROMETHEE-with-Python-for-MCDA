@@ -47,9 +47,9 @@ def check_constraint(constraint: Constraint, combination: Tuple[int]) -> bool:
     """
     if constraint.relation == Relation.EQ:
         return np.dot(combination, constraint.A) == constraint.b
-    elif constraint.relation == Relation.MT:
+    elif constraint.relation == Relation.GEQ:
         return np.dot(combination, constraint.A) >= constraint.b
-    elif constraint.relation == Relation.LT:
+    elif constraint.relation == Relation.LEQ:
         return np.dot(combination, constraint.A) <= constraint.b
     else:
         raise ValueError("Wrong relation operator")

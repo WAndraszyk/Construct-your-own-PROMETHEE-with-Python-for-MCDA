@@ -22,7 +22,7 @@ def _check_constraint(constraint: Constraint):
             if not isinstance(i, (int, float)):
                 raise TypeError("Multipliers should be passed as a list of numeric values")
 
-    if constraint.relation not in [Relation.EQ, Relation.LT, Relation.MT]:
+    if constraint.relation not in [Relation.EQ, Relation.LEQ, Relation.GEQ]:
         raise TypeError("Relation should be passed as a Relation Enum")
 
     if not isinstance(constraint.b, (int, float)):

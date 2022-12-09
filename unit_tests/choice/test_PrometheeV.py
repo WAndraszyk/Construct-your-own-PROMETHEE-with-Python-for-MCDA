@@ -18,7 +18,7 @@ def flows():
 @pytest.fixture
 def constraints():
     budget = [27, 29, 20, 34, 32, 22, 34, 30, 28, 21, 32, 37, 26, 16, 13, 32, 35, 20, 40, 39]
-    return [Constraint(budget, Relation.LT, 150)]
+    return [Constraint(budget, Relation.LEQ, 150)]
 
 
 def test_compute_decision(flows, constraints):
