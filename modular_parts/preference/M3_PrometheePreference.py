@@ -9,7 +9,7 @@ __all__ = ["compute_preference_indices"]
 def compute_preference_indices(alternatives_performances: pd.DataFrame,
                                preference_thresholds: pd.Series,
                                indifference_thresholds: pd.Series,
-                               standard_deviations: pd.Series,
+                               s_parameters: pd.Series,
                                generalized_criteria: pd.Series,
                                directions: pd.Series,
                                weights: pd.Series,
@@ -23,22 +23,20 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
     every criterion
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
-    :param standard_deviations: standard deviation for each criterion
+    :param s_parameters: s parameter for each criterion
     :param generalized_criteria: list of preference functions
     :param directions: directions of preference of criteria
     :param weights: criteria with weights
     :param profiles_performance: Dataframe of profiles performance (value)
     at every criterion
-    :param decimal_place: with this you can choose the decimal_place of the
-     output numbers
+    :param decimal_place: the decimal place of the output numbers
 
-    :return: preferences
-    :return: partial preferences
+    :return: preferences and partial preferences
     """
     promethee_preference_validation(alternatives_performances,
                                     preference_thresholds,
                                     indifference_thresholds,
-                                    standard_deviations,
+                                    s_parameters,
                                     generalized_criteria, directions,
                                     weights, profiles_performance,
                                     decimal_place)
@@ -60,7 +58,7 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
         criteria=criteria,
         p_list=preference_thresholds,
         q_list=indifference_thresholds,
-        s_list=standard_deviations,
+        s_list=s_parameters,
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
