@@ -1,3 +1,8 @@
+"""
+This module implements a way of calculating discordance indices which
+is a measure of the extent to which criterion j is discordant with aPjb using
+Promethee Discordance method.
+"""
 import pandas as pd
 from typing import Tuple, List, Union
 from core.aliases import NumericValue
@@ -13,7 +18,7 @@ def compute_discordance(criteria: List[str],
                         tau: NumericValue, decimal_place: NumericValue = 3,
                         preferences: Union[pd.DataFrame,
                                            Tuple[pd.DataFrame]] = None,
-                        categories_profiles: bool = False
+                        were_categories_profiles: bool = False
                         ) -> Union[
     Tuple[Union[pd.DataFrame, List[pd.DataFrame]], Union[
         pd.DataFrame, List[pd.DataFrame]]], pd.DataFrame, Tuple[
@@ -23,23 +28,23 @@ def compute_discordance(criteria: List[str],
 
     :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker
     discordance
-    :param decimal_place: with this you can choose the decimal_place of the
-    output numbers
-    :param preferences: if not empty function returns already calculated
+    :param decimal_place: the decimal place of the output numbers
+    :param preferences: if not None function returns already calculated
     preference instead of just discordance
-    :param criteria: list of criteria names
+    :param criteria: list of criteria
     :param partial_preferences: partial preference of every alternative
     over other alternatives or profiles
-    :param categories_profiles: were the preferences calculated for profiles
+    :param were_categories_profiles: were the preferences calculated
+    for profiles
 
     :return: matrix of overall discordance and matrix of partial discordance
      indices. Alternatively: preference
     """
 
     discordance_validation(criteria, partial_preferences, tau, decimal_place,
-                           preferences, categories_profiles)
+                           preferences, were_categories_profiles)
 
-    if not categories_profiles:
+    if not were_categories_profiles:
         partial_discordance = _calculate_partial_discordance(
             criteria, partial_preferences)
         discordance = _overall_discordance(criteria, partial_discordance, tau,
@@ -57,7 +62,7 @@ def compute_discordance(criteria: List[str],
 
     if preferences is not None:
         return overall_preference(preferences, discordance,
-                                  categories_profiles, decimal_place)
+                                  were_categories_profiles, decimal_place)
     else:
         return discordance, partial_discordance
 
@@ -69,9 +74,11 @@ def _calculate_partial_discordance(criteria: List[str],
     """
     Calculates partial discordance indices based on partial preference indices
 
+    :param criteria: list of criteria
     :param partial_preferences: partial preference of every alternative over 
-    other alternatives
-    or profiles
+    other alternatives or profiles
+    :param other_partial_preferences: partial preference of every alternative 
+    over other alternatives or profiles or None
 
     :returns: 3D matrix of partial discordance indices
     """

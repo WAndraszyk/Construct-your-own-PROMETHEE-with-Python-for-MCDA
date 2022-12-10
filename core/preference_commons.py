@@ -240,8 +240,7 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
         :param discordances: aggregated discordance/veto indices
         :param profiles: were the preferences and discordance/veto calculated
         with profiles
-        :param decimal_place: with this you can choose the decimal_place of
-        the output numbers
+        :param decimal_place: the decimal place of the output numbers
         :returns: overall preference indices
     """
     if profiles:
