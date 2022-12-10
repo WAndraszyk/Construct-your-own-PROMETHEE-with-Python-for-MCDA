@@ -1,3 +1,9 @@
+"""
+This module calculates preference indices with possibility of
+reinforcement, which means giving a bonus to an alternative which is
+significantly better on a given criterion than another alternative, using
+Promethee Reinforced Preference method.
+"""
 from typing import List, Tuple, Union
 from core.preference_commons import GeneralCriterion
 from core.aliases import NumericValue
@@ -30,24 +36,20 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
     :param alternatives_performances: Dataframe of alternatives' value at
     every criterion
     :param weights: criteria with weights
-    :param generalized_criteria: method used for computing partial preference
-    indices
+    :param generalized_criteria: list of preference functions
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
-    :param generalized_criteria: list of preference functions
     :param directions: directions of preference of criteria
     :param reinforced_preference_thresholds: list of reinforced preference
-    threshold for each criterion
-    :param reinforcement_factors: list of reinforcement factor for
+    thresholds for each criterion
+    :param reinforcement_factors: list of reinforcement factors for
      each criterion
     :param weights: criteria with weights
     :param profiles_performance: Dataframe of profiles performance (value)
      at every criterion
-    :param decimal_place: with this you can choose the decimal_place of
-    the output numbers
+    :param decimal_place: the decimal place of the output numbers
 
-    :return: preferences
-    :return: partial preferences
+    :return: preferences and partial preferences
     """
     reinforced_preference_validation(alternatives_performances,
                                      preference_thresholds,
@@ -106,11 +108,24 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
                                          List[List[int]]]]:
     """
     Calculates partial preference of every alternative over others
-    at every criterion
-    based on deviations using a method chosen by user. If deviation
-     is greater than
-    reinforced preference threshold than partial preference takes the value of
-    reinforcement factor.
+    at every criterion based on deviations using a method chosen by user.
+    If deviation is greater than reinforced preference threshold than partial
+    preference takes the value of reinforcement factor.
+
+    :param criteria: list of criteria
+    :param alternatives_performances: Dataframe of alternatives' value at
+    every criterion
+    :param generalized_criteria: list of preference functions
+    :param preference_thresholds: preference threshold for each criterion
+    :param indifference_thresholds: indifference threshold for each criterion
+    :param reinforced_preference_thresholds: list of reinforced preference
+    thresholds for each criterion
+    :param reinforcement_factors: list of reinforcement factors for
+     each criterion
+    :param profile_performance_table: Dataframe of profiles' value at
+    every criterion
+    :param categories_profiles: list of categories profiles
+
     :return: partial preference indices
     """
     deviations = pc.deviations(criteria, alternatives_performances,
@@ -153,6 +168,25 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
              deviations: List[List[List[NumericValue]]], i_iter: pd.DataFrame,
              j_iter: pd.DataFrame) -> Tuple[pd.DataFrame,
                                             List[List[List[int]]]]:
+    """
+    This function computes the preference indices for a given set of
+    alternatives and criteria.
+
+    :param criteria: list of criteria
+    :param preference_thresholds: preference thresholds
+    :param indifference_thresholds: indifference thresholds
+    :param reinforced_preference_thresholds: list of reinforced preference
+    thresholds for each criterion
+    :param reinforcement_factors: list of reinforcement factors for
+     each criterion
+    :param generalized_criteria: list of preference functions
+    :param deviations: list of calculated deviations
+    :param i_iter: alternatives or categories profiles performances
+    :param j_iter: alternatives or categories profiles performances
+    or None
+
+    :return: partial preference indices
+    """
     ppIndices = []
     FrpList = []
     for k in range(len(criteria)):
@@ -228,6 +262,19 @@ def _preferences(criteria: pd.Index, weights: pd.Series,
                                                 List[List[int]]],
                  i_perf: pd.DataFrame, j_perf: pd.DataFrame = None
                  ) -> pd.DataFrame:
+    """
+    Calculates aggregated preference indices.
+
+    :param weights: criteria with weights
+    :param criteria: list of criteria
+    :param reinforcement_factors: list of reinforcement factors
+    :param partialPref: partial preference indices
+    :param decimal_place: the decimal place of the output numbers
+    :param i_perf: alternatives or categories profiles performances
+    :param j_perf: alternatives or categories profiles performances or None
+
+    :return: aggregated preference indices
+    """
     i_iter = i_perf.index
     if j_perf is None:
         j_iter = i_iter

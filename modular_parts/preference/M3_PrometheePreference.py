@@ -21,7 +21,7 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
                                decimal_place: NumericValue = 3) -> tuple:
     """
     Calculates preference of every alternative over other alternatives
-    or profiles based on partial preferences
+    or profiles based on partial preferences.
     
     :param alternatives_performances: Dataframe of alternatives' value at
     every criterion
@@ -60,9 +60,9 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
 
     partialPref = pc.partial_preference(
         criteria=criteria,
-        p_list=preference_thresholds,
-        q_list=indifference_thresholds,
-        s_list=s_parameters,
+        preference_thresholds=preference_thresholds,
+        indifference_thresholds=indifference_thresholds,
+        s_parameters=s_parameters,
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,

@@ -35,10 +35,27 @@ def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
     """
         Compares alternatives on criteria.
 
+        :param criteria: list of criteria
+        :param alternatives_performances: 2D list of alternatives' value at
+        every criterion
+        :param profile_performance_table: Dataframe of profiles' value at
+        every criterion
         :return: 3D matrix of deviations in evaluations on criteria
     """
 
-    def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, n):
+    def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, n: int
+                 ) -> List[List[NumericValue]]:
+        """
+        Calculates deviation in performance between alternatives on
+        given criterion.
+
+        :param i_iter: alternatives or categories profiles performances
+        :param j_iter: alternatives or categories profiles performances
+        or None
+        :param n: criterion
+
+        :return: deviation
+        """
         for _, i in i_iter.iterrows():
             comparison_direct = []
             for _, j in j_iter.iterrows():
@@ -69,34 +86,47 @@ def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
     return deviations_list
 
 
-def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
-            s_list: pd.Series, generalized_criteria: pd.Series,
-            deviations_list: List[Union[List[List[NumericValue]],
-                                        List[List[List[NumericValue]]]]],
+def pp_deep(criteria: pd.Index, preference_thresholds: pd.Series,
+            indifference_thresholds: pd.Series,
+            s_parameters: pd.Series, generalized_criteria: pd.Series,
+            deviations: List[Union[List[List[NumericValue]],
+                                   List[List[List[NumericValue]]]]],
             i_iter: pd.DataFrame, j_iter: pd.DataFrame) -> pd.DataFrame:
     """
         This function computes the preference indices for a given set of
         alternatives and criteria.
+
+        :param criteria: list of criteria
+        :param preference_thresholds: preference thresholds
+        :param indifference_thresholds: indifference thresholds
+        :param s_parameters: s parameters
+        :param generalized_criteria: list of preference functions
+        :param deviations: list of calculated deviations
+        :param i_iter: alternatives or categories profiles performances
+        :param j_iter: alternatives or categories profiles performances
+        or None
+
+        :return: partial preference indices
     """
     ppIndices = []
     for k in range(len(criteria)):
         method = generalized_criteria[k]
-        q = q_list[k]
-        p = p_list[k]
-        s = s_list[k]
+        q = indifference_thresholds[k]
+        p = preference_thresholds[k]
+        s = s_parameters[k]
         criterionIndices = []
         for i in range(i_iter.shape[0]):
             alternativeIndices = []
             for j in range(j_iter.shape[0]):
                 if method is GeneralCriterion.USUAL:
                     alternativeIndices.append(gc.usual_criterion(
-                        deviations_list[k][i][j]))
+                        deviations[k][i][j]))
                 elif method is GeneralCriterion.U_SHAPE:
                     alternativeIndices.append(gc.u_shape_criterion(
-                        deviations_list[k][i][j], q))
+                        deviations[k][i][j], q))
                 elif method is GeneralCriterion.V_SHAPE:
                     alternativeIndices.append(gc.v_shape_criterion(
-                        deviations_list[k][i][j], p))
+                        deviations[k][i][j], p))
                 elif method is GeneralCriterion.LEVEL:
                     if q > p:
                         raise ValueError(
@@ -106,7 +136,7 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
                             + str(p)
                         )
                     alternativeIndices.append(gc.level_criterion(
-                        deviations_list[k][i][j], p, q))
+                        deviations[k][i][j], p, q))
                 elif method is GeneralCriterion.V_SHAPE_INDIFFERENCE:
                     if q > p:
                         raise ValueError(
@@ -117,10 +147,10 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
                         )
                     alternativeIndices.append(
                         gc.v_shape_indifference_criterion(
-                            deviations_list[k][i][j], p, q))
+                            deviations[k][i][j], p, q))
                 elif method is GeneralCriterion.GAUSSIAN:
                     alternativeIndices.append(gc.gaussian_criterion(
-                        deviations_list[k][i][j], s))
+                        deviations[k][i][j], s))
                 else:
                     raise ValueError(
                         "pref_func "
@@ -139,8 +169,9 @@ def pp_deep(criteria: pd.Index, p_list: pd.Series, q_list: pd.Series,
     return ppIndices
 
 
-def partial_preference(criteria: pd.Index, p_list: pd.Series,
-                       q_list: pd.Series, s_list: pd.Series,
+def partial_preference(criteria: pd.Index, preference_thresholds: pd.Series,
+                       indifference_thresholds: pd.Series,
+                       s_parameters: pd.Series,
                        generalized_criteria: pd.Series,
                        categories_profiles: pd.Index,
                        alternatives_performances: pd.DataFrame,
@@ -151,6 +182,18 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series,
         Calculates partial preference of every alternative over other
         alternatives or profiles at every criterion based on deviations
         using a method chosen by user.
+
+        :param criteria: list of criteria
+        :param preference_thresholds: preference thresholds
+        :param indifference_thresholds: indifference thresholds
+        :param s_parameters: s parameters
+        :param generalized_criteria: list of preference functions
+        :param alternatives_performances: Dataframe of alternatives' value at
+        every criterion
+        :param profile_performance_table: Dataframe of profiles' value at
+        every criterion
+        :param categories_profiles: list of categories profiles
+
         :return: partial preference indices
     """
 
@@ -160,20 +203,25 @@ def partial_preference(criteria: pd.Index, p_list: pd.Series,
                            profile_performance_table=profile_performance_table
                            )
     if categories_profiles is None:
-        ppIndices = pp_deep(deviations_list=deviation, criteria=criteria,
-                            p_list=p_list, q_list=q_list, s_list=s_list,
+        ppIndices = pp_deep(deviations=deviation, criteria=criteria,
+                            preference_thresholds=preference_thresholds,
+                            indifference_thresholds=indifference_thresholds,
+                            s_parameters=s_parameters,
                             i_iter=alternatives_performances,
                             j_iter=alternatives_performances,
                             generalized_criteria=generalized_criteria)
     else:
-        ppIndices = (pp_deep(deviations_list=deviation[0], criteria=criteria,
-                             p_list=p_list, q_list=q_list, s_list=s_list,
+        ppIndices = (pp_deep(deviations=deviation[0], criteria=criteria,
+                             preference_thresholds=preference_thresholds,
+                             indifference_thresholds=indifference_thresholds,
+                             s_parameters=s_parameters,
                              i_iter=alternatives_performances,
                              j_iter=profile_performance_table,
                              generalized_criteria=generalized_criteria),
-                     pp_deep(deviations_list=deviation[1], criteria=criteria,
-                             p_list=p_list,
-                             q_list=q_list, s_list=s_list,
+                     pp_deep(deviations=deviation[1], criteria=criteria,
+                             preference_thresholds=preference_thresholds,
+                             indifference_thresholds=indifference_thresholds,
+                             s_parameters=s_parameters,
                              i_iter=profile_performance_table,
                              j_iter=alternatives_performances,
                              generalized_criteria=generalized_criteria))
@@ -211,7 +259,7 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
     if type(overall_preferences) == tuple:
         for i in range(2):
             overall_preferences = \
-                overall_preferences[0].round(decimal_place),\
+                overall_preferences[0].round(decimal_place), \
                 overall_preferences[1].round(decimal_place)
     else:
         overall_preferences = overall_preferences.round(decimal_place)

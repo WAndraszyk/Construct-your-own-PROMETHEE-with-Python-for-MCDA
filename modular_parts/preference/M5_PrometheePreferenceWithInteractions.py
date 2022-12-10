@@ -68,8 +68,9 @@ def compute_preference_indices_with_interactions(
         profile_performance_table = None
 
     partialPref = pc.partial_preference(
-        criteria=criteria, p_list=preference_thresholds,
-        q_list=indifference_thresholds, s_list=standard_deviations,
+        criteria=criteria, preference_thresholds=preference_thresholds,
+        indifference_thresholds=indifference_thresholds,
+        s_parameters=standard_deviations,
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
