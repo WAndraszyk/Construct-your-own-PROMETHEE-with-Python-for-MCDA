@@ -75,7 +75,8 @@ def _calculate_sorted_alternatives(alternatives_performances: pd.DataFrame,
                                    standard_deviations: pd.Series,
                                    generalized_criteria: pd.Series,
                                    directions: pd.Series, weights: pd.Series,
-                                   profiles: pd.DataFrame):
+                                   profiles: pd.DataFrame) -> tuple[
+    pd.Series, pd.DataFrame]:
     """
     Calculates new partial preferences, applies PrometheeTri and redefines
     new clusters.
