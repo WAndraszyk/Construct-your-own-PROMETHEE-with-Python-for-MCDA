@@ -1,3 +1,7 @@
+"""
+This module implements the basic way of calculating preference indices with
+Promethee Preference method.
+"""
 from core.aliases import NumericValue
 import core.preference_commons as pc
 from core.input_validation import promethee_preference_validation
@@ -77,6 +81,18 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
 def _preferences(weights: pd.Series, criteria: pd.Index,
                  decimal_place: NumericValue, partialPref: pd.DataFrame,
                  i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
+    """
+    Calculates aggregated preference indices.
+
+    :param weights: criteria with weights
+    :param criteria: list of criteria
+    :param decimal_place: the decimal place of the output numbers
+    :param partialPref: partial preference indices
+    :param i_iter: alternatives or categories profiles
+    :param j_iter: alternatives or categories profiles or None
+
+    :return: aggregated preference indices
+    """
     weight_sum = sum(weights.values)
     if j_iter is None:
         j_iter = i_iter
