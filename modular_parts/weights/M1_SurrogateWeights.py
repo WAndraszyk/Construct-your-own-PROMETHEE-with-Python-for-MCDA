@@ -30,6 +30,9 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
         """
         This method assigns weights to according criteria.
 
+        :param rc: criteria ranks
+        :param weights: calculated weights
+
         :return: Criteria with weights
         """
         rank_summed = rc.replace([i + 1 for i in range(len(weights))],
@@ -40,6 +43,9 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
         """
         In this method all weights are computed with the same value and sum
         up to 1.
+
+        :param rc: criteria ranks
+        :param dp: decimal place
 
         :return: Criteria with weights
         """
@@ -53,7 +59,10 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
     def rank_sum(rc: pd.Series, dp: NumericValue = 3) -> pd.Series:
         """
         In this method the more important the criterion is, the greater
-         its weight.
+        its weight.
+
+        :param rc: criteria ranks
+        :param dp: decimal place
 
         :return: Criteria with weights
         """
@@ -66,8 +75,10 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
     def reciprocal_of_ranks(rc: pd.Series, dp: NumericValue = 3) -> pd.Series:
         """
         This method computes weights by dividing each reciprocal of rank by
-        the sum of these
-        reciprocals for all criteria.
+        the sum of these reciprocals for all criteria.
+
+        :param rc: criteria ranks
+        :param dp: decimal place
 
         :return: Criteria with weights
         """
@@ -83,8 +94,10 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
     def rank_order_centroid(rc: pd.Series, dp: NumericValue = 3) -> pd.Series:
         """
         The weights in this method reflect the centroid of the simplex
-        defined by ranking of
-        the criteria.
+        defined by ranking of the criteria.
+
+        :param rc: criteria ranks
+        :param dp: decimal place
 
         :return: Criteria with weights
         """
