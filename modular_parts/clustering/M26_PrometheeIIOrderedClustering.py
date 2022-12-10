@@ -55,6 +55,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
     def which_profile():
         return CompareProfiles.CENTRAL_PROFILES
 
+    profile_checker = which_profile()
     central_profiles = initialization_of_the_central_profiles(
         alternatives_performances, categories, directions)
     sorted = _sort_alternatives_to_categories(alternatives_performances,
@@ -64,7 +65,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                               generalized_criteria,
                                               directions, weights,
                                               central_profiles, categories,
-                                              which_profile)
+                                              profile_checker)
     sorted_old = None
     while not sorted.equals(sorted_old):
         sorted_old = sorted
@@ -77,7 +78,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                                   generalized_criteria,
                                                   directions, weights,
                                                   central_profiles,
-                                                  categories, which_profile)
+                                                  categories, profile_checker)
 
     cluster = group_alternatives(sorted)
     cluster.sort_index(inplace=True)
@@ -85,9 +86,13 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
 
 
 def _sort_alternatives_to_categories(
-        alternatives_performances, preference_thresholds,
-        indifference_thresholds, standard_deviations, generalized_criteria,
-        directions, weights, central_profiles, categories, which_profile):
+        alternatives_performances: pd.DataFrame,
+        preference_thresholds: pd.Series,
+        indifference_thresholds: pd.Series, standard_deviations: pd.Series,
+        generalized_criteria: pd.Series,
+        directions: pd.Series, weights: pd.Series,
+        central_profiles: pd.DataFrame,
+        categories: pd.Index, which_profile: CompareProfiles) -> pd.Series:
     """
     Calculates new partial preferences, prometheeII_flows, applies flowsortII
     and redefines new clusters.
@@ -114,7 +119,7 @@ def _sort_alternatives_to_categories(
                                                       redirected_profiles,
                                                       directions,
                                                       prometheeII_flows,
-                                                      which_profile())[
+                                                      which_profile)[
         'negative']
     sorted = _force_alternative_to_empty_category(sorted,
                                                   central_profiles.index)
@@ -122,8 +127,9 @@ def _sort_alternatives_to_categories(
     return sorted
 
 
-def _calculate_new_profiles_median(profiles, alternatives_performances,
-                                   sorted):
+def _calculate_new_profiles_median(profiles: pd.DataFrame,
+                                   alternatives_performances: pd.DataFrame,
+                                   sorted: pd.DataFrame) -> pd.DataFrame:
     profiles = calculate_new_profiles(profiles, alternatives_performances,
                                       sorted, np.mean)
     profiles.fillna(0, inplace=True)

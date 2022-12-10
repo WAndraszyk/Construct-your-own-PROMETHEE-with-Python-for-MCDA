@@ -1,4 +1,6 @@
 import random
+from typing import Any, Union
+
 import pandas as pd
 from collections import defaultdict
 
@@ -21,8 +23,10 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
     return cluster
 
 
-def calculate_new_profiles(central_profiles, alternatives_performances,
-                           sorted, method):
+def calculate_new_profiles(central_profiles: pd.DataFrame,
+                           alternatives_performances: pd.DataFrame,
+                           sorted: Union[pd.DataFrame, pd.Series],
+                           method: Any) -> pd.DataFrame:
     """
     Redefines profile's performance based on alternatives assigned to it.
 

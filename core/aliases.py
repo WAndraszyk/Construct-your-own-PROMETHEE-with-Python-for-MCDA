@@ -2,7 +2,7 @@ from typing import Callable, Union
 
 from pandas import DataFrame
 
-NumericValue = float
+NumericValue = Union[float, int]
 Value = Union[float, str]
 
 PerformanceTable = DataFrame

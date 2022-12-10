@@ -69,12 +69,13 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
     return cluster
 
 
-def _calculate_sorted_alternatives(alternatives_performances,
-                                   preference_thresholds,
-                                   indifference_thresholds,
-                                   standard_deviations,
-                                   generalized_criteria, directions, weights,
-                                   profiles):
+def _calculate_sorted_alternatives(alternatives_performances: pd.DataFrame,
+                                   preference_thresholds: pd.Series,
+                                   indifference_thresholds: pd.Series,
+                                   standard_deviations: pd.Series,
+                                   generalized_criteria: pd.Series,
+                                   directions: pd.Series, weights: pd.Series,
+                                   profiles: pd.DataFrame):
     """
     Calculates new partial preferences, applies PrometheeTri and redefines
     new clusters.

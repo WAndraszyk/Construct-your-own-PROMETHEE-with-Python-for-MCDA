@@ -1,3 +1,4 @@
+from typing import Tuple, Union
 from core.aliases import NumericValue
 import core.preference_commons as pc
 import pandas as pd
@@ -18,7 +19,9 @@ def compute_preference_indices_with_interactions(
         interactions: pd.DataFrame,
         profiles_performance: pd.DataFrame = None,
         decimal_place: NumericValue = 3,
-        minimum_interaction_effect: bool = False) -> tuple:
+        minimum_interaction_effect: bool = False) -> Union[
+    Tuple[pd.DataFrame, pd.DataFrame], Tuple[
+        Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]]:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences
@@ -78,12 +81,14 @@ def compute_preference_indices_with_interactions(
                             ), partialPref
     else:
         return (
-               _preferences(minimum_interaction_effect, interactions, weights,
-                            criteria, partialPref[0], decimal_place,
-                            alternatives, categories_profiles),
-               _preferences(minimum_interaction_effect, interactions, weights,
-                            criteria, partialPref[1], decimal_place,
-                            categories_profiles, alternatives)
+                   _preferences(minimum_interaction_effect, interactions,
+                                weights,
+                                criteria, partialPref[0], decimal_place,
+                                alternatives, categories_profiles),
+                   _preferences(minimum_interaction_effect, interactions,
+                                weights,
+                                criteria, partialPref[1], decimal_place,
+                                categories_profiles, alternatives)
                ), partialPref
 
 
@@ -117,7 +122,7 @@ def _preferences(interaction_effects: NumericValue,
                         partialPref.loc[k2, i][j]) * coefficient
 
             aggregated = round((Pi_A_B + interaction_ab) / (
-                        sum(weights.values) + interaction_ab), decimal_place)
+                    sum(weights.values) + interaction_ab), decimal_place)
             aggregatedPI.append(aggregated if aggregated >= 0 else 0)
         preferences.append(aggregatedPI)
     preferences = pd.DataFrame(data=preferences, columns=j_iter, index=i_iter)

@@ -13,13 +13,13 @@ def compute_veto(
         weights: pd.Series,
         veto_thresholds: pd.Series,
         directions: pd.Series,
-        full_veto: bool = True,
+        strong_veto: bool = True,
         profiles_performance: pd.DataFrame = None,
         decimal_place: NumericValue = 3,
         preferences=None) -> Union[
-    Tuple[Union[pd.DataFrame, List[pd.DataFrame]], Union[pd.DataFrame,
-                                                         List[pd.DataFrame]]],
-    pd.DataFrame, Tuple[pd.DataFrame]]:
+    Tuple[Union[pd.DataFrame, List[pd.DataFrame]], Union[
+        pd.DataFrame, List[pd.DataFrame]]], pd.DataFrame, Tuple[
+        pd.DataFrame]]:
     """
     Calculates veto of every alternative over other alternatives
     or profiles based on partial veto
@@ -29,7 +29,7 @@ def compute_veto(
     :param weights: criteria with weights
     :param veto_thresholds: veto threshold for each criterion
     :param directions: directions of preference of criteria
-    :param full_veto: choose methode of calculating vetoes
+    :param strong_veto: choose methode of calculating vetoes
     :param profiles_performance: Dataframe of profiles performance (value) at
     every criterion
     :param decimal_place: with this you can choose the decimal_place of the
@@ -40,7 +40,7 @@ def compute_veto(
     :return: partial veto
     """
     veto_validation(alternatives_performances, weights, veto_thresholds,
-                    directions, full_veto, profiles_performance,
+                    directions, strong_veto, profiles_performance,
                     decimal_place, preferences)
 
     alternatives = alternatives_performances.index
@@ -62,18 +62,18 @@ def compute_veto(
 
     profiles = False
     if categories_profiles is None:
-        veto = _vetoes(criteria, weights, full_veto, partialVet,
+        veto = _vetoes(criteria, weights, strong_veto, partialVet,
                        decimal_place, alternatives)
         partial_veto = partialVet
     else:
         profiles = True
         partial_veto = partialVet[1], partialVet[0]
         veto = (
-            _vetoes(criteria, weights, full_veto, partialVet[1],
+            _vetoes(criteria, weights, strong_veto, partialVet[1],
                     decimal_place,
                     categories_profiles,
                     alternatives),
-            _vetoes(criteria, weights, full_veto, partialVet[0],
+            _vetoes(criteria, weights, strong_veto, partialVet[0],
                     decimal_place,
                     alternatives,
                     categories_profiles))
@@ -134,7 +134,7 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
                             i_iter=alternatives_performances,
                             j_iter=alternatives_performances)
     else:
-        pvetos = [
+        pvetos = (
             _veto_deep(veto_thresholds=veto_thresholds, criteria=criteria,
                        deviations=deviations[0],
                        i_iter=alternatives_performances,
@@ -142,7 +142,7 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
             _veto_deep(veto_thresholds=veto_thresholds, criteria=criteria,
                        deviations=deviations[1],
                        i_iter=profile_performance_table,
-                       j_iter=alternatives_performances)]
+                       j_iter=alternatives_performances))
     return pvetos
 
 

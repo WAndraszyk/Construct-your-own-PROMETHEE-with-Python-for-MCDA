@@ -219,7 +219,7 @@ def promethee_interaction_preference_validation(
         _check_performances(profiles_performance, criteria)
 
 
-def _check_interactions(interactions, criteria):
+def _check_interactions(interactions: pd.DataFrame, criteria: pd.Series):
     if not isinstance(interactions, pd.DataFrame):
         raise TypeError(
             "Performances on criteria should be passed as a DataFrame object")
@@ -230,7 +230,7 @@ def _check_interactions(interactions, criteria):
     _check_interaction_coefficient(interactions[['type', 'coefficient']])
 
 
-def _check_interaction_columns(column_names):
+def _check_interaction_columns(column_names: pd.Index):
     if list(column_names.values) != ['criterion_1', 'criterion_2', 'type',
                                      'coefficient']:
         raise TypeError(
@@ -238,13 +238,13 @@ def _check_interaction_columns(column_names):
             "'criterion_2', 'type', 'coefficient'")
 
 
-def _check_interactions_criteria(column, criteria):
+def _check_interactions_criteria(column: pd.Series, criteria: pd.Series):
     for value in column.values:
         if value not in list(criteria.values):
             raise TypeError("Criteria names in interactions are not valid!")
 
 
-def _check_interactions_types(interactions):
+def _check_interactions_types(interactions: pd.DataFrame):
     for type in list(interactions.values):
         if type is InteractionType.STN:
             continue
@@ -256,7 +256,7 @@ def _check_interactions_types(interactions):
             raise ValueError(f"Incorrect interaction type: {type}")
 
 
-def _check_interaction_coefficient(interactions):
+def _check_interaction_coefficient(interactions: pd.DataFrame):
     for _, row in interactions.iterrows():
         if row['type'] is InteractionType.WKN:
             if row['coefficient'] > 0:
@@ -416,8 +416,8 @@ def _check_preferences(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
                 " tuple of two DataFrames")
 
 
-def _check_full_veto(full_veto: bool):
-    if not isinstance(full_veto, bool):
+def _check_full_veto(strong_veto: bool):
+    if not isinstance(strong_veto, bool):
         raise TypeError("Full veto should be a boolean value")
 
 
