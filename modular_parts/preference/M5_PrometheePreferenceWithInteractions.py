@@ -31,7 +31,7 @@ def compute_preference_indices_with_interactions(
     criteria effect.
 
     :param alternatives_performances: Dataframe of alternatives' value at
-    every criterion
+        every criterion
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
     :param s_parameters: s parameter for each criterion
@@ -41,7 +41,7 @@ def compute_preference_indices_with_interactions(
     :param interactions: DataFrame of interactions between criteria with
      coefficients
     :param profiles_performance: Dataframe of profiles performance (value)
-    at every criterion
+        at every criterion
     :param decimal_place: the decimal place of the output numbers
     :param minimum_interaction_effect: boolean representing function used to
      capture the interaction effects in the ambiguity zone. DM can choose 2
