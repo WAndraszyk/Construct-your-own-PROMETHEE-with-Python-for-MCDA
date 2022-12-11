@@ -34,19 +34,19 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
     Includes reinforced preference effect.
 
     :param alternatives_performances: Dataframe of alternatives' value at
-    every criterion
+        every criterion
     :param weights: criteria with weights
     :param generalized_criteria: list of preference functions
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
     :param directions: directions of preference of criteria
     :param reinforced_preference_thresholds: list of reinforced preference
-    thresholds for each criterion
+        thresholds for each criterion
     :param reinforcement_factors: list of reinforcement factors for
-     each criterion
+        each criterion
     :param weights: criteria with weights
     :param profiles_performance: Dataframe of profiles performance (value)
-     at every criterion
+        at every criterion
     :param decimal_place: the decimal place of the output numbers
 
     :return: preferences and partial preferences
@@ -114,16 +114,16 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
 
     :param criteria: list of criteria
     :param alternatives_performances: Dataframe of alternatives' value at
-    every criterion
+        every criterion
     :param generalized_criteria: list of preference functions
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
     :param reinforced_preference_thresholds: list of reinforced preference
-    thresholds for each criterion
+        thresholds for each criterion
     :param reinforcement_factors: list of reinforcement factors for
-     each criterion
+        each criterion
     :param profile_performance_table: Dataframe of profiles' value at
-    every criterion
+        every criterion
     :param categories_profiles: list of categories profiles
 
     :return: partial preference indices
@@ -176,14 +176,14 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
     :param preference_thresholds: preference thresholds
     :param indifference_thresholds: indifference thresholds
     :param reinforced_preference_thresholds: list of reinforced preference
-    thresholds for each criterion
+        thresholds for each criterion
     :param reinforcement_factors: list of reinforcement factors for
-     each criterion
+        each criterion
     :param generalized_criteria: list of preference functions
     :param deviations: list of calculated deviations
     :param i_iter: alternatives or categories profiles performances
     :param j_iter: alternatives or categories profiles performances
-    or None
+        or None
 
     :return: partial preference indices
     """

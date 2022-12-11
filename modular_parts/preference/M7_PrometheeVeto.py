@@ -28,14 +28,14 @@ def compute_veto(
     or profiles based on partial veto
 
     :param alternatives_performances: Dataframe of alternatives' value at
-    every criterion
+        every criterion
     :param weights: criteria with weights
     :param veto_thresholds: veto threshold for each criterion
     :param directions: directions of preference of criteria
     :param strong_veto: boolean value representing strong veto or discordance
-    like veto 
+        like veto
     :param profiles_performance: Dataframe of profiles performance (value) at
-    every criterion
+        every criterion
     :param decimal_place: the decimal place of the output numbers
     :param preferences: if not None function returns already calculated
      preference instead of just veto
@@ -98,7 +98,7 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
     :param criteria: list of criteria names
     :param weights: criteria with weights
     :param strong_veto: boolean value representing strong veto or discordance
-    like veto
+        like veto
     :param partial_veto: partial veto indices
     :param decimal_place: the decimal place of the output numbers
     :param i_iter: alternatives or categories profiles
@@ -141,9 +141,9 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
     :param veto_thresholds: veto threshold for each criterion
     :param criteria: list of criteria
     :param alternatives_performances: Dataframe of alternatives' value at
-    every criterion
+        every criterion
     :param profile_performance_table: DataFrame of directed profiles' value
-    at every criterion
+        at every criterion
     :param categories_profiles: profiles' indices
 
     :return: partial veto indices
@@ -184,7 +184,7 @@ def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
     :param deviations: list of calculated deviations
     :param i_iter: alternatives or categories profiles performances
     :param j_iter: alternatives or categories profiles performances
-    or None
+        or None
 
     :return: partial veto indices
     """

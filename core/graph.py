@@ -10,6 +10,8 @@ class Graph:
     def __init__(self, vertices: int):
         """
             Constructs a new Graph instance with the given number of vertices.
+
+            :param vertices: number of vertices
         """
         self.graph = defaultdict(list)
         self.V = vertices
@@ -17,13 +19,22 @@ class Graph:
     def add_edge(self, u: int, v: int):
         """
             Adds a directed edge from vertex u to vertex v in the graph.
+
+            :param u: first vertex
+            :param v: second vertex
         """
         self.graph[u].append(v)
 
     def __is_cyclic_util__(self, v: int, visited: List[bool],
-                           recStack: List[bool]):
+                           recStack: List[bool]) -> bool:
         """
             Checks for a given vertex if a cycle occurs.
+
+            :param v: vertex
+            :param visited: list of information about visiting vertexes
+            :param recStack: recursion stack
+
+            :return: True/False whether a cycle occurs
         """
         visited[v] = True
         recStack[v] = True
@@ -38,9 +49,11 @@ class Graph:
         recStack[v] = False
         return False
 
-    def is_cyclic(self):
+    def is_cyclic(self) -> bool:
         """
-            Returns True if the graph contains a cycle, and False otherwise.
+            Checks whether the graph contains a cycle.
+
+            :return: True if the graph contains a cycle, and False otherwise.
         """
         visited = [False] * (self.V + 1)
         recStack = [False] * (self.V + 1)
@@ -50,9 +63,11 @@ class Graph:
                     return True
         return False
 
-    def find_longest_path(self):
+    def find_longest_path(self) -> int:
         """
-            Returns the length of the longest path in the graph.
+            Calculates the length of the longest path in the graph.
+
+            :return: the length of the longest path in the graph
         """
         n = self.V
         dp = [0] * (n + 1)
@@ -74,6 +89,11 @@ class Graph:
                 dp: List[NumericValue], vis: List[bool]):
         """
             Depth-first search (DFS) algorithm.
+
+            :param node: node index
+            :param adj: graph default dict
+            :param dp: list of paths lengths
+            :param vis: list of information about visiting nodes
         """
         vis[node] = True
 

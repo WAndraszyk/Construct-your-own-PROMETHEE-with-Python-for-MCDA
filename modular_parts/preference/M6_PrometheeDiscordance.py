@@ -27,15 +27,15 @@ def compute_discordance(criteria: List[str],
     Calculates overall discordance by aggregating partial discordance indices.
 
     :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker
-    discordance
+        discordance
     :param decimal_place: the decimal place of the output numbers
     :param preferences: if not None function returns already calculated
-    preference instead of just discordance
+        preference instead of just discordance
     :param criteria: list of criteria
     :param partial_preferences: partial preference of every alternative
-    over other alternatives or profiles
+        over other alternatives or profiles
     :param were_categories_profiles: were the preferences calculated
-    for profiles
+        for profiles
 
     :return: matrix of overall discordance and matrix of partial discordance
      indices. Alternatively: preference
@@ -76,9 +76,9 @@ def _calculate_partial_discordance(criteria: List[str],
 
     :param criteria: list of criteria
     :param partial_preferences: partial preference of every alternative over 
-    other alternatives or profiles
+        other alternatives or profiles
     :param other_partial_preferences: partial preference of every alternative 
-    over other alternatives or profiles or None
+        over other alternatives or profiles or None
 
     :returns: 3D matrix of partial discordance indices
     """

@@ -1,3 +1,8 @@
+"""
+This module implements Promethee V method, which
+maximises the result of {0,1} linear programming problem
+by choosing appropriate set of alternatives.
+"""
 from core.constraint import Constraint
 from core.linear_solver import solve_linear_problem
 from core.input_validation import decision_validation
@@ -12,7 +17,10 @@ def compute_decision(flows: pd.Series, constraints: List[Constraint]
     """
     Computes decision by solving a linear problem.
 
-    :returns: alternatives that are part of the decision
+    :param flows: net flows
+    :param constraints: list of problem constraints
+
+    :returns: alternatives which are part of the decision
     """
     decision_validation(flows, constraints)
 
