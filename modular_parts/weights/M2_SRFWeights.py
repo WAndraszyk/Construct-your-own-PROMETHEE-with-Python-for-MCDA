@@ -18,6 +18,8 @@ def _calculate_spaces_between_criteria_ranks(criteria_ranks: pd.Series
                                              ) -> pd.Series:
     """
     Calculate amount of spaces between criteria ranks.
+
+    :param criteria_ranks: criteria with according ranks
     :return: Series with amount of spaces between criteria ranks
     """
     spaces_between_criteria_ranks = pd.Series(dtype=int)
@@ -37,8 +39,13 @@ def _calculate_non_normalized_weights(criteria_ranks: pd.Series,
                                       ) -> pd.Series:
     """
     Calculate non-normalized weights of criteria.
+
+    :param criteria_ranks: criteria with according ranks
+    :param criteria_weight_ratio: the ratio of the
+        weights of the best and worst ranks
     :param spaces_between_criteria_ranks: Series with amount of
-    spaces between criteria ranks
+        spaces between criteria ranks
+
     :return: Series with non-normalized weights of criteria
     """
     non_normalized_weights = pd.Series(dtype=float)
@@ -62,8 +69,9 @@ def _normalize_weight_up_to_100(
         non_normalized_weights: pd.Series) -> pd.Series:
     """
     Normalize weights of criteria up to 100.
+
     :param non_normalized_weights: Series with non-normalized weights of
-     criteria
+        criteria
     :return: Series with normalized weights of criteria
     """
     sum_of_weights = sum(non_normalized_weights)
@@ -74,8 +82,10 @@ def _truncate_normalized_weights(normalized_weights: pd.Series,
                                  decimal_place: int) -> pd.Series:
     """
     Truncate normalized weights of criteria to self.decimal_place number
-     of figures after the decimal point.
+    of figures after the decimal point.
+
     :param normalized_weights: List with normalized weights of criteria
+    :param decimal_place: the decimal place of the output numbers
     :return: Series with truncated weights of criteria
     """
 
@@ -91,8 +101,10 @@ def _calculate_correction_ratios(normalized_weights: pd.Series,
                                  ) -> pd.DataFrame:
     """
     Calculate positive and negative ratios for final rounding.
+
     :param normalized_weights: Series with normalized weights of criteria
     :param truncated_weights: Series with truncated weights of criteria
+    :param decimal_place: the decimal place of the output numbers
     :return: DataFrame with positive and negative ratios for final rounding
     """
     weights_df = pd.DataFrame(
@@ -121,7 +133,9 @@ def _calculate_size_of_upward_rounded_set(truncated_weights: pd.Series,
                                           decimal_place: int) -> NumericValue:
     """
     Calculate size of upward rounded set.
+
     :param truncated_weights: List with truncated weights of criteria
+    :param decimal_place: the decimal place of the output numbers
     :return: Size of upward rounded set
     """
     return (100 - sum(truncated_weights)) * 10 ** decimal_place
@@ -134,8 +148,11 @@ def _round_properly_weights(criteria_ranks: pd.Series,
                             ) -> pd.Series:
     """
     Round weights with special algorithm to avoid rounding errors.
+
+    :param criteria_ranks: criteria with according ranks
     :param normalized_weights: Series with normalized weights of criteria
     :param truncated_weights: Series with truncated weights of criteria
+    :param decimal_place: the decimal place of the output numbers
     :return: Series with rounded weights of criteria, sorted by order of
      passed criteria
     """
@@ -209,6 +226,11 @@ def calculate_srf_weights(criteria_ranks: pd.Series,
                           decimal_place: int = 2) -> pd.Series:
     """
     Calculate weights of criteria with SRF method.
+
+    :param criteria_ranks: criteria with according ranks
+    :param criteria_weight_ratio: the ratio of the
+        weights of the best and worst ranks
+    :param decimal_place: the decimal place of the output numbers
     :return: Series with weights of criteria
     """
     srf_weights_validation(criteria_ranks, criteria_weight_ratio,
