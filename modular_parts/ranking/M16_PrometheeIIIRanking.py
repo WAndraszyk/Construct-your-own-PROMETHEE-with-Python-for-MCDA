@@ -22,7 +22,9 @@ def calculate_promethee_iii_ranking(flows: pd.DataFrame,
     1st alternative in pair | relation between variants | 2nd alternative
     in pair.
     Relationship types:
+
     P - preferred
+
     I - indifferent
 
     :param flows: Flows table of both positive and negative outranking flows.
