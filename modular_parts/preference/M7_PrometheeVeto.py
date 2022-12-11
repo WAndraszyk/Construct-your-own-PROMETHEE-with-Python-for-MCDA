@@ -1,3 +1,6 @@
+"""
+This module calculates preference indices with veto thresholds
+"""
 from core.aliases import NumericValue
 import core.preference_commons as pc
 import pandas as pd
@@ -29,15 +32,15 @@ def compute_veto(
     :param weights: criteria with weights
     :param veto_thresholds: veto threshold for each criterion
     :param directions: directions of preference of criteria
-    :param strong_veto: choose methode of calculating vetoes
+    :param strong_veto: boolean value representing strong veto or discordance
+    like veto 
     :param profiles_performance: Dataframe of profiles performance (value) at
     every criterion
-    :param decimal_place: with this you can choose the decimal_place of the
-     output numbers
+    :param decimal_place: the decimal place of the output numbers
     :param preferences: if not None function returns already calculated
      preference instead of just veto
-    :return: veto
-    :return: partial veto
+     
+    :return: veto, partial veto
     """
     veto_validation(alternatives_performances, weights, veto_thresholds,
                     directions, strong_veto, profiles_performance,
@@ -84,11 +87,25 @@ def compute_veto(
         return veto, partial_veto
 
 
-def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool,
+def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
             partial_veto: Union[
                 pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
             decimal_place: NumericValue,
             i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
+    """
+    Calculates aggregated veto indices.
+    
+    :param criteria: list of criteria names
+    :param weights: criteria with weights
+    :param strong_veto: boolean value representing strong veto or discordance
+    like veto
+    :param partial_veto: partial veto indices
+    :param decimal_place: the decimal place of the output numbers
+    :param i_iter: alternatives or categories profiles
+    :param j_iter: alternatives or categories profiles or None
+
+    :return: aggregated veto indices
+    """
     if j_iter is None:
         j_iter = i_iter
     Vetoes = []
@@ -99,7 +116,7 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, full_veto: bool,
         for i in i_iter:
             Pi_A_B = 0
             for k in criteria:
-                if full_veto:
+                if strong_veto:
                     if partial_veto.loc[k, j][i] == 1:
                         Pi_A_B = 1
                         break
@@ -121,7 +138,15 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
     Calculates partial veto of every alternative over other alternatives
     or profiles at every criterion based on deviations.
 
-    :return: partial veto
+    :param veto_thresholds: veto threshold for each criterion
+    :param criteria: list of criteria
+    :param alternatives_performances: Dataframe of alternatives' value at
+    every criterion
+    :param profile_performance_table: DataFrame of directed profiles' value
+    at every criterion
+    :param categories_profiles: profiles' indices
+
+    :return: partial veto indices
     """
     deviations = pc.deviations(
         criteria=criteria,
@@ -150,6 +175,19 @@ def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
                deviations: List[Union[
                    List[List[NumericValue]], List[List[List[NumericValue]]]]],
                i_iter: pd.DataFrame, j_iter: pd.DataFrame) -> pd.DataFrame:
+    """
+    This function computes the veto indices for a given set of alternatives
+    and criteria.
+
+    :param veto_thresholds: veto threshold for each criterion
+    :param criteria: list of criteria
+    :param deviations: list of calculated deviations
+    :param i_iter: alternatives or categories profiles performances
+    :param j_iter: alternatives or categories profiles performances
+    or None
+
+    :return: partial veto indices
+    """
     pvetos = []
     for k in range(criteria.size):
         v = veto_thresholds[k]
