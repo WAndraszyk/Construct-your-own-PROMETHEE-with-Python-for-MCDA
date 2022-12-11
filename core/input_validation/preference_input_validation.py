@@ -149,8 +149,9 @@ def promethee_preference_validation(alternatives_performances: pd.DataFrame,
                                     decimal_place: NumericValue):
     """
     Validates input data for Promethee Preference calculation.
+
     :param alternatives_performances: Dataframe of alternatives' value at
-    every criterion
+        every criterion
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
     :param standard_deviations: standard deviation for each criterion
@@ -158,9 +159,9 @@ def promethee_preference_validation(alternatives_performances: pd.DataFrame,
     :param directions: directions of preference of criteria
     :param weights: criteria with weights
     :param profiles_performance: Dataframe of profiles performance (value) at
-    every criterion
+        every criterion
     :param decimal_place: with this you can choose the decimal_place of the
-    output numbers
+        output numbers
     :return: None
     """
     _check_weights(weights)
@@ -190,6 +191,7 @@ def promethee_interaction_preference_validation(
         decimal_place: NumericValue):
     """
     Validates input data for Promethee Preference calculation.
+
     :param alternatives_performances: Dataframe of alternatives' value at
      every criterion
     :param preference_thresholds: preference threshold for each criterion
@@ -199,9 +201,11 @@ def promethee_interaction_preference_validation(
     :param directions: directions of preference of criteria
     :param weights: criteria with weights
     :param profiles_performance: Dataframe of profiles performance (value)
-    at every criterion
+        at every criterion
+    :param interactions: list of interaction types
+    :param minimum_interaction_effect: is minimum interaction effect used
     :param decimal_place: with this you can choose the decimal_place of the
-    output numbers
+        output numbers
     :return: None
     """
     _check_weights(weights)
@@ -321,19 +325,20 @@ def reinforced_preference_validation(
         decimal_place: NumericValue):
     """
     Validates input data for Reinforced Preference calculation.
+
     :param alternatives_performances: Dataframe of alternatives' value at
-    every criterion
+        every criterion
     :param preference_thresholds: preference threshold for each criterion
     :param indifference_thresholds: indifference threshold for each criterion
     :param generalized_criteria: list of preference functions
     :param directions: directions of preference of criteria
     :param reinforced_preference_thresholds: list of reinforced preference
-    threshold for each criterion
+        threshold for each criterion
     :param reinforcement_factors: list of reinforcement factor for each
-    criterion
+        criterion
     :param weights: criteria with weights
     :param profiles_performance: Dataframe of profiles performance (value)
-    at every criterion
+        at every criterion
     :param decimal_place: with this you can choose the decimal_place of the
      output numbers
     :return: None
