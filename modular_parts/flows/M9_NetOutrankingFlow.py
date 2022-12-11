@@ -1,3 +1,7 @@
+"""
+    This class computes net outranking flows based on positive and negative
+    outranking flows.
+"""
 import pandas as pd
 
 __all__ = ['calculate_net_outranking_flows',
@@ -11,8 +15,10 @@ def calculate_net_outranking_flows(flows: pd.DataFrame) -> pd.Series:
     Computes net outranking flow based on positive and negative flows.
     'Net outranking flow' is a difference between positive and negative flow
     for each alternative.
-    :param flows: FlowsTable of both positive and negative outranking flows.
-    :return: net outranking flow Series.
+
+    :param flows: FlowsTable of both positive and negative outranking flows
+
+    :return: net outranking flow
     """
 
     calculate_net_outranking_flows_validation(flows)
@@ -34,8 +40,8 @@ def calculate_net_outranking_flows_for_prometheeII(
     for each alternative.
 
     :param flows: FlowsTable of both positive and negative outranking flows.
-    :return: FlowTable of all positive and negative and net
-    outranking flow Series.
+
+    :return: FlowTable of all positive, negative and net
     """
     calculate_net_outranking_flows_validation(flows)
     flows_copy = flows.copy()
