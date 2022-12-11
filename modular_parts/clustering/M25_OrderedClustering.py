@@ -1,3 +1,8 @@
+"""
+This module implements the Ordered Clustering method which divides
+alternatives into k ordered clusters based on the preference
+indices matrix
+"""
 from typing import List, Tuple
 from core.aliases import NumericValue
 from core.input_validation import ordered_clustering_validation
@@ -58,6 +63,12 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
 
 def _search_max(preferences: List[List[NumericValue]]
                 ) -> Tuple[NumericValue, int, int]:
+    """
+    This function searches for the maximum value in preference matrix.
+
+    :param preferences: preference matrix
+    :return: maximum preference value and its position in matrix
+    """
     max_pi = 0
     pi_i = 0
     pi_j = 0
@@ -71,6 +82,15 @@ def _search_max(preferences: List[List[NumericValue]]
 
 
 def _check_graph(graph: np.ndarray, k: int) -> bool:
+    """
+    This function checks if the graph has no cycle or path longer than k − 1.
+
+    :param graph: graph which takes alternatives for nodes
+    :param k: number of clusters
+
+    :return: True if the graph has a cycle or path longer than k − 1,
+        False otherwise
+    """
     g = Graph(len(graph))
     for i in range(len(graph)):
         for j in range(len(graph[0])):
@@ -84,6 +104,15 @@ def _check_graph(graph: np.ndarray, k: int) -> bool:
 
 
 def _calculate_degrees(graph: np.ndarray) -> Tuple[List[int], bool]:
+    """
+    This function calculates input degrees of nodes in the graph and
+    checks if there are nodes left in it.
+
+    :param graph: graph which takes alternatives for nodes
+
+    :return: nodes' input degrees and True/False whether there are nodes
+        left in the graph
+    """
     degrees = []
     no_nodes = True
     for j in range(len(graph)):
@@ -96,7 +125,13 @@ def _calculate_degrees(graph: np.ndarray) -> Tuple[List[int], bool]:
     return degrees, no_nodes
 
 
-def _delete_node(graph: np.ndarray, row: int) -> None:
+def _delete_node(graph: np.ndarray, row: int):
+    """
+    This function deletes a node in the graph.
+
+    :param graph: graph which takes alternatives for nodes
+    :param row: row in the graph matrix
+    """
     for i in range(len(graph[row])):
         graph[row][i] = 0
         graph[i][row] = 0

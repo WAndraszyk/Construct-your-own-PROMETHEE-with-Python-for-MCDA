@@ -1,6 +1,6 @@
-import numpy as np
 from typing import Tuple
 
+import numpy as np
 import core.preference_commons as pc
 from core.clusters_commons import group_alternatives, calculate_new_profiles
 from core.input_validation import promethee_cluster_validation
@@ -78,7 +78,7 @@ def _calculate_sorted_alternatives(alternatives_performances: pd.DataFrame,
                                    generalized_criteria: pd.Series,
                                    directions: pd.Series, weights: pd.Series,
                                    profiles: pd.DataFrame) -> Tuple[
-    pd.Series, pd.DataFrame]:
+        pd.Series, pd.DataFrame]:
     """
     Calculates new partial preferences, applies PrometheeTri and redefines
     new clusters.

@@ -35,11 +35,12 @@ def check_dominance_condition_GDSS(profiles: pd.Index,
 
     :param profiles: Index with profiles names
     :param profiles_performances: List with DataFrames with profiles
-     performances for each DM
+        performances for each DM
     :param criteria_directions: Series with criteria directions
-    (max or min)
+        (max or min)
+
     :raise ValueError: if any profile is not strictly worse in any
-    criterion than any better profile
+        criterion than any better profile
     """
     for criterion in criteria_directions.index:
         for DM_i_profiles_performances in profiles_performances:
@@ -62,10 +63,10 @@ def check_if_profiles_are_strictly_worse(criteria_thresholds: pd.Series,
 
     :param criteria_thresholds: Series with criteria thresholds
     :param category_profiles: Performance table with category profiles
-    performances
+        performances
 
     :raise ValueError: if any profile is not strictly worse in any
-    criterion than anny better profile
+        criterion than anny better profile
     """
     for criterion, threshold in criteria_thresholds.items():
         for i, (_, profile_i) in enumerate(

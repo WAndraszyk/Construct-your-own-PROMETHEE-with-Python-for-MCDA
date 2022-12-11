@@ -1,7 +1,6 @@
 """
 This class computes Promethee III intervals and ranking based on positive
- and negative flows,
-and preferences.
+and negative flows and preferences.
 """
 from typing import List, Tuple
 
@@ -23,14 +22,15 @@ def calculate_promethee_iii_ranking(flows: pd.DataFrame,
     1st alternative in pair | relation between variants | 2nd alternative
     in pair.
     Relationship types:
+
     P - preferred
+
     I - indifferent
 
-    :param flows: FlowsTable of both positive and negative outranking flows.
-    :param preferences: PreferenceTable of alternatives over alternatives
+    :param flows: Flows table of both positive and negative outranking flows.
+    :param preferences: Preference table of alternatives over alternatives
     :param alpha: parameter used in calculating intervals
-    :param decimal_place: with this you can choose the decimal_place of the
-     output numbers
+    :param decimal_place: the decimal place of the output numbers
 
     :return: Intervals; Preference ranking pairs
     """
@@ -61,14 +61,18 @@ def calculate_promethee_iii_ranking(flows: pd.DataFrame,
     return intervals, pairs
 
 
-def _calculate_intervals(alternatives, flow: pd.Series,
+def _calculate_intervals(alternatives: pd.Index, flow: pd.Series,
                          preferences: pd.DataFrame, alpha: NumericValue,
                          decimal_place: NumericValue = 3
                          ) -> Tuple[List[List[NumericValue]], pd.DataFrame]:
     """
     Calculates intervals used in alternatives comparison.
 
+    :param alternatives: list of alternatives
+    :param flow: net flow
+    :param preferences: Preference table of alternatives over alternatives
     :param alpha: parameter used in calculating intervals
+    :param decimal_place: the decimal place of the output numbers
 
     :return: intervals in a list, intervals as a DataFrame
     """

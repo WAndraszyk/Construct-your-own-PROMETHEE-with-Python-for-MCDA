@@ -35,6 +35,7 @@ def srf_weights_validation(criteria_ranks: pd.Series,
                            decimal_place: int):
     """
     Validate input data for SRF weights calculation.
+
     :param criteria_ranks: Series with ranks of criteria
     :param criteria_weight_ratio: Ratio of weights of criteria
     :param decimal_place: Decimal place for weights
@@ -49,6 +50,7 @@ def surrogate_weights_validation(criteria_ranks: pd.Series,
                                  decimal_place: int):
     """
    Validate input data for surrogate weights calculation.
+
    :param criteria_ranks: Series with ranks of criteria
    :param decimal_place: Decimal place for weights
    :return: None

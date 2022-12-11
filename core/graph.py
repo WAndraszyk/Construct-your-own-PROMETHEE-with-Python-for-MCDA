@@ -11,7 +11,7 @@ class Graph:
         """
         Constructs a new Graph instance with the given number of vertices.
 
-        :param vertices: the number of vertices in the graph
+        :param vertices: number of vertices in the graph
         """
         self.graph = defaultdict(list)
         self.V = vertices
@@ -20,8 +20,8 @@ class Graph:
         """
         Adds a directed edge from vertex u to vertex v in the graph.
 
-        :param u: the source vertex
-        :param v: ...
+        :param u: first vertex
+        :param v: second vertex
         """
         self.graph[u].append(v)
 
@@ -30,10 +30,11 @@ class Graph:
         """
         Checks for a given vertex if a cycle occurs.
 
-        :param v: ...
-        :param visited: ...
-        :param recStack: ...
-        :return: ...
+        :param v: vertex
+        :param visited: list of information about visiting vertexes
+        :param recStack: recursion stack
+
+        :return: True/False whether a cycle occurs
         """
         visited[v] = True
         recStack[v] = True
@@ -50,9 +51,9 @@ class Graph:
 
     def is_cyclic(self) -> bool:
         """
-        Returns True if the graph contains a cycle, and False otherwise.
+        Checks whether the graph contains a cycle.
 
-        :return: ...
+        :return: True if the graph contains a cycle, and False otherwise.
         """
         visited = [False] * (self.V + 1)
         recStack = [False] * (self.V + 1)
@@ -64,9 +65,9 @@ class Graph:
 
     def find_longest_path(self) -> int:
         """
-        Returns the length of the longest path in the graph.
+        Calculates the length of the longest path in the graph.
 
-        :return: ...
+        :return: the length of the longest path in the graph
         """
         n = self.V
         dp = [0] * (n + 1)
@@ -89,10 +90,10 @@ class Graph:
         """
         Depth-first search (DFS) algorithm.
 
-        :param node: ...
-        :param adj: ...
-        :param dp: ...
-        :param vis: ...
+        :param node: node index
+        :param adj: graph default dict
+        :param dp: list of paths lengths
+        :param vis: list of information about visiting nodes
         """
         vis[node] = True
 
