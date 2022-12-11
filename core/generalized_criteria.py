@@ -43,8 +43,8 @@ def v_shape_criterion(d: NumericValue, p: NumericValue) -> NumericValue:
 def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue
                     ) -> NumericValue:
     """
-    Returns: 0 for d<=q
-             0.5 for q<d<=p
+    Returns: 0 for d<=q,
+             0.5 for q<d<=p,
              1 for d>p
 
     :param d: difference between two alternatives on a specified criterion

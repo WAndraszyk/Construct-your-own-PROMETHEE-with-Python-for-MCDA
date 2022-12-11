@@ -10,6 +10,7 @@ class Graph:
     def __init__(self, vertices: int):
         """
             Constructs a new Graph instance with the given number of vertices.
+
             :param vertices: number of vertices
         """
         self.graph = defaultdict(list)
@@ -18,6 +19,7 @@ class Graph:
     def add_edge(self, u: int, v: int):
         """
             Adds a directed edge from vertex u to vertex v in the graph.
+
             :param u: first vertex
             :param v: second vertex
         """
@@ -27,6 +29,7 @@ class Graph:
                            recStack: List[bool]) -> bool:
         """
             Checks for a given vertex if a cycle occurs.
+
             :param v: vertex
             :param visited: list of information about visiting vertexes
             :param recStack: recursion stack
