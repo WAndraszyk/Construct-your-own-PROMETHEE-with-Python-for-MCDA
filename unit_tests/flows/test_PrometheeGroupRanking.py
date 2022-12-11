@@ -26,7 +26,6 @@ def test_promethee_group_ranking(dms_flows, dms_weights):
     alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
     expected = pd.Series([-0.18, 0.98, 0.57, -0.1, -0.89, -0.42],
                          index=alternatives)
-    expected.name = 'aggregated_flows'
 
     actual = calculate_promethee_group_ranking(dms_flows, dms_weights)
 

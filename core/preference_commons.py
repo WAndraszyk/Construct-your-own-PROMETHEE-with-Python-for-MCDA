@@ -10,13 +10,13 @@ def directed_alternatives_performances(alternatives_performances: pd.DataFrame
                                        , directions: pd.Series
                                        ) -> pd.DataFrame:
     """
-        Changes value of alternative performance to the opposite value if
-        the direction of preference is min (represented by 0)
+    Changes value of alternative performance to the opposite value if
+    the direction of preference is min (represented by 0)
 
-        :param alternatives_performances: 2D list of alternatives' value at
-        every criterion
-        :param directions: directions of preference of criteria
-        :return: 2D list of alternatives' value at every criterion
+    :param alternatives_performances: 2D list of alternatives' value at
+    every criterion
+    :param directions: directions of preference of criteria
+    :return: 2D list of alternatives' value at every criterion
     """
     copy_alternatives_performances = copy.deepcopy(alternatives_performances)
     for direction in directions.keys():
@@ -33,14 +33,14 @@ def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
                ) -> List[Union[List[List[NumericValue]],
                                List[List[List[NumericValue]]]]]:
     """
-        Compares alternatives on criteria.
+    Compares alternatives on criteria.
 
-        :param criteria: list of criteria
-        :param alternatives_performances: 2D list of alternatives' value at
-        every criterion
-        :param profile_performance_table: Dataframe of profiles' value at
-        every criterion
-        :return: 3D matrix of deviations in evaluations on criteria
+    :param criteria: list of criteria
+    :param alternatives_performances: 2D list of alternatives' value at
+    every criterion
+    :param profile_performance_table: Dataframe of profiles' value at
+    every criterion
+    :return: 3D matrix of deviations in evaluations on criteria
     """
 
     def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, n: int
@@ -93,20 +93,20 @@ def pp_deep(criteria: pd.Index, preference_thresholds: pd.Series,
                                    List[List[List[NumericValue]]]]],
             i_iter: pd.DataFrame, j_iter: pd.DataFrame) -> pd.DataFrame:
     """
-        This function computes the preference indices for a given set of
-        alternatives and criteria.
+    This function computes the preference indices for a given set of
+    alternatives and criteria.
 
-        :param criteria: list of criteria
-        :param preference_thresholds: preference thresholds
-        :param indifference_thresholds: indifference thresholds
-        :param s_parameters: s parameters
-        :param generalized_criteria: list of preference functions
-        :param deviations: list of calculated deviations
-        :param i_iter: alternatives or categories profiles performances
-        :param j_iter: alternatives or categories profiles performances
-        or None
+    :param criteria: list of criteria
+    :param preference_thresholds: preference thresholds
+    :param indifference_thresholds: indifference thresholds
+    :param s_parameters: s parameters
+    :param generalized_criteria: list of preference functions
+    :param deviations: list of calculated deviations
+    :param i_iter: alternatives or categories profiles performances
+    :param j_iter: alternatives or categories profiles performances
+    or None
 
-        :return: partial preference indices
+    :return: partial preference indices
     """
     ppIndices = []
     for k in range(len(criteria)):
@@ -179,22 +179,22 @@ def partial_preference(criteria: pd.Index, preference_thresholds: pd.Series,
                        ) -> Union[pd.DataFrame,
                                   Tuple[pd.DataFrame, pd.DataFrame]]:
     """
-        Calculates partial preference of every alternative over other
-        alternatives or profiles at every criterion based on deviations
-        using a method chosen by user.
+    Calculates partial preference of every alternative over other
+    alternatives or profiles at every criterion based on deviations
+    using a method chosen by user.
 
-        :param criteria: list of criteria
-        :param preference_thresholds: preference thresholds
-        :param indifference_thresholds: indifference thresholds
-        :param s_parameters: s parameters
-        :param generalized_criteria: list of preference functions
-        :param alternatives_performances: Dataframe of alternatives' value at
-        every criterion
-        :param profile_performance_table: Dataframe of profiles' value at
-        every criterion
-        :param categories_profiles: list of categories profiles
+    :param criteria: list of criteria
+    :param preference_thresholds: preference thresholds
+    :param indifference_thresholds: indifference thresholds
+    :param s_parameters: s parameters
+    :param generalized_criteria: list of preference functions
+    :param alternatives_performances: Dataframe of alternatives' value at
+    every criterion
+    :param profile_performance_table: Dataframe of profiles' value at
+    every criterion
+    :param categories_profiles: list of categories profiles
 
-        :return: partial preference indices
+    :return: partial preference indices
     """
 
     deviation = deviations(criteria=criteria,
@@ -233,15 +233,15 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
                        profiles: bool, decimal_place: NumericValue
                        ) -> Union[pd.DataFrame, Tuple[pd.DataFrame]]:
     """
-        Combines preference and discordance/veto indices to compute overall
-        preference
+    Combines preference and discordance/veto indices to compute overall
+    preference
 
-        :param preferences: aggregated preference indices
-        :param discordances: aggregated discordance/veto indices
-        :param profiles: were the preferences and discordance/veto calculated
-        with profiles
-        :param decimal_place: the decimal place of the output numbers
-        :returns: overall preference indices
+    :param preferences: aggregated preference indices
+    :param discordances: aggregated discordance/veto indices
+    :param profiles: were the preferences and discordance/veto calculated
+    with profiles
+    :param decimal_place: the decimal place of the output numbers
+    :returns: overall preference indices
     """
     if profiles:
         for discordance in discordances:
@@ -267,11 +267,11 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
 
 def criteria_series(criteria: pd.Index, weights: List[float]) -> pd.Series:
     """
-        Connect criterion name with its weight.
+    Connect criterion name with its weight.
 
-        :param criteria: criteria names as list of string.
-        :param weights: criteria weights as list of Numeric Values.
+    :param criteria: criteria names as list of string.
+    :param weights: criteria weights as list of Numeric Values.
 
-        :return: dictionary of connection.
+    :return: dictionary of connection.
     """
     return pd.Series(weights, criteria, name="weights")

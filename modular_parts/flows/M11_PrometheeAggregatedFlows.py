@@ -24,6 +24,5 @@ def calculate_promethee_group_ranking(dms_flows: pd.DataFrame,
 
     weighted_flows = dms_flows.mul(dms_weights, axis=1)
     aggregated_flows = weighted_flows.sum(axis=1)
-    aggregated_flows.name = 'aggregated_flows'
 
     return aggregated_flows

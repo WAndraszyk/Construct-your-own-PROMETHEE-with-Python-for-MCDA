@@ -5,25 +5,35 @@ from core.aliases import NumericValue
 
 class Graph:
     """
-        The Graph class represents a directed graph data structure
+    The Graph class represents a directed graph data structure
     """
     def __init__(self, vertices: int):
         """
-            Constructs a new Graph instance with the given number of vertices.
+        Constructs a new Graph instance with the given number of vertices.
+
+        :param vertices: the number of vertices in the graph
         """
         self.graph = defaultdict(list)
         self.V = vertices
 
     def add_edge(self, u: int, v: int):
         """
-            Adds a directed edge from vertex u to vertex v in the graph.
+        Adds a directed edge from vertex u to vertex v in the graph.
+
+        :param u: the source vertex
+        :param v: ...
         """
         self.graph[u].append(v)
 
     def __is_cyclic_util__(self, v: int, visited: List[bool],
-                           recStack: List[bool]):
+                           recStack: List[bool]) -> bool:
         """
-            Checks for a given vertex if a cycle occurs.
+        Checks for a given vertex if a cycle occurs.
+
+        :param v: ...
+        :param visited: ...
+        :param recStack: ...
+        :return: ...
         """
         visited[v] = True
         recStack[v] = True
@@ -38,9 +48,11 @@ class Graph:
         recStack[v] = False
         return False
 
-    def is_cyclic(self):
+    def is_cyclic(self) -> bool:
         """
-            Returns True if the graph contains a cycle, and False otherwise.
+        Returns True if the graph contains a cycle, and False otherwise.
+
+        :return: ...
         """
         visited = [False] * (self.V + 1)
         recStack = [False] * (self.V + 1)
@@ -50,9 +62,11 @@ class Graph:
                     return True
         return False
 
-    def find_longest_path(self):
+    def find_longest_path(self) -> int:
         """
-            Returns the length of the longest path in the graph.
+        Returns the length of the longest path in the graph.
+
+        :return: ...
         """
         n = self.V
         dp = [0] * (n + 1)
@@ -73,7 +87,12 @@ class Graph:
     def __dfs__(self, node: int, adj: DefaultDict[Any, list],
                 dp: List[NumericValue], vis: List[bool]):
         """
-            Depth-first search (DFS) algorithm.
+        Depth-first search (DFS) algorithm.
+
+        :param node: ...
+        :param adj: ...
+        :param dp: ...
+        :param vis: ...
         """
         vis[node] = True
 

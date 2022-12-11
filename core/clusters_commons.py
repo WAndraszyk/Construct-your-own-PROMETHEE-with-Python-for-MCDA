@@ -11,11 +11,11 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
     pd.Series with clusters as indexes sorted by numbers of assigned
     alternatives .
 
+    :param assignment: ...
     :return: Alternatives assignment, Redefined central_profiles
-
     """
     cluster = pd.Series([], dtype=pd.StringDtype())
-    for key, value in assignment.iteritems():
+    for key, value in assignment.items():
         if value in cluster:
             cluster[value].append(key)
         else:
@@ -30,8 +30,12 @@ def calculate_new_profiles(central_profiles: pd.DataFrame,
     """
     Redefines profile's performance based on alternatives assigned to it.
 
-    :return: Redefined central_profiles
+    :param central_profiles: ...
+    :param alternatives_performances: ...
+    :param sorted: ...
+    :param method: ...
 
+    :return: Redefined central_profiles
     """
     central_profiles_out = central_profiles.copy()
     profile_alternatives = defaultdict(list)
@@ -55,6 +59,12 @@ def initialization_of_the_central_profiles(
     First step of clustering. Initialization of the central profiles.
     Profiles features have random values, but they keep the rule of not
     being worse than the worse profile.
+
+    :param alternatives_performances: ...
+    :param categories: ...
+    :param directions: ...
+
+    :return: ...
     """
     min_and_max_performances = pd.DataFrame(
         {'Min': alternatives_performances.min(),
