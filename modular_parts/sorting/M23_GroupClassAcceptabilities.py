@@ -5,7 +5,7 @@ import math
 
 import pandas as pd
 from typing import List, Tuple
-from core.input_validation import alternatives_support_validation
+from core.input_validation import group_class_acceptabilities_validation
 
 __all__ = ["calculate_alternatives_support"]
 
@@ -102,7 +102,7 @@ def calculate_alternatives_support(categories: List[str],
     :return: Tuple with DataFrames as alternatives support and unimodal
     alternatives support
     """
-    alternatives_support_validation(categories, assignments)
+    group_class_acceptabilities_validation(categories, assignments)
     alternatives = list(assignments[0].index)
 
     votes = _calculate_votes(alternatives, categories, assignments)

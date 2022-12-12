@@ -257,103 +257,6 @@ def _check_if_criteria_are_the_same(criteria_1: pd.Index,
         raise ValueError("Criteria are not the same in different objects")
 
 
-def promethee_preference_validation(alternatives_performances: pd.DataFrame,
-                                    preference_thresholds: pd.Series,
-                                    indifference_thresholds: pd.Series,
-                                    standard_deviations: pd.Series,
-                                    generalized_criteria: pd.Series,
-                                    directions: pd.Series,
-                                    criteria_weights: pd.Series,
-                                    profiles_performance: pd.DataFrame,
-                                    decimal_place: NumericValue):
-    """
-    Check if all inputs are valid for PROMETHEE Preference method.
-
-    :param alternatives_performances: pd.DataFrame with alternatives as index
-    and criteria as columns
-    :param preference_thresholds: pd.Series with criteria as index and
-    preference thresholds as values
-    :param indifference_thresholds: pd.Series with criteria as index and
-    indifference thresholds as values
-    :param standard_deviations: pd.Series with criteria as index and
-    standard deviations as values
-    :param generalized_criteria: pd.Series with criteria as index and
-    General criterion enums as values
-    :param directions: pd.Series with criteria as index and Direction enums
-    as values
-    :param criteria_weights: pd.Series with criteria as index and weights as
-    values
-    :param profiles_performance: pd.DataFrame with profiles as index and
-    criteria as columns
-    :param decimal_place: integer with decimal place
-    :raises ValueError: if input data is not valid
-    """
-    _check_weights(criteria_weights)
-    criteria = criteria_weights.index
-    _check_performances_with_criteria(alternatives_performances, criteria)
-    _check_preference_thresholds(preference_thresholds, criteria)
-    _check_indifference_thresholds(indifference_thresholds, criteria)
-    _check_standard_deviations(standard_deviations, criteria)
-    _check_generalized_criteria(generalized_criteria, criteria)
-    _check_directions(directions, criteria)
-    _check_decimal_place(decimal_place)
-    if profiles_performance is not None:
-        _check_performances_with_criteria(profiles_performance, criteria)
-
-
-def promethee_interaction_preference_validation(
-        alternatives_performances: pd.DataFrame,
-        preference_thresholds: pd.Series,
-        indifference_thresholds: pd.Series,
-        standard_deviations: pd.Series,
-        generalized_criteria: pd.Series,
-        directions: pd.Series,
-        criteria_weights: pd.Series,
-        profiles_performance: pd.DataFrame,
-        interactions: pd.DataFrame,
-        minimum_interaction_effect: bool,
-        decimal_place: NumericValue):
-    """
-    Check if all inputs are valid for PROMETHEE Interaction Preference method.
-
-    :param alternatives_performances: pd.DataFrame with alternatives as index
-    and criteria as columns
-    :param preference_thresholds: pd.Series with criteria as index and
-    preference thresholds as values
-    :param indifference_thresholds: pd.Series with criteria as index and
-    indifference thresholds as values
-    :param standard_deviations: pd.Series with criteria as index and
-    standard deviations as values
-    :param generalized_criteria: pd.Series with criteria as index and
-    General criterion enums as values
-    :param directions: pd.Series with criteria as index and Direction enums
-    as values
-    :param criteria_weights: pd.Series with criteria as index and weights as
-    values
-    :param profiles_performance: pd.DataFrame with profiles as index and
-    criteria as columns
-    :param interactions: pd.DataFrame with interactions as index and
-    'criterion_1', 'criterion_2', 'type' and 'coefficient' columns
-    :param minimum_interaction_effect: boolean representing function used to
-     capture the interaction effects in the ambiguity zone
-    :param decimal_place: integer with decimal place
-    :raise ValueError: if input data is not valid
-    """
-    _check_weights(criteria_weights)
-    criteria = criteria_weights.index
-    _check_performances_with_criteria(alternatives_performances, criteria)
-    _check_preference_thresholds(preference_thresholds, criteria)
-    _check_indifference_thresholds(indifference_thresholds, criteria)
-    _check_standard_deviations(standard_deviations, criteria)
-    _check_generalized_criteria(generalized_criteria, criteria)
-    _check_directions(directions, criteria)
-    _check_decimal_place(decimal_place)
-    _check_interactions(interactions, criteria)
-    _check_minimum_interaction_effect(minimum_interaction_effect)
-    if profiles_performance is not None:
-        _check_performances_with_criteria(profiles_performance, criteria)
-
-
 def _check_interactions(interactions: pd.DataFrame, criteria: pd.Index):
     """
     Check if interactions are valid.
@@ -504,6 +407,246 @@ def _check_reinforcement_factors(reinforcement_factors: pd.Series,
         raise ValueError("Reinforcement factores must be grater than 1")
 
 
+def _check_criteria(criteria: List[str]):
+    """
+    Check if criteria are valid for PROMETHEE Discordance Preference module.
+
+    :param criteria: list with criteria names as strings
+    :raises TypeError: if criteria are not valid
+    """
+
+    # Check if criteria are list
+    if not isinstance(criteria, list):
+        raise TypeError("Criteria should be passed as a list object")
+
+    # Check if all criteria are strings
+    for k in criteria:
+        if not isinstance(k, str):
+            raise TypeError("Criterion should be a string")
+
+
+def _check_partial_preferences(
+        partial_preferences: Union[pd.DataFrame,
+                                   Tuple[pd.DataFrame, pd.DataFrame]],
+        with_profiles: bool = False):
+    """
+    Check if partial preferences are valid.
+
+    :param partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, alternatives) and alternatives as columns
+    or Tuple of two pd.DataFrame with MultiIndex(criteria, alternatives)
+    and profiles as columns in first pd.DataFrame and
+    MultiIndex(criteria, profiles) and alternatives as columns
+    in second pd.DataFrame
+    :param with_profiles: if True partial preferences are
+    alternative vs profiles (helps in handling tuple case)
+    :raises TypeError: if partial preferences are not valid
+    """
+    if isinstance(partial_preferences, Tuple):
+        for partial_preference in partial_preferences:
+            _check_partial_preferences(partial_preference, True)
+
+        if partial_preferences[0].index.equals(
+                partial_preferences[1].columns) or \
+                partial_preferences[1].index.equals(
+                    partial_preferences[0].columns):
+            raise ValueError("Partial preferences for "
+                             "alternatives vs profiles must have oposite"
+                             " indexes and columns")
+    else:
+        # Check if partial preferences are passed as a DataFrame
+        if not isinstance(partial_preferences, pd.DataFrame):
+            raise ValueError("Partial preferences should be passed as a "
+                             "DataFrame object")
+
+        # Check if partial preferences dataframe has only numeric values
+        if not partial_preferences.dtypes.values.all() in ['int32',
+                                                           'int64',
+                                                           'float32',
+                                                           'float64']:
+            raise ValueError("Partial preferences should be a numeric values")
+
+        # Check if partial preferences dataframe has index equals to columns
+        if not partial_preferences.index.get_level_values(1).unique().equals(
+                partial_preferences.columns) and not with_profiles:
+            raise ValueError(
+                "Partial preferences should have alternatives/profiles as "
+                "index and columns")
+
+        # Check if partial preferences for each criterion has the same
+        # number of alternatives
+        n_alternatives = [len(criterion_preferences.index) for
+                          _, criterion_preferences in
+                          partial_preferences.groupby(level=0)]
+        if not all(n == n_alternatives[0] for n in n_alternatives):
+            raise ValueError(
+                "Partial preferences for each criterion should have "
+                "the same number of alternatives")
+
+
+def _check_tau(tau: NumericValue, criteria: List[str]):
+    """
+    Check if tau is valid for PROMETHEE Discordance Preference module.
+
+    :param tau: float or int with tau value
+    :param criteria: list with criteria names as strings
+    :raises TypeError: if tau is not valid
+    :raises ValueError: if tau is not valid
+    """
+
+    # Check if tau is numeric
+    if not isinstance(tau, (int, float)):
+        raise TypeError("Tau should be a numeric value")
+
+    # Check if tau is greater or equal to 0 and less or equal
+    # to number of criteria
+    if tau < 1 or tau > len(criteria):
+        raise ValueError(
+            "Tau needs to be a number from 1 to k, where k "
+            "is the number of criteria.")
+
+
+def _check_categories_profiles(categories_profiles: bool):
+    """
+    Check if categories profiles is valid for PROMETHEE Discordance Preference
+    module.
+
+    :param categories_profiles: bool which indicates if preferences
+    was calculated for profiles
+    :raises TypeError: if categories profiles is not valid
+    """
+
+    # Check if categories profiles is boolean
+    if not isinstance(categories_profiles, bool):
+        raise TypeError("Categories profiles should be a boolean value")
+
+
+def _check_preferences(preferences: Union[pd.DataFrame,
+                                          Tuple[pd.DataFrame, pd.DataFrame]]):
+    """
+    Check if preferences are valid.
+
+    :param preferences: pd.DataFrame with alternatives as index and
+    alternatives as columns or tuple of two pd.DataFrame with alternatives
+    as index and profiles as columns in first pd.DataFrame and profiles as
+    index and alternatives as columns in second pd.DataFrame
+    :raises ValueError: if any preference is not valid
+    """
+    if isinstance(preferences, Tuple):
+        if len(preferences) != 2:
+            raise ValueError("Tuple of preferences should have two elements")
+
+        for preference_table in preferences:
+            # Check if preferences are passed as a DataFrame
+            if not isinstance(preference_table, pd.DataFrame):
+                raise ValueError(
+                    "Preferences should be passed as a DataFrame "
+                    "object")
+
+            # Check if preferences dataframe has only numeric values
+            if not preference_table.dtypes.values.all() in ['int32',
+                                                            'int64',
+                                                            'float32',
+                                                            'float64']:
+                raise ValueError("Preferences should be a numeric values")
+
+        # Check if preferences have proper indexes and columns
+        if not (preferences[0].index.equals(preferences[1].columns) and
+                preferences[0].columns.equals(preferences[1].index)):
+            raise ValueError("Preferences should have opposite indexes"
+                             " and columns ( index_1 = columns_2 and"
+                             " columns_1 = index_2 )")
+    else:
+        # Check if preferences are passed as a DataFrame
+        if not isinstance(preferences, pd.DataFrame):
+            raise ValueError("Preferences should be passed as a DataFrame "
+                             "object")
+
+        # Check if preferences dataframe has only numeric values
+        if not preferences.dtypes.values.all() in ['int32', 'int64',
+                                                   'float32', 'float64']:
+            raise ValueError("Preferences should be a numeric values")
+
+        # Check if preferences dataframe has index equals to columns
+        if not preferences.index.equals(preferences.columns):
+            raise ValueError("Preferences should have alternatives as index "
+                             "and columns")
+
+
+def _check_full_veto(strong_veto: bool):
+    """
+    Check if full veto is valid for PROMETHEE Veto Preference module.
+
+    :param strong_veto: bool which indicates if full veto is used or
+    only discordance veto
+    :raise TypeError: if full veto is not valid
+    """
+
+    # Check if full veto is boolean
+    if not isinstance(strong_veto, bool):
+        raise TypeError("Full veto should be a boolean value")
+
+
+def _check_minimum_interaction_effect(minimum_interaction_effect: bool):
+    """
+    Check if minimum interaction effect is valid for
+    PROMETHEE Interactions Preference module.
+
+    :param minimum_interaction_effect: bool which indicates function used to
+     capture the interaction effects in the ambiguity zone
+    :raise TypeError: if minimum interaction effect is not valid
+    """
+
+    # Check if minimum interaction effect is boolean
+    if not isinstance(minimum_interaction_effect, bool):
+        raise TypeError(
+            "Minimum interaction effect should be a boolean value")
+
+
+def promethee_preference_validation(alternatives_performances: pd.DataFrame,
+                                    preference_thresholds: pd.Series,
+                                    indifference_thresholds: pd.Series,
+                                    standard_deviations: pd.Series,
+                                    generalized_criteria: pd.Series,
+                                    directions: pd.Series,
+                                    criteria_weights: pd.Series,
+                                    profiles_performance: pd.DataFrame,
+                                    decimal_place: NumericValue):
+    """
+    Check if all inputs are valid for PROMETHEE Preference method.
+
+    :param alternatives_performances: pd.DataFrame with alternatives as index
+    and criteria as columns
+    :param preference_thresholds: pd.Series with criteria as index and
+    preference thresholds as values
+    :param indifference_thresholds: pd.Series with criteria as index and
+    indifference thresholds as values
+    :param standard_deviations: pd.Series with criteria as index and
+    standard deviations as values
+    :param generalized_criteria: pd.Series with criteria as index and
+    General criterion enums as values
+    :param directions: pd.Series with criteria as index and Direction enums
+    as values
+    :param criteria_weights: pd.Series with criteria as index and weights as
+    values
+    :param profiles_performance: pd.DataFrame with profiles as index and
+    criteria as columns
+    :param decimal_place: integer with decimal place
+    :raises ValueError: if input data is not valid
+    """
+    _check_weights(criteria_weights)
+    criteria = criteria_weights.index
+    _check_performances_with_criteria(alternatives_performances, criteria)
+    _check_preference_thresholds(preference_thresholds, criteria)
+    _check_indifference_thresholds(indifference_thresholds, criteria)
+    _check_standard_deviations(standard_deviations, criteria)
+    _check_generalized_criteria(generalized_criteria, criteria)
+    _check_directions(directions, criteria)
+    _check_decimal_place(decimal_place)
+    if profiles_performance is not None:
+        _check_performances_with_criteria(profiles_performance, criteria)
+
+
 def reinforced_preference_validation(
         alternatives_performances: pd.DataFrame,
         preference_thresholds: pd.Series,
@@ -517,7 +660,7 @@ def reinforced_preference_validation(
         decimal_place: NumericValue):
     """
     Check if all inputs are valid for PROMETHEE Reinforced Preference method
-    
+
     :param alternatives_performances: pd.DataFrame with alternatives as index
     and criteria as columns
     :param preference_thresholds: pd.Series with criteria as index and
@@ -555,101 +698,91 @@ def reinforced_preference_validation(
         _check_performances_with_criteria(profiles_performance, criteria)
 
 
-def _check_criteria(criteria: List[str]):
-    if not isinstance(criteria, list):
-        raise TypeError("Criteria should be passed as a list object")
-    for k in criteria:
-        if not isinstance(k, str):
-            raise TypeError("Criterion should be a string")
+def promethee_interaction_preference_validation(
+        alternatives_performances: pd.DataFrame,
+        preference_thresholds: pd.Series,
+        indifference_thresholds: pd.Series,
+        standard_deviations: pd.Series,
+        generalized_criteria: pd.Series,
+        directions: pd.Series,
+        criteria_weights: pd.Series,
+        profiles_performance: pd.DataFrame,
+        interactions: pd.DataFrame,
+        minimum_interaction_effect: bool,
+        decimal_place: NumericValue):
+    """
+    Check if all inputs are valid for PROMETHEE Interaction Preference method.
+
+    :param alternatives_performances: pd.DataFrame with alternatives as index
+    and criteria as columns
+    :param preference_thresholds: pd.Series with criteria as index and
+    preference thresholds as values
+    :param indifference_thresholds: pd.Series with criteria as index and
+    indifference thresholds as values
+    :param standard_deviations: pd.Series with criteria as index and
+    standard deviations as values
+    :param generalized_criteria: pd.Series with criteria as index and
+    General criterion enums as values
+    :param directions: pd.Series with criteria as index and Direction enums
+    as values
+    :param criteria_weights: pd.Series with criteria as index and weights as
+    values
+    :param profiles_performance: pd.DataFrame with profiles as index and
+    criteria as columns
+    :param interactions: pd.DataFrame with interactions as index and
+    'criterion_1', 'criterion_2', 'type' and 'coefficient' columns
+    :param minimum_interaction_effect: boolean representing function used to
+     capture the interaction effects in the ambiguity zone
+    :param decimal_place: integer with decimal place
+    :raise ValueError: if input data is not valid
+    """
+    _check_weights(criteria_weights)
+    criteria = criteria_weights.index
+    _check_performances_with_criteria(alternatives_performances, criteria)
+    _check_preference_thresholds(preference_thresholds, criteria)
+    _check_indifference_thresholds(indifference_thresholds, criteria)
+    _check_standard_deviations(standard_deviations, criteria)
+    _check_generalized_criteria(generalized_criteria, criteria)
+    _check_directions(directions, criteria)
+    _check_decimal_place(decimal_place)
+    _check_interactions(interactions, criteria)
+    _check_minimum_interaction_effect(minimum_interaction_effect)
+    if profiles_performance is not None:
+        _check_performances_with_criteria(profiles_performance, criteria)
 
 
-def _check_partial_preferences(partial_preferences: pd.DataFrame):
-    if not isinstance(partial_preferences, tuple):
-        if not isinstance(partial_preferences, pd.DataFrame):
-            raise TypeError(
-                "Partial preferences should be passed as a DataFrame object")
-    else:
-        if len(partial_preferences) != 2:
-            raise TypeError(
-                "Partial preferences with profiles should be"
-                " passed as tuple of two DataFrames")
-        if not isinstance(partial_preferences[0],
-                          pd.DataFrame) or not isinstance(
-            partial_preferences[1], pd.DataFrame):
-            raise TypeError(
-                "Partial preferences with profiles should be "
-                "passed as tuple of two DataFrames")
-
-
-def _check_tau(tau: NumericValue, criteria: List[str]):
-    if not isinstance(tau, (int, float)):
-        raise TypeError("Tau should be a numeric value")
-    if tau < 1 or tau > len(criteria):
-        raise ValueError(
-            "Tau needs to be a number from 1 to k, where k "
-            "is the number of criteria.")
-
-
-def _check_categories_profiles(categories_profiles: bool):
-    if not isinstance(categories_profiles, bool):
-        raise TypeError("Categories profiles should be a boolean value")
-
-
-def _check_if_dataframe(data_frame: pd.DataFrame, checked_object_name: str):
-    if not isinstance(data_frame, pd.DataFrame):
-        raise ValueError(
-            f"{checked_object_name} should be passed as a DataFrame object")
-
-
-def _check_preferences(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
-    if not isinstance(preferences, tuple):
-        if not isinstance(preferences, pd.DataFrame):
-            raise TypeError(
-                "Preferences should be passed as a DataFrame object")
-    else:
-        if len(preferences) != 2:
-            raise TypeError(
-                "Preferences with profiles should be passed as "
-                "tuple of two DataFrames")
-        if not isinstance(preferences[0], pd.DataFrame) or not isinstance(
-                preferences[1], pd.DataFrame):
-            raise TypeError(
-                "Preferences with profiles should be passed as"
-                " tuple of two DataFrames")
-
-
-def _check_full_veto(strong_veto: bool):
-    if not isinstance(strong_veto, bool):
-        raise TypeError("Full veto should be a boolean value")
-
-
-def _check_minimum_interaction_effect(minimum_interaction_effect: bool):
-    if not isinstance(minimum_interaction_effect, bool):
-        raise TypeError(
-            "Minimum interaction effect should be a boolean value")
-
-
-def discordance_validation(criteria: List[str], partial_preferences: Union[
-    pd.DataFrame, Tuple[pd.DataFrame]],
-                           tau: NumericValue, decimal_place: NumericValue,
-                           preferences: Union[
-                               pd.DataFrame, Tuple[pd.DataFrame]],
+def discordance_validation(criteria: List[str],
+                           partial_preferences:
+                           Union[pd.DataFrame,
+                                 Tuple[pd.DataFrame, pd.DataFrame]],
+                           tau: NumericValue,
+                           decimal_place: NumericValue,
+                           preferences:
+                           Union[pd.DataFrame,
+                                 Tuple[pd.DataFrame, pd.DataFrame]],
                            categories_profiles: bool):
     """
-    Validates input data for Discordance calculation.
+    Check if all inputs are valid for PROMETHEE Discordance Preference method
 
-    :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker
-     discordance
-    :param decimal_place: with this you can choose the decimal_place of
-     the output numbers
-    :param preferences: if not empty function returns already calculated
-     preference instead of just discordance
-    :param criteria: list of criteria names
-    :param partial_preferences: partial preference of every alternative over
-     other alternatives or profiles
-    :param categories_profiles: were the preferences calculated for profiles
-
-    :return: None
+    :param criteria: List with criteria names as strings
+    :param partial_preferences: pd.DataFrame with 
+    MultiIndex(criteria, alternatives) and alternatives as columns 
+    or Tuple of two pd.DataFrame with MultiIndex(criteria, alternatives) 
+    and profiles as columns in first pd.DataFrame and 
+    MultiIndex(criteria, profiles) and alternatives as columns 
+    in second pd.DataFrame
+    :param tau: float or int, technical parameter which indicates 
+    power of discordance, has to be greater or equal to 1 and less or equal
+     to number of criteria
+    :param decimal_place: int with number of decimal places of output
+    :param preferences: pd.DataFrame with alternatives as index and
+    alternatives as columns or tuple of two pd.DataFrame with alternatives
+    as index and profiles as columns in first pd.DataFrame and profiles as
+    index and alternatives as columns in second pd.DataFrame. If not passed,
+     module computes only discordance, does not apply it
+    :param categories_profiles: boolean, which indicates if the preferences 
+    was calculated for alternatives and profiles or only for alternatives
+    :raises TypeError: if any input is not valid
     """
     _check_criteria(criteria)
     _check_partial_preferences(partial_preferences)
@@ -661,11 +794,34 @@ def discordance_validation(criteria: List[str], partial_preferences: Union[
 
 
 def veto_validation(alternatives_performances: pd.DataFrame,
-                    weights: pd.Series, veto_thresholds: pd.Series,
-                    directions: pd.Series, full_veto: bool,
+                    weights: pd.Series,
+                    veto_thresholds: pd.Series,
+                    directions: pd.Series,
+                    full_veto: bool,
                     profiles_performance: pd.DataFrame,
                     decimal_place: NumericValue,
                     preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
+    """
+    Check if all inputs are valid for PROMETHEE Veto method.
+
+    :param alternatives_performances: pd.DataFrame with alternatives as index
+    and criteria as columns
+    :param weights: pd.Series with criteria as index and weights as values
+    :param veto_thresholds: pd.Series with criteria as index and
+    veto thresholds
+    :param directions: pd.Series with criteria as index and Direction enums
+    as values
+    :param full_veto: boolean which indicates if full veto is used or
+    only discordance veto
+    :param profiles_performance: pd.DataFrame with profiles as index and
+    criteria as columns
+    :param decimal_place: integer with decimal place
+    :param preferences: pd.DataFrame with alternatives as index and
+    alternatives as columns or tuple of two pd.DataFrame with alternatives
+    as index and profiles as columns in first pd.DataFrame and profiles as
+    index and alternatives as columns in second pd.DataFrame.
+    :raise ValueError: if input data is not valid
+    """
     _check_weights(weights)
     criteria = weights.index
     _check_performances_with_criteria(alternatives_performances, criteria)

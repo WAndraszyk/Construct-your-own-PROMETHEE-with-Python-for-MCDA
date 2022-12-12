@@ -2,6 +2,8 @@ import pandas as pd
 
 __all__ = ["alternatives_profiles_validation"]
 
+from typing import Tuple, Union
+
 
 def _check_weights(weights: pd.Series):
     """
@@ -25,31 +27,63 @@ def _check_weights(weights: pd.Series):
         raise ValueError("Weights should be positive")
 
 
-def _check_partial_preferences(partial_preferences: pd.DataFrame):
-    # Check if partial preferences are passed as a DataFrame
-    if not isinstance(partial_preferences, pd.DataFrame):
-        raise ValueError("Partial preferences should be passed as a "
-                         "DataFrame object")
+def _check_partial_preferences(
+        partial_preferences: Union[pd.DataFrame,
+                                   Tuple[pd.DataFrame, pd.DataFrame]],
+        with_profiles: bool = False):
+    """
+    Check if partial preferences are valid.
 
-    # Check if partial preferences dataframe has only numeric values
-    if not partial_preferences.dtypes.values.all() in ['int32', 'int64',
-                                                       'float32', 'float64']:
-        raise ValueError("Partial preferences should be a numeric values")
+    :param partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, alternatives) and alternatives as columns
+    or Tuple of two pd.DataFrame with MultiIndex(criteria, alternatives)
+    and profiles as columns in first pd.DataFrame and
+    MultiIndex(criteria, profiles) and alternatives as columns
+    in second pd.DataFrame
+    :param with_profiles: if True partial preferences are
+    alternative vs profiles (helps in handling tuple case)
+    :raises TypeError: if partial preferences are not valid
+    """
+    if isinstance(partial_preferences, Tuple):
+        for partial_preference in partial_preferences:
+            _check_partial_preferences(partial_preference, True)
 
-    # Check if partial preferences dataframe has index equals to columns
-    if not partial_preferences.index.get_level_values(1).unique().equals(
-            partial_preferences.columns):
-        raise ValueError("Partial preferences should have alternatives as "
-                         "index and columns")
+        if partial_preferences[0].index.equals(
+                partial_preferences[1].columns) or \
+                partial_preferences[1].index.equals(
+                    partial_preferences[0].columns):
+            raise ValueError("Partial preferences for "
+                             "alternatives vs profiles must have oposite"
+                             " indexes and columns")
+    else:
+        # Check if partial preferences are passed as a DataFrame
+        if not isinstance(partial_preferences, pd.DataFrame):
+            raise ValueError("Partial preferences should be passed as a "
+                             "DataFrame object")
 
-    # Check if partial preferences for each criterion has the same number of
-    # alternatives
-    n_alternatives = [len(criterion_preferences.index) for
-                      _, criterion_preferences in
-                      partial_preferences.groupby(level=0)]
-    if not all(n == n_alternatives[0] for n in n_alternatives):
-        raise ValueError("Partial preferences for each criterion should have "
-                         "the same number of alternatives")
+        # Check if partial preferences dataframe has only numeric values
+        if not partial_preferences.dtypes.values.all() in ['int32',
+                                                           'int64',
+                                                           'float32',
+                                                           'float64']:
+            raise ValueError("Partial preferences should be a numeric values")
+
+        # Check if partial preferences dataframe has index equals to columns
+        if not partial_preferences.index.get_level_values(1).unique().equals(
+                partial_preferences.columns) and not with_profiles:
+            raise ValueError(
+                "Partial preferences should have alternatives/profiles as "
+                "index and columns")
+
+        # Check if partial preferences for each criterion has the same
+        # number of alternatives
+        n_alternatives = [len(criterion_preferences.index) for
+                          _, criterion_preferences in
+                          partial_preferences.groupby(level=0)]
+        if not all(n == n_alternatives[0] for n in n_alternatives):
+            raise ValueError(
+                "Partial preferences for each criterion should have "
+                "the same number of alternatives")
 
 
 def _check_if_criteria_are_the_same(criteria_1: pd.Index,
