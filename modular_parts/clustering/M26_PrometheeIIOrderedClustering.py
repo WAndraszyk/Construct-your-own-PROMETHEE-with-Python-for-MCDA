@@ -52,7 +52,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                                directions,
                                                weights,
                                                n_categories)
-    global sorted_old
+    global assignments_old
     alternatives_performances = pc.directed_alternatives_performances(
         alternatives_performances, directions)
     categories = pd.Index([f'C{i}' for i in range(1, n_categories + 1)])
@@ -66,14 +66,14 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                               generalized_criteria,
                                               directions, weights,
                                               central_profiles, categories)
-    sorted_old = None
+    assignments_old = None
     iteration = 0
 
-    while (not sorted.equals(sorted_old)) and iteration < max_iterations:
+    while (not assignments.equals(assignments_old)) and iteration < max_iterations:
         iteration += 1
-        sorted_old = sorted
+        assignments_old = assignments
         central_profiles = _calculate_new_profiles_mean(
-            central_profiles, alternatives_performances, sorted)
+            central_profiles, alternatives_performances, assignments)
         assignments = _sort_alternatives_to_categories(alternatives_performances,
                                                   preference_thresholds,
                                                   indifference_thresholds,
@@ -83,7 +83,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                                   central_profiles,
                                                   categories)
 
-    cluster = group_alternatives(sorted)
+    cluster = group_alternatives(assignments)
     cluster.sort_index(inplace=True)
     return cluster
 
@@ -126,9 +126,9 @@ def _sort_alternatives_to_categories(
     redirected_profiles = pc.directed_alternatives_performances(
         central_profiles, directions)
     check_dominance_condition(directions, redirected_profiles)
-    assignments = calculate_flowsort_assignment(categories.tolist(),
+    assignments = calculate_flowsort_assignment(categories,
                                            prometheeII_flows)
-    assignments = _force_alternative_to_empty_category(sorted,
+    assignments = _force_alternative_to_empty_category(assignments,
                                                   central_profiles.index)
     return assignments
 
@@ -156,7 +156,7 @@ def _calculate_new_profiles_mean(profiles_performances: pd.DataFrame,
     return profiles
 
 
-def _force_alternative_to_empty_category(sorted: pd.Series,
+def _force_alternative_to_empty_category(assignments: pd.Series,
                                          categories: pd.Index) -> pd.Series:
     """
     In case given category disappear (is empty) during the execution of the
@@ -164,24 +164,24 @@ def _force_alternative_to_empty_category(sorted: pd.Series,
     category.
 
 
-    :param sorted: Series of alternatives grouped into k ordered clusters
+    :param assignments: Series of alternatives grouped into k ordered clusters
     :param categories: Indices of categories
 
     :return: Redefined assignments without empty categories
     """
-    sorted_copy = sorted.copy(deep=True)
+    assignments_copy = assignments.copy(deep=True)
     old_value = []
     while True:
-        item = sorted_copy.sample()
-        unique_category = sorted_copy.unique()
+        item = assignments_copy.sample()
+        unique_category = assignments_copy.unique()
         if list(set(categories.values) - set(unique_category)) == []:
             break
         if item.values in old_value:
-            sorted_copy[item.keys()] = np.random.choice(
+            assignments_copy[item.keys()] = np.random.choice(
                 list(set(categories) - set(unique_category)))
         else:
             old_value += [np.random.choice(item.values)]
-    return sorted_copy
+    return assignments_copy
 
 
 def calculate_flowsort_assignment(categories: pd.Index,
