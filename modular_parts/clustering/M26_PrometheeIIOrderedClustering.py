@@ -137,7 +137,7 @@ def _sort_alternatives_to_categories(
 
 def _calculate_new_profiles_mean(profiles_performances: pd.DataFrame,
                                  alternatives_performances: pd.DataFrame,
-                                 sorted: pd.Series) -> pd.DataFrame:
+                                 assignment: pd.Series) -> pd.DataFrame:
     """
     This function updates profiles performances on the basis of the
     alternatives belonging to it using math mean function.
@@ -145,13 +145,14 @@ def _calculate_new_profiles_mean(profiles_performances: pd.DataFrame,
 
     :param profiles_performances: DataFrame of profiles' performances
     :param alternatives_performances: DataFrame of alternatives' performances
-    :param sorted: Series of alternatives grouped into k ordered clusters
+    :param assignment: Series with precise assignments of alternatives to
+    categories
 
     :return: DataFrame of updated profiles' performances
     """
     profiles = calculate_new_profiles(profiles_performances,
                                       alternatives_performances,
-                                      sorted, np.mean)
+                                      assignment, np.mean)
     profiles.fillna(0, inplace=True)
     profiles = profiles.apply(lambda x: x.sort_values().values)
     return profiles

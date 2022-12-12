@@ -96,7 +96,7 @@ def _calculate_sorted_alternatives(alternatives_performances: pd.DataFrame,
     :param weights: criteria with weights
     :param n_categories: Number of categories
 
-    :return: Alternatives assignment, redefined central_profiles
+    :return: Alternatives assignment, redefined profiles_performances
 
     """
     _, partial_prefe = compute_preference_indices(alternatives_performances,
