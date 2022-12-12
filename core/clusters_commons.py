@@ -7,11 +7,12 @@ from collections import defaultdict
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:
     """
-    Converts output form @calculate_prometheetri_sorted_alternatives into
+    Converts output from @calculate_prometheetri_sorted_alternatives into
     pd.Series with clusters as indexes assignment by numbers of assigned
     alternatives .
 
-    :param assignment: Series with precise assignments of alternatives to categories
+    :param assignment: Series with precise assignments of alternatives to
+        categories
 
     :return: Alternatives assignment, Redefined profiles_performances
     """
@@ -34,7 +35,7 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
     :param profiles_performances: DataFrame of profiles' performances
     :param alternatives_performances: DataFrame of alternatives' performances
     :param assignment: Series with precise assignments of alternatives to
-    categories
+        categories
     :param method: Math method used for profiles' redefinition.
 
     :return: Redefined profiles' performances

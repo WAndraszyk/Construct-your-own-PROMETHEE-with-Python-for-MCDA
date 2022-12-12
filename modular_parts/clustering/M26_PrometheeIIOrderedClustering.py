@@ -140,11 +140,10 @@ def _calculate_new_profiles_mean(profiles_performances: pd.DataFrame,
     This function updates profiles performances on the basis of the
     alternatives belonging to it using math mean function.
 
-
     :param profiles_performances: DataFrame of profiles' performances
     :param alternatives_performances: DataFrame of alternatives' performances
     :param assignment: Series with precise assignments of alternatives to
-    categories
+        categories
 
     :return: DataFrame of updated profiles' performances
     """
@@ -163,8 +162,8 @@ def _force_alternative_to_empty_category(assignments: pd.Series,
     algorithm, method force randomly chosen alternative to belong to the
     category.
 
-
-    :param assignments: Series of alternatives grouped into k ordered clusters
+    :param assignments: Series with precise assignments of alternatives to
+        categories
     :param categories: Indices of categories
 
     :return: Redefined assignments without empty categories
