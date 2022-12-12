@@ -1,5 +1,5 @@
 """
-    This class computes net outranking flows based on positive and negative
+    This module computes net outranking flows based on positive and negative
     outranking flows.
 """
 import pandas as pd

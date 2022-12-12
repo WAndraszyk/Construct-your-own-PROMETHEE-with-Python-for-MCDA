@@ -11,7 +11,6 @@ def calculate_promethee_ii_ranking(promethee_ii_flows: pd.DataFrame
                                    ) -> pd.Series:
     """
     Creates a Promethee II ranking.
-
     :param promethee_ii_flows: Promethee II flows
     :return: Promethee II ranking
     """
