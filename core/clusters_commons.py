@@ -7,11 +7,12 @@ from collections import defaultdict
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:
     """
-    Converts output form @calculate_prometheetri_sorted_alternatives into
-    pd.Series with clusters as indexes sorted by numbers of assigned
-    alternatives .
+    Converts output form @calculate_prometheetri_sorted_alternatives to
+    cluster.
 
-    :return: Alternatives assignment, Redefined central_profiles
+    :param assignment: Series of alternatives assignment
+
+    :return: Series of alternatives grouped into clusters
 
     """
     cluster = pd.Series([], dtype=pd.StringDtype())
@@ -23,24 +24,31 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
     return cluster
 
 
-def calculate_new_profiles(central_profiles: pd.DataFrame,
+def calculate_new_profiles(profiles_performances: pd.DataFrame,
                            alternatives_performances: pd.DataFrame,
                            sorted: Union[pd.DataFrame, pd.Series],
-                           method: Any) -> pd.DataFrame:
+                           function: Any) -> pd.DataFrame:
     """
-    Redefines profile's performance based on alternatives assigned to it.
+    This function redefines profiles' performances on the basis of the
+    alternatives belonging to it using math @function.
 
-    :return: Redefined central_profiles
+
+    :param central_profiles: DataFrame of profiles' performances
+    :param alternatives_performances: DataFrame of alternatives' performances
+    :param sorted: Series of alternatives grouped into k ordered clusters
+    :param function: math function used for profiles' redefinition
+
+    :return: DataFrame of updated profiles' performance
 
     """
-    central_profiles_out = central_profiles.copy()
+    central_profiles_out = profiles_performances.copy()
     profile_alternatives = defaultdict(list)
     for index, value in sorted.items():
         profile_alternatives[value].append(index)
     for profile in central_profiles_out.index:
         for criterion in central_profiles_out.columns:
             if profile in profile_alternatives.keys():
-                method_value = method(alternatives_performances.loc[
+                method_value = function(alternatives_performances.loc[
                                           profile_alternatives[
                                               profile], criterion])
                 central_profiles_out.loc[profile, criterion] = method_value
@@ -55,6 +63,12 @@ def initialization_of_the_central_profiles(
     First step of clustering. Initialization of the central profiles.
     Profiles features have random values, but they keep the rule of not
     being worse than the worse profile.
+
+    :param alternatives_performances: DataFrame of alternatives' performances
+    :param categories: Indices of categories
+    :param directions: directions of preference of criteria
+
+    :return: new profiles' performances
     """
     min_and_max_performances = pd.DataFrame(
         {'Min': alternatives_performances.min(),
