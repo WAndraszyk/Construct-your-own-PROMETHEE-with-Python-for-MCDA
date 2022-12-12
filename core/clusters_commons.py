@@ -7,12 +7,14 @@ from collections import defaultdict
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:
     """
-    Converts output form @calculate_prometheetri_sorted_alternatives into
-    pd.Series with clusters as indexes sorted by numbers of assigned
+    Converts output from @calculate_prometheetri_sorted_alternatives into
+    pd.Series with clusters as indexes assignment by numbers of assigned
     alternatives .
 
-    :param assignment: ...
-    :return: Alternatives assignment, Redefined central_profiles
+    :param assignment: Series with precise assignments of alternatives to
+        categories
+
+    :return: Alternatives assignment, Redefined profiles_performances
     """
     cluster = pd.Series([], dtype=pd.StringDtype())
     for key, value in assignment.items():
@@ -23,23 +25,24 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
     return cluster
 
 
-def calculate_new_profiles(central_profiles: pd.DataFrame,
+def calculate_new_profiles(profiles_performances: pd.DataFrame,
                            alternatives_performances: pd.DataFrame,
-                           sorted: Union[pd.DataFrame, pd.Series],
+                           assignment: Union[pd.DataFrame, pd.Series],
                            method: Any) -> pd.DataFrame:
     """
-    Redefines profile's performance based on alternatives assigned to it.
+    Redefines profiles' performances based on alternatives assigned to it.
 
-    :param central_profiles: ...
-    :param alternatives_performances: ...
-    :param sorted: ...
-    :param method: ...
+    :param profiles_performances: DataFrame of profiles' performances
+    :param alternatives_performances: DataFrame of alternatives' performances
+    :param assignment: Series with precise assignments of alternatives to
+        categories
+    :param method: Math method used for profiles' redefinition.
 
-    :return: Redefined central_profiles
+    :return: Redefined profiles' performances
     """
-    central_profiles_out = central_profiles.copy()
+    central_profiles_out = profiles_performances.copy()
     profile_alternatives = defaultdict(list)
-    for index, value in sorted.items():
+    for index, value in assignment.items():
         profile_alternatives[value].append(index)
     for profile in central_profiles_out.index:
         for criterion in central_profiles_out.columns:
@@ -60,11 +63,11 @@ def initialization_of_the_central_profiles(
     Profiles features have random values, but they keep the rule of not
     being worse than the worse profile.
 
-    :param alternatives_performances: ...
-    :param categories: ...
-    :param directions: ...
+    :param alternatives_performances: DataFrame of alternatives' performances
+    :param categories: Categories' indices
+    :param directions: directions of preference of criteria
 
-    :return: ...
+    :return: New DataFrame of profiles' performances
     """
     min_and_max_performances = pd.DataFrame(
         {'Min': alternatives_performances.min(),

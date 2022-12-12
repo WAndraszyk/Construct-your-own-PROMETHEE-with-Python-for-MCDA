@@ -89,7 +89,7 @@ def test_cluster_using_prometheecluster(alternatives_performances,
                                                  criteria_weights,
                                                  n_categories)
     assignment_to_check = pd.Series(
-        data=[['a2', 'a5'], ['a1', 'a3', 'a4', 'a6']], index=['C1', 'C2'])
+        data=[['a1', 'a3', 'a4', 'a6'], ['a2', 'a5']], index=['C1', 'C2'])
     assert_series_equal(assignment_to_check, assignment, atol=0.006)
 
 
