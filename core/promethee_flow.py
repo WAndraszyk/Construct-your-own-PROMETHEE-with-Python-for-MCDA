@@ -6,11 +6,11 @@ def compute_single_criterion_net_flows(partial_preferences: Union[
     pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]
                                        ) -> pd.DataFrame:
     """
-        Compute the single criterion net flows for alternatives.
+    Compute the single criterion net flows for alternatives.
 
-        :param partial_preferences: DataFrame with MultiIndex of criterion
-            and alternative and alternative as columns.
-        :return: DataFrame with single criterion net flows
+    :param partial_preferences: DataFrame with MultiIndex of criterion
+        and alternative and alternative as columns.
+    :return: DataFrame with single criterion net flows
     """
     single_criterion_net_flows = pd.DataFrame(dtype=float)
 

@@ -3,140 +3,258 @@ from typing import List, Union, Tuple
 import pandas as pd
 from core.aliases import NumericValue
 from core.enums import Direction, InteractionType
+from core.enums import GeneralCriterion
 
 __all__ = ["promethee_preference_validation",
            "reinforced_preference_validation", "discordance_validation",
-           "_check_decimal_place", "_check_if_dataframe",
            "promethee_interaction_preference_validation", "veto_validation"]
 
 
-def _check_performances(performance_table: pd.DataFrame, criteria: pd.Index):
-    if not isinstance(performance_table, pd.DataFrame):
-        raise TypeError("Performances on criteria should be passed "
-                        "as a DataFrame object")
-    _compare_criteria(performance_table.columns, criteria)
+def _check_performances_with_criteria(performances: pd.DataFrame,
+                                      criteria: pd.Index):
+    """
+    Check if performances are valid.
+
+    :param performances: pd.DataFrame with alternatives/profiles as index
+    and criteria as columns
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if performances are not valid
+    """
+
+    # Check if performances are a DataFrame
+    if not isinstance(performances, pd.DataFrame):
+        raise ValueError("Performances should be passed "
+                         "as a DataFrame")
+
+    # Check if performances are numeric
+    if not performances.dtypes.values.all() in ['int32',
+                                                'int64',
+                                                'float32',
+                                                'float64']:
+        raise ValueError("Performances should be passed "
+                         "with int or float values")
+
+    # Check if performances have the same criteria as other object
+    _check_if_criteria_are_the_same(performances.columns, criteria)
 
 
 def _check_preference_thresholds(preference_thresholds: pd.Series,
                                  criteria: pd.Index):
+    """
+    Check if preference thresholds are valid.
+
+    :param preference_thresholds: pd.Series with criteria as index and
+    preference thresholds as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if preference thresholds are not valid
+    """
+
+    # Check if preference thresholds are a Series
     if not isinstance(preference_thresholds, pd.Series):
         raise TypeError("Preference thresholds should be passed as "
-                        "a DataSeries object")
-    _compare_criteria(preference_thresholds.index, criteria)
-    if len(preference_thresholds) != len(criteria):
-        raise ValueError("Number of preference thresholds should be "
-                         "equal to number of criteria")
-    for i in preference_thresholds:
-        if i is not None:
-            if not isinstance(i, (int, float)):
-                raise TypeError("Preference thresholds should be "
-                                "numerical values")
-            if i < 0:
-                raise ValueError("Preference threshold can not be "
-                                 "lower than 0")
+                        "a Series object")
+
+    _check_if_criteria_are_the_same(preference_thresholds.index, criteria)
+
+    # Check if preference thresholds are numeric
+    for threshold in preference_thresholds:
+        if not (isinstance(threshold, int) or isinstance(threshold, float)
+                or threshold is None):
+            raise TypeError("Preference thresholds should be numeric values"
+                            " or None")
+
+    # Check if preference thresholds are not negative
+    if (preference_thresholds < 0).any():
+        raise ValueError("Preference thresholds can not be lower than 0")
 
 
 def _check_indifference_thresholds(indifference_thresholds: pd.Series,
                                    criteria: pd.Index):
+    """
+    Check if indifference thresholds are valid.
+
+    :param indifference_thresholds: pd.Series with criteria as index and
+    indifference thresholds as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if indifference thresholds are not valid
+    """
+
+    # Check if indifference thresholds are a Series
     if not isinstance(indifference_thresholds, pd.Series):
         raise TypeError("Indifference thresholds should be passed as a "
-                        "DataSeries object")
-    _compare_criteria(indifference_thresholds.index, criteria)
-    if len(indifference_thresholds) != len(criteria):
-        raise ValueError("Number of indifference thresholds should be"
-                         " equal to number of criteria")
-    for i in indifference_thresholds:
-        if i is not None:
-            if not isinstance(i, (int, float)):
-                raise TypeError("Indifference thresholds should be"
-                                " numerical values")
-            if i < 0:
-                raise ValueError("Indifference threshold can not be "
-                                 "lower than 0")
+                        "Series object")
+
+    _check_if_criteria_are_the_same(indifference_thresholds.index, criteria)
+
+    # Check if indifference thresholds are numeric or None
+    for threshold in indifference_thresholds:
+        if not (isinstance(threshold, int) or isinstance(threshold, float)
+                or threshold is None):
+            raise TypeError("Indifference thresholds should be numeric values"
+                            " or None")
+
+    # Check if indifference thresholds are not negative
+    if (indifference_thresholds < 0).any():
+        raise ValueError("Indifference thresholds can not be lower than 0")
 
 
 def _check_standard_deviations(standard_deviations: pd.Series,
                                criteria: pd.Index):
+    """
+    Check if standard deviations are valid.
+
+    :param standard_deviations: pd.Series with criteria as index and
+    standard deviations as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if standard deviations are not valid
+    """
+
+    # Check if standard deviations are a Series
     if not isinstance(standard_deviations, pd.Series):
         raise TypeError("Standard deviations should be passed as a "
-                        "DataSeries object")
-    _compare_criteria(standard_deviations.index, criteria)
-    if len(standard_deviations) != len(criteria):
-        raise ValueError("Number of standard deviations should be equal "
-                         "to number of criteria")
-    for i in standard_deviations:
-        if i is not None:
-            if not isinstance(i, (int, float)):
-                raise TypeError("Standard deviations should be numeric "
-                                "values")
-            if i < 0:
-                raise ValueError("Standard deviation can not be lower than 0")
+                        "Series object")
+
+    _check_if_criteria_are_the_same(standard_deviations.index, criteria)
+
+    # Check if standard deviations thresholds are numeric
+    for deviation in standard_deviations:
+        if not (isinstance(deviation, int) or isinstance(deviation, float)
+                or deviation is None):
+            raise TypeError("Standard deviations should be numeric values"
+                            " or None")
+
+    # Check if standard deviations are not negative
+    if (standard_deviations < 0).any():
+        raise ValueError("Standard deviations can not be lower than 0")
 
 
 def _check_veto_thresholds(veto_thresholds: pd.Series, criteria: pd.Index):
+    """
+    Check if veto thresholds are valid.
+
+    :param veto_thresholds: pd.Series with criteria as index and
+    veto thresholds as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if veto thresholds are not valid
+    """
+
+    # Check if veto thresholds are a Series
     if not isinstance(veto_thresholds, pd.Series):
         raise TypeError("Veto thresholds should be passed as a "
-                        "DataSeries object")
-    _compare_criteria(veto_thresholds.index, criteria)
-    if len(veto_thresholds) != len(criteria):
-        raise ValueError("Number of veto thresholds should be equal to "
-                         "number of criteria")
-    for i in veto_thresholds:
-        if i is not None:
-            if not isinstance(i, (int, float)):
-                raise TypeError("Veto thresholds should be numeric values")
-            if i < 0:
-                raise ValueError("Veto thresholds can not be lower than 0")
+                        "Series object")
+
+    _check_if_criteria_are_the_same(veto_thresholds.index, criteria)
+
+    # Check if veto thresholds are numeric
+    for threshold in veto_thresholds:
+        if not (isinstance(threshold, int) or isinstance(threshold, float)
+                or threshold is None):
+            raise TypeError("Veto thresholds should be numeric values"
+                            " or None")
+
+    # Check if veto thresholds are not negative
+    if (veto_thresholds < 0).any():
+        raise ValueError("Veto thresholds can not be lower than 0")
 
 
 def _check_generalized_criteria(generalized_criteria: pd.Series,
                                 criteria: pd.Index):
+    """
+    Check if generalized criteria are valid.
+
+    :param generalized_criteria: pd.Series with criteria as index and
+    Generalized criteria enums as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if generalized criteria are not valid
+    """
+
+    # Check if generalized criteria are a Series
     if not isinstance(generalized_criteria, pd.Series):
         raise TypeError("Generalized criteria should be passed as a "
-                        "DataSeries object")
-    _compare_criteria(generalized_criteria.index, criteria)
-    if len(generalized_criteria) != len(criteria):
-        raise ValueError("Number of generalized criteria should be equal "
-                         "to number of criteria")
+                        "Series object")
+
+    _check_if_criteria_are_the_same(generalized_criteria.index, criteria)
+
+    # Check if generalized criteria are GeneralCriterion enums
+    if not all(isinstance(criterion, GeneralCriterion)
+               for criterion in generalized_criteria):
+        raise TypeError("Generalized criteria should be GeneralizedCriteria "
+                        "enums")
 
 
 def _check_directions(directions: pd.Series, criteria: pd.Index):
+    """
+    Check if directions are valid.
+
+    :param directions: pd.Series with criteria as index and Direction enums
+    as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if directions are not valid
+    """
+
+    # Check if directions are a Series
     if not isinstance(directions, pd.Series):
-        raise TypeError("Directions should be passed as a DataSeries object")
-    _compare_criteria(directions.index, criteria)
-    if len(directions) != len(criteria):
-        raise ValueError("Number of directions should be equal to"
-                         " number of criteria")
-    for k in criteria:
-        direction = directions[k]
-        if direction is Direction.MIN:
-            continue
-        elif direction is Direction.MAX:
-            continue
-        else:
-            raise ValueError(f"Incorrect direction: {direction}")
+        raise TypeError("Directions should be passed as a Series object")
+
+    _check_if_criteria_are_the_same(directions.index, criteria)
+
+    # Check if directions are Direction enums
+    if not all(isinstance(direction, Direction) for direction in directions):
+        raise TypeError("Directions should be Direction enums")
 
 
 def _check_weights(weights: pd.Series):
+    """
+    Check if weights are valid.
+
+    :param weights: pd.Series with criteria as index and weights as values
+    :raises ValueError: if weights are not valid
+    """
+
+    # Check if weights are a Series
     if not isinstance(weights, pd.Series):
-        raise ValueError("Criteria weights should be passed as a "
-                         "Series object")
-    for weight in weights:
-        if not isinstance(weight, (int, float)):
-            raise ValueError("Weights should be numeric values")
+        raise ValueError("Criteria weights should be passed as a"
+                         " Series object")
+
+    # Check if weights are numeric
+    if weights.dtype not in ['int32', 'int64', 'float32', 'float64']:
+        raise ValueError("Weights should be a numeric values")
+
+    # Check if all weights are positive
+    if (weights <= 0).any():
+        raise ValueError("Weights should be positive")
 
 
 def _check_decimal_place(decimal_place: int):
+    """
+    Check if decimal place is valid.
+
+    :param decimal_place: integer with decimal place
+    :raises ValueError: if decimal place is not valid
+    """
+
+    # Check if decimal place is an integer
     if not isinstance(decimal_place, int):
         raise TypeError("Decimal place must be integer")
+
+    # Check if decimal place is not negative
     if decimal_place < 0:
-        raise ValueError("Decimal place must be positive")
+        raise ValueError("Decimal place must be not negative")
 
 
-def _compare_criteria(criteria_from_series: pd.Index,
-                      criteria_from_df: pd.Index):
-    if not criteria_from_series.equals(criteria_from_df):
-        raise ValueError("Criteria do not match in all inputs")
+def _check_if_criteria_are_the_same(criteria_1: pd.Index,
+                                    criteria_2: pd.Index):
+    """
+    Check if two criteria are the same.
+
+    :param criteria_1: pd.Index with criteria names
+    :param criteria_2: pd.Index with criteria names
+    :raises ValueError: if criteria are not the same
+    """
+
+    # Check if criteria are the same
+    if not criteria_1.equals(criteria_2):
+        raise ValueError("Criteria are not the same in different objects")
 
 
 def promethee_preference_validation(alternatives_performances: pd.DataFrame,
@@ -144,29 +262,35 @@ def promethee_preference_validation(alternatives_performances: pd.DataFrame,
                                     indifference_thresholds: pd.Series,
                                     standard_deviations: pd.Series,
                                     generalized_criteria: pd.Series,
-                                    directions: pd.Series, weights: pd.Series,
+                                    directions: pd.Series,
+                                    criteria_weights: pd.Series,
                                     profiles_performance: pd.DataFrame,
                                     decimal_place: NumericValue):
     """
-    Validates input data for Promethee Preference calculation.
+    Check if all inputs are valid for PROMETHEE Preference method.
 
-    :param alternatives_performances: Dataframe of alternatives' value at
-        every criterion
-    :param preference_thresholds: preference threshold for each criterion
-    :param indifference_thresholds: indifference threshold for each criterion
-    :param standard_deviations: standard deviation for each criterion
-    :param generalized_criteria: list of preference functions
-    :param directions: directions of preference of criteria
-    :param weights: criteria with weights
-    :param profiles_performance: Dataframe of profiles performance (value) at
-        every criterion
-    :param decimal_place: with this you can choose the decimal_place of the
-        output numbers
-    :return: None
+    :param alternatives_performances: pd.DataFrame with alternatives as index
+    and criteria as columns
+    :param preference_thresholds: pd.Series with criteria as index and
+    preference thresholds as values
+    :param indifference_thresholds: pd.Series with criteria as index and
+    indifference thresholds as values
+    :param standard_deviations: pd.Series with criteria as index and
+    standard deviations as values
+    :param generalized_criteria: pd.Series with criteria as index and
+    General criterion enums as values
+    :param directions: pd.Series with criteria as index and Direction enums
+    as values
+    :param criteria_weights: pd.Series with criteria as index and weights as
+    values
+    :param profiles_performance: pd.DataFrame with profiles as index and
+    criteria as columns
+    :param decimal_place: integer with decimal place
+    :raises ValueError: if input data is not valid
     """
-    _check_weights(weights)
-    criteria = weights.index
-    _check_performances(alternatives_performances, criteria)
+    _check_weights(criteria_weights)
+    criteria = criteria_weights.index
+    _check_performances_with_criteria(alternatives_performances, criteria)
     _check_preference_thresholds(preference_thresholds, criteria)
     _check_indifference_thresholds(indifference_thresholds, criteria)
     _check_standard_deviations(standard_deviations, criteria)
@@ -174,7 +298,7 @@ def promethee_preference_validation(alternatives_performances: pd.DataFrame,
     _check_directions(directions, criteria)
     _check_decimal_place(decimal_place)
     if profiles_performance is not None:
-        _check_performances(profiles_performance, criteria)
+        _check_performances_with_criteria(profiles_performance, criteria)
 
 
 def promethee_interaction_preference_validation(
@@ -184,33 +308,40 @@ def promethee_interaction_preference_validation(
         standard_deviations: pd.Series,
         generalized_criteria: pd.Series,
         directions: pd.Series,
-        weights: pd.Series,
+        criteria_weights: pd.Series,
         profiles_performance: pd.DataFrame,
         interactions: pd.DataFrame,
         minimum_interaction_effect: bool,
         decimal_place: NumericValue):
     """
-    Validates input data for Promethee Preference calculation.
+    Check if all inputs are valid for PROMETHEE Interaction Preference method.
 
-    :param alternatives_performances: Dataframe of alternatives' value at
-     every criterion
-    :param preference_thresholds: preference threshold for each criterion
-    :param indifference_thresholds: indifference threshold for each criterion
-    :param standard_deviations: standard deviation for each criterion
-    :param generalized_criteria: list of preference functions
-    :param directions: directions of preference of criteria
-    :param weights: criteria with weights
-    :param profiles_performance: Dataframe of profiles performance (value)
-        at every criterion
-    :param interactions: list of interaction types
-    :param minimum_interaction_effect: is minimum interaction effect used
-    :param decimal_place: with this you can choose the decimal_place of the
-        output numbers
-    :return: None
+    :param alternatives_performances: pd.DataFrame with alternatives as index
+    and criteria as columns
+    :param preference_thresholds: pd.Series with criteria as index and
+    preference thresholds as values
+    :param indifference_thresholds: pd.Series with criteria as index and
+    indifference thresholds as values
+    :param standard_deviations: pd.Series with criteria as index and
+    standard deviations as values
+    :param generalized_criteria: pd.Series with criteria as index and
+    General criterion enums as values
+    :param directions: pd.Series with criteria as index and Direction enums
+    as values
+    :param criteria_weights: pd.Series with criteria as index and weights as
+    values
+    :param profiles_performance: pd.DataFrame with profiles as index and
+    criteria as columns
+    :param interactions: pd.DataFrame with interactions as index and
+    'criterion_1', 'criterion_2', 'type' and 'coefficient' columns
+    :param minimum_interaction_effect: boolean representing function used to
+     capture the interaction effects in the ambiguity zone
+    :param decimal_place: integer with decimal place
+    :raise ValueError: if input data is not valid
     """
-    _check_weights(weights)
-    criteria = weights.index
-    _check_performances(alternatives_performances, criteria)
+    _check_weights(criteria_weights)
+    criteria = criteria_weights.index
+    _check_performances_with_criteria(alternatives_performances, criteria)
     _check_preference_thresholds(preference_thresholds, criteria)
     _check_indifference_thresholds(indifference_thresholds, criteria)
     _check_standard_deviations(standard_deviations, criteria)
@@ -220,13 +351,24 @@ def promethee_interaction_preference_validation(
     _check_interactions(interactions, criteria)
     _check_minimum_interaction_effect(minimum_interaction_effect)
     if profiles_performance is not None:
-        _check_performances(profiles_performance, criteria)
+        _check_performances_with_criteria(profiles_performance, criteria)
 
 
-def _check_interactions(interactions: pd.DataFrame, criteria: pd.Series):
+def _check_interactions(interactions: pd.DataFrame, criteria: pd.Index):
+    """
+    Check if interactions are valid.
+
+    :param interactions: pd.DataFrame with interactions as index and
+    'criterion_1', 'criterion_2', 'type' and 'coefficient' columns
+    :param criteria: pd.Index with criteria names
+    :raises ValueError: if interactions are not valid
+    """
+
+    # Check if interactions are DataFrame
     if not isinstance(interactions, pd.DataFrame):
         raise TypeError(
             "Performances on criteria should be passed as a DataFrame object")
+
     _check_interaction_columns(interactions.columns)
     _check_interactions_criteria(interactions['criterion_1'], criteria)
     _check_interactions_criteria(interactions['criterion_2'], criteria)
@@ -235,81 +377,131 @@ def _check_interactions(interactions: pd.DataFrame, criteria: pd.Series):
 
 
 def _check_interaction_columns(column_names: pd.Index):
-    if list(column_names.values) != ['criterion_1', 'criterion_2', 'type',
-                                     'coefficient']:
+    """
+    Check if interactions columns are valid.
+
+    :param column_names: pd.Index with interactions columns names
+    :raises TypeError: if interactions columns are not valid
+    """
+
+    # Check if interactions columns have proper names
+    if column_names.values.tolist() != ['criterion_1', 'criterion_2', 'type',
+                                        'coefficient']:
         raise TypeError(
             "Interactions columns should be names as 'criterion_1', "
             "'criterion_2', 'type', 'coefficient'")
 
 
-def _check_interactions_criteria(column: pd.Series, criteria: pd.Series):
-    for value in column.values:
-        if value not in list(criteria.values):
+def _check_interactions_criteria(columns: pd.Series, criteria: pd.Index):
+    """
+    Check if interactions criteria are valid.
+
+    :param columns: pd.Series with interactions criteria
+    :param criteria: pd.Index with criteria names
+    :raises TypeError: if interactions criteria are not valid
+    """
+
+    # Check if criteria in interactions are valid
+    for value in columns:
+        if value not in criteria.values:
             raise TypeError("Criteria names in interactions are not valid!")
 
 
-def _check_interactions_types(interactions: pd.DataFrame):
-    for type in list(interactions.values):
-        if type is InteractionType.STN:
-            continue
-        elif type is InteractionType.WKN:
-            continue
-        elif type is InteractionType.ANT:
-            continue
-        else:
-            raise ValueError(f"Incorrect interaction type: {type}")
+def _check_interactions_types(interactions: pd.Series):
+    """
+    Check if interactions types are valid.
+
+    :param interactions: pd.Series with InteractionType enums as values
+    :raises ValueError: if interactions types are not valid
+    """
+
+    # Check if interactions types are InteractionType enums
+    if not all([isinstance(value, InteractionType) for value in
+                interactions.values]):
+        raise ValueError("Interaction types should be "
+                         "of InteractionType enum")
 
 
 def _check_interaction_coefficient(interactions: pd.DataFrame):
+    """
+    Check if interactions coefficients are valid.
+
+    :param interactions: pd.DataFrame with interactions and
+    'interaction_type' and 'coefficient' columns
+    :raises TypeError: if interactions coefficients are not valid
+    """
     for _, row in interactions.iterrows():
         if row['type'] is InteractionType.WKN:
             if row['coefficient'] > 0:
-                raise TypeError("Mutual weakening coefficient must be < 0!")
+                raise TypeError("Mutual weakening coefficient must be"
+                                " less than 0")
         elif row['coefficient'] < 0:
             raise TypeError(
                 "Mutual antagonistic and strengthening "
-                "coefficients must be > 0!")
+                "coefficients must be greater than 0")
 
 
 def _check_reinforced_preference_thresholds(
         reinforced_preference_thresholds: pd.Series, criteria: pd.Index):
+    """
+    Check if reinforced preference thresholds are valid.
+
+    :param reinforced_preference_thresholds: pd.Series with criteria as index
+    and reinforced preference thresholds as values
+    :param criteria: pd.Index with criteria names
+    :raises ValueError: if reinforced preference thresholds are not valid
+    :raises TypeError: if reinforced preference thresholds are not valid
+    """
+
+    # Check if reinforced preference thresholds are Series
     if not isinstance(reinforced_preference_thresholds, pd.Series):
         raise TypeError(
             "Reinforced preference thresholds should"
-            " be passed as a DataSeries object")
-    _compare_criteria(reinforced_preference_thresholds.index, criteria)
-    if len(reinforced_preference_thresholds) != len(criteria):
-        raise ValueError(
-            "Number of reinforced preference thresholds"
-            " should be equal to number of criteria")
-    for i in reinforced_preference_thresholds:
-        if i is not None:
-            if not isinstance(i, (int, float)):
-                raise TypeError(
-                    "Reinforced preference thresholds "
-                    "should be numerical values")
-            if i < 0:
-                raise ValueError(
-                    "Reinforced preference threshold can not be lower than 0")
+            " be passed as a Series object")
+
+    _check_if_criteria_are_the_same(reinforced_preference_thresholds.index,
+                                    criteria)
+
+    # Check if reinforced preference thresholds are numeric
+    for threshold in reinforced_preference_thresholds:
+        if not (isinstance(threshold, int) or isinstance(threshold, float)
+                or threshold is None):
+            raise TypeError("Reinforced preference thresholds"
+                            " should be numeric values or None")
+
+    # Check if reinforced preference thresholds are not negative
+    if (reinforced_preference_thresholds < 0).any():
+        raise ValueError("Reinforced preference thresholds"
+                         " can not be lower than 0")
 
 
 def _check_reinforcement_factors(reinforcement_factors: pd.Series,
                                  criteria: pd.Index):
+    """
+    Check if reinforcement factors are valid.
+
+    :param reinforcement_factors: pd.Series with criteria as index
+    and reinforcement factors as values
+    :param criteria: pd.Index with criteria names
+    :raises ValueError: if reinforcement factors are not valid
+    :raises TypeError: if reinforcement factors are not valid
+    """
+
+    # Check if reinforcement factors are Series
     if not isinstance(reinforcement_factors, pd.Series):
         raise TypeError(
-            "Reinforcement factors should be passed as a DataSeries object")
-    _compare_criteria(reinforcement_factors.index, criteria)
-    if len(reinforcement_factors) != len(criteria):
-        raise ValueError(
-            "Number of reinforcement factors should be equal "
-            "to number of criteria")
-    for i in reinforcement_factors:
-        if i is not None:
-            if not isinstance(i, (int, float)):
-                raise TypeError(
-                    "Reinforcement factors should be numerical values")
-            if i <= 1:
-                raise ValueError("Reinforcement factors need to be >1")
+            "Reinforcement factors should be passed as a Series object")
+
+    _check_if_criteria_are_the_same(reinforcement_factors.index, criteria)
+
+    # Check if reinforced factors are numeric
+    if reinforcement_factors.dtype not in ['int32', 'int64',
+                                           'float32', 'float64']:
+        raise ValueError("Reinforced factors should be a numeric values")
+
+    # Check if reinforcement factors are greater than 1
+    if (reinforcement_factors < 1).any():
+        raise ValueError("Reinforcement factores must be grater than 1")
 
 
 def reinforced_preference_validation(
@@ -320,32 +512,37 @@ def reinforced_preference_validation(
         directions: pd.Series,
         reinforced_preference_thresholds: pd.Series,
         reinforcement_factors: pd.Series,
-        weights: pd.Series,
+        criteria_weights: pd.Series,
         profiles_performance: pd.DataFrame,
         decimal_place: NumericValue):
     """
-    Validates input data for Reinforced Preference calculation.
-
-    :param alternatives_performances: Dataframe of alternatives' value at
-        every criterion
-    :param preference_thresholds: preference threshold for each criterion
-    :param indifference_thresholds: indifference threshold for each criterion
-    :param generalized_criteria: list of preference functions
-    :param directions: directions of preference of criteria
-    :param reinforced_preference_thresholds: list of reinforced preference
-        threshold for each criterion
-    :param reinforcement_factors: list of reinforcement factor for each
-        criterion
-    :param weights: criteria with weights
-    :param profiles_performance: Dataframe of profiles performance (value)
-        at every criterion
-    :param decimal_place: with this you can choose the decimal_place of the
-     output numbers
-    :return: None
+    Check if all inputs are valid for PROMETHEE Reinforced Preference method
+    
+    :param alternatives_performances: pd.DataFrame with alternatives as index
+    and criteria as columns
+    :param preference_thresholds: pd.Series with criteria as index and
+    preference thresholds as values
+    :param indifference_thresholds: pd.Series with criteria as index and
+    indifference thresholds as values
+    :param generalized_criteria: pd.Series with criteria as index and
+    generalized criteria as values
+    :param directions: pd.Series with criteria as index and
+    Direction enums as values
+    :param reinforced_preference_thresholds: pd.Series with criteria as index
+    and reinforced preference thresholds as values
+    :param reinforcement_factors: pd.Series with criteria as index
+    and reinforcement factors as values
+    :param criteria_weights: pd.Series with criteria as index and
+    criteria weights as values
+    :param profiles_performance: pd.DataFrame with profiles as index and
+    criteria as columns
+    :param decimal_place: int with number of decimal places
+    :raises TypeError: if any input is not valid
+    :raises ValueError: if any input is not valid
     """
-    _check_weights(weights)
-    criteria = weights.index
-    _check_performances(alternatives_performances, criteria)
+    _check_weights(criteria_weights)
+    criteria = criteria_weights.index
+    _check_performances_with_criteria(alternatives_performances, criteria)
     _check_preference_thresholds(preference_thresholds, criteria)
     _check_indifference_thresholds(indifference_thresholds, criteria)
     _check_generalized_criteria(generalized_criteria, criteria)
@@ -355,7 +552,7 @@ def reinforced_preference_validation(
     _check_reinforcement_factors(reinforcement_factors, criteria)
     _check_decimal_place(decimal_place)
     if profiles_performance is not None:
-        _check_performances(profiles_performance, criteria)
+        _check_performances_with_criteria(profiles_performance, criteria)
 
 
 def _check_criteria(criteria: List[str]):
@@ -471,12 +668,12 @@ def veto_validation(alternatives_performances: pd.DataFrame,
                     preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]]):
     _check_weights(weights)
     criteria = weights.index
-    _check_performances(alternatives_performances, criteria)
+    _check_performances_with_criteria(alternatives_performances, criteria)
     _check_veto_thresholds(veto_thresholds, criteria)
     _check_directions(directions, criteria)
     _check_full_veto(full_veto)
     _check_decimal_place(decimal_place)
     if profiles_performance is not None:
-        _check_performances(profiles_performance, criteria)
+        _check_performances_with_criteria(profiles_performance, criteria)
     if preferences is not None:
         _check_preferences(preferences)

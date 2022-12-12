@@ -91,7 +91,6 @@ def gaussian_criterion(d: NumericValue, s: NumericValue) -> NumericValue:
     point of the preference function.
     :param d: difference between two
     alternatives on a specified criterion
-
     :return: preference value
     """
     e = math.e

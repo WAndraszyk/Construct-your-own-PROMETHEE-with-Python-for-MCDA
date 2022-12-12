@@ -11,6 +11,49 @@ __all__ = ["alternatives_support_validation", "prom_sort_validation",
            "multiple_dm_criteria_net_flows_validation"]
 
 
+def _check_partial_preferences(partial_preferences: pd.DataFrame):
+    """
+    Check if partial preferences are valid.
+
+    :param partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, alternatives) and columns as alternatives
+    :raises ValueError: if partial preferences are not valid
+    """
+
+    # Check if partial preferences are a DataFrame
+    if not isinstance(partial_preferences, pd.DataFrame):
+        raise ValueError("Partial preferences should be passed"
+                         " as a DataFrame object")
+
+
+def _check_weights(weights: pd.Series, n_criteria: int):
+    """
+    Check if weights are valid.
+
+    :param weights: pd.Series with criteria as index an weights as values
+    :param n_criteria: number of criteria
+    :raises ValueError: if weights are not valid
+    """
+
+    # Check if weights are a Series
+    if not isinstance(weights, pd.Series):
+        raise ValueError("Criteria weights should be passed as a"
+                         " Series object")
+
+    # Check if there are enough weights
+    if len(weights) != n_criteria:
+        raise ValueError("Number of weights should be equals "
+                         "to number of criteria")
+
+    # Check if weights are numeric
+    if weights.dtype not in ['int32', 'int64', 'float32', 'float64']:
+        raise ValueError("Weights should be a numeric values")
+
+    # Check if all weights are positive
+    if (weights <= 0).any():
+        raise ValueError("Weights should be positive")
+
+
 # M22
 def _check_categories(categories: List[str]):
     if not isinstance(categories, List):

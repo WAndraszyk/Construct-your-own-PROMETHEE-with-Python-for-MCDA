@@ -5,36 +5,36 @@ from core.aliases import NumericValue
 
 class Graph:
     """
-        The Graph class represents a directed graph data structure
+    The Graph class represents a directed graph data structure
     """
     def __init__(self, vertices: int):
         """
-            Constructs a new Graph instance with the given number of vertices.
+        Constructs a new Graph instance with the given number of vertices.
 
-            :param vertices: number of vertices
+        :param vertices: number of vertices in the graph
         """
         self.graph = defaultdict(list)
         self.V = vertices
 
     def add_edge(self, u: int, v: int):
         """
-            Adds a directed edge from vertex u to vertex v in the graph.
+        Adds a directed edge from vertex u to vertex v in the graph.
 
-            :param u: first vertex
-            :param v: second vertex
+        :param u: first vertex
+        :param v: second vertex
         """
         self.graph[u].append(v)
 
     def __is_cyclic_util__(self, v: int, visited: List[bool],
                            recStack: List[bool]) -> bool:
         """
-            Checks for a given vertex if a cycle occurs.
+        Checks for a given vertex if a cycle occurs.
 
-            :param v: vertex
-            :param visited: list of information about visiting vertexes
-            :param recStack: recursion stack
+        :param v: vertex
+        :param visited: list of information about visiting vertexes
+        :param recStack: recursion stack
 
-            :return: True/False whether a cycle occurs
+        :return: True/False whether a cycle occurs
         """
         visited[v] = True
         recStack[v] = True
@@ -51,9 +51,9 @@ class Graph:
 
     def is_cyclic(self) -> bool:
         """
-            Checks whether the graph contains a cycle.
+        Checks whether the graph contains a cycle.
 
-            :return: True if the graph contains a cycle, and False otherwise.
+        :return: True if the graph contains a cycle, and False otherwise.
         """
         visited = [False] * (self.V + 1)
         recStack = [False] * (self.V + 1)
@@ -65,9 +65,9 @@ class Graph:
 
     def find_longest_path(self) -> int:
         """
-            Calculates the length of the longest path in the graph.
+        Calculates the length of the longest path in the graph.
 
-            :return: the length of the longest path in the graph
+        :return: the length of the longest path in the graph
         """
         n = self.V
         dp = [0] * (n + 1)
@@ -88,12 +88,12 @@ class Graph:
     def __dfs__(self, node: int, adj: DefaultDict[Any, list],
                 dp: List[NumericValue], vis: List[bool]):
         """
-            Depth-first search (DFS) algorithm.
+        Depth-first search (DFS) algorithm.
 
-            :param node: node index
-            :param adj: graph default dict
-            :param dp: list of paths lengths
-            :param vis: list of information about visiting nodes
+        :param node: node index
+        :param adj: graph default dict
+        :param dp: list of paths lengths
+        :param vis: list of information about visiting nodes
         """
         vis[node] = True
 
