@@ -12,7 +12,7 @@ from core.input_validation import calculate_net_outranking_flows_validation
 
 
 def calculate_net_outranking_flows(flows: pd.DataFrame,
-                                   flowsort_II_format: bool = False) \
+                                   promethee_II_format: bool = False) \
         -> Union[pd.Series, pd.DataFrame]:
     """
     Computes net outranking flow based on positive and negative flows.
@@ -20,7 +20,7 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
     for each alternative.
 
     :param flows: FlowsTable of both positive and negative outranking flows.
-    :param flowsort_II_format: boolean value describe whether net flow should
+    :param promethee_II_format: boolean value describe whether net flow should
         be return alone or as DataFrame together with outranking flows
 
     :return: Series of net outranking flow or DataFrame of
@@ -37,7 +37,7 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
 
     net = pd.Series(data=flow_data, index=alternatives,
                     name='Net outranking flow')
-    if flowsort_II_format:
+    if promethee_II_format:
         net_flow = flows.copy()
         net_flow['net'] = net
         return net_flow
