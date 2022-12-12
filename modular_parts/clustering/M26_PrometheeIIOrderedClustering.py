@@ -13,8 +13,7 @@ from core.promethee_check_dominance import check_dominance_condition
 from modular_parts.preference import compute_preference_indices
 from modular_parts.flows.M8_PrometheeOutrankingFlows import \
     calculate_promethee_outranking_flows
-from modular_parts.flows.M9_NetOutrankingFlow import \
-    calculate_net_outranking_flows_for_prometheeII
+from modular_parts.flows import calculate_net_outranking_flows
 
 __all__ = ['promethee_II_ordered_clustering']
 
@@ -123,8 +122,7 @@ def _sort_alternatives_to_categories(
     prometheeII_flows = calculate_promethee_outranking_flows(
         alternatives_preference, FlowType.PROMETHEE_II,
         profiles_preference)
-    prometheeII_flows = calculate_net_outranking_flows_for_prometheeII(
-        prometheeII_flows)
+    prometheeII_flows = calculate_net_outranking_flows(prometheeII_flows, True)
     redirected_profiles = pc.directed_alternatives_performances(
         central_profiles, directions)
     check_dominance_condition(directions, redirected_profiles)
