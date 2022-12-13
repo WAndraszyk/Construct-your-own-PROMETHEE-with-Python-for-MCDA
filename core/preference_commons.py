@@ -243,6 +243,8 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
     :returns: overall preference indices
     """
     if profiles:
+        # caclulating overall preference for both preference matrices
+        # if profiles
         for discordance in discordances:
             for n in discordance.index:
                 for i in discordance.columns:
@@ -250,10 +252,13 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
         overall_preferences = (preferences[0] * discordances[0],
                                preferences[1] * discordances[1])
     else:
+        # calculating overall preference
         for n in discordances.index:
             for i in discordances.columns:
                 discordances[n][i] = 1 - discordances[n][i]
         overall_preferences = preferences * discordances
+
+    # round preferences to decimal place
     if type(overall_preferences) == tuple:
         for i in range(2):
             overall_preferences = \
@@ -261,6 +266,7 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
                 overall_preferences[1].round(decimal_place)
     else:
         overall_preferences = overall_preferences.round(decimal_place)
+
     return overall_preferences
 
 
