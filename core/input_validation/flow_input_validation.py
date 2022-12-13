@@ -1,6 +1,6 @@
 import pandas as pd
 
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 
 from core.enums import ScoringFunction, ScoringFunctionDirection, FlowType
 
@@ -125,31 +125,63 @@ def _check_preferences(preferences: Union[pd.DataFrame,
                              "and columns")
 
 
-def _check_partial_preferences(partial_preferences: pd.DataFrame):
-    # Check if partial preferences are passed as a DataFrame
-    if not isinstance(partial_preferences, pd.DataFrame):
-        raise ValueError("Partial preferences should be passed as a "
-                         "DataFrame object")
+def _check_partial_preferences(
+        partial_preferences: Union[pd.DataFrame,
+                                   Tuple[pd.DataFrame, pd.DataFrame]],
+        with_profiles: bool = False):
+    """
+    Check if partial preferences are valid.
 
-    # Check if partial preferences dataframe has only numeric values
-    if not partial_preferences.dtypes.values.all() in ['int32', 'int64',
-                                                       'float32', 'float64']:
-        raise ValueError("Partial preferences should be a numeric values")
+    :param partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, alternatives) and alternatives as columns
+    or Tuple of two pd.DataFrame with MultiIndex(criteria, alternatives)
+    and profiles as columns in first pd.DataFrame and
+    MultiIndex(criteria, profiles) and alternatives as columns
+    in second pd.DataFrame
+    :param with_profiles: if True partial preferences are
+    alternative vs profiles (helps in handling tuple case)
+    :raises TypeError: if partial preferences are not valid
+    """
+    if isinstance(partial_preferences, Tuple):
+        for partial_preference in partial_preferences:
+            _check_partial_preferences(partial_preference, True)
 
-    # Check if partial preferences dataframe has index equals to columns
-    if partial_preferences.index.get_level_values(1).unique() != \
-            partial_preferences.columns:
-        raise ValueError("Partial preferences should have alternatives as "
-                         "index and columns")
+        if partial_preferences[0].index.equals(
+                partial_preferences[1].columns) or \
+                partial_preferences[1].index.equals(
+                    partial_preferences[0].columns):
+            raise ValueError("Partial preferences for "
+                             "alternatives vs profiles must have oposite"
+                             " indexes and columns")
+    else:
+        # Check if partial preferences are passed as a DataFrame
+        if not isinstance(partial_preferences, pd.DataFrame):
+            raise ValueError("Partial preferences should be passed as a "
+                             "DataFrame object")
 
-    # Check if partial preferences for each criterion has the same number of
-    # alternatives
-    n_alternatives = [len(criterion_preferences.index) for
-                      _, criterion_preferences in
-                      partial_preferences.groupby(level=0)]
-    if not all(n == n_alternatives[0] for n in n_alternatives):
-        raise ValueError("Partial preferences for each criterion should have "
-                         "the same number of alternatives")
+        # Check if partial preferences dataframe has only numeric values
+        if not partial_preferences.dtypes.values.all() in ['int32',
+                                                           'int64',
+                                                           'float32',
+                                                           'float64']:
+            raise ValueError("Partial preferences should be a numeric values")
+
+        # Check if partial preferences dataframe has index equals to columns
+        if not partial_preferences.index.get_level_values(1).unique().equals(
+                partial_preferences.columns) and not with_profiles:
+            raise ValueError(
+                "Partial preferences should have alternatives/profiles as "
+                "index and columns")
+
+        # Check if partial preferences for each criterion has the same
+        # number of alternatives
+        n_alternatives = [len(criterion_preferences.index) for
+                          _, criterion_preferences in
+                          partial_preferences.groupby(level=0)]
+        if not all(n == n_alternatives[0] for n in n_alternatives):
+            raise ValueError(
+                "Partial preferences for each criterion should have "
+                "the same number of alternatives")
 
 
 def _check_flows_for_aggregated_flows(flows: pd.DataFrame):
@@ -205,6 +237,263 @@ def _check_if_criteria_are_the_same(criteria_1: pd.Index,
     # Check if criteria are the same
     if not criteria_1.equals(criteria_2):
         raise ValueError("Criteria are not the same in different objects")
+
+
+def _check_criteria_weights_gdss(
+        dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
+        dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
+        dms_profile_vs_profile_partial_preferences: pd.DataFrame,
+        # P(r_i,r_j)
+        criteria_weights: pd.Series):
+    """
+    Check if criteria weights are valid in FlowSortGDSS method.
+
+    :param dms_profiles_partial_preferences: List with pd.DataFrame with
+    MultiIndex(criteria, profiles) and alternatives as
+    columns
+    :param dms_alternatives_partial_preferences: List with pd.DataFrame
+    with MultiIndex(criteria, alternatives)
+    and profiles as columns
+    :param dms_profile_vs_profile_partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, DMs, profiles) and MultiIndex(DMs, profiles)
+    as columns
+    :param criteria_weights: pd.Series with criteria weights
+    :raise ValueError: if criteria weights are not valid
+    """
+
+    # Check if number of criteria weights is the same in every input
+    if not len(dms_profiles_partial_preferences[0].index.get_level_values(
+            0).unique()) == \
+           len(dms_alternatives_partial_preferences[0].index.get_level_values(
+               0).unique()) == \
+           len(dms_profile_vs_profile_partial_preferences.index.
+                       get_level_values(0).unique()) == len(criteria_weights):
+        raise ValueError(
+            "Number of criteria should be the same in every DMs partial "
+            "preferences and criteria weights")
+
+
+def _check_dms_profile_vs_profile_partial_preferences(
+        dms_profile_vs_profile_partial_preferences: pd.DataFrame):
+    """
+    Check if DMs profile vs profile partial preferences are valid in
+    FlowSortGDSS method.
+
+    :param dms_profile_vs_profile_partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, DMs, profiles) and MultiIndex(DMs, profiles)
+    as columns
+    :raise ValueError: if DMs profile vs profile partial preferences are not
+    valid
+    """
+
+    # Check if DMs profile vs profile partial preferences is a DataFrame
+    if not isinstance(dms_profile_vs_profile_partial_preferences,
+                      pd.DataFrame):
+        raise ValueError(
+            "DMs profile vs profile partial preferences "
+            "should be passed as a DataFrame")
+
+    number_of_criteria = len(
+        dms_profile_vs_profile_partial_preferences.index.get_level_values(
+            0).unique())
+    columns_size = len(
+        dms_profile_vs_profile_partial_preferences) / number_of_criteria
+
+    # Check if DMs profile vs profile partial preferences have the same
+    # length for each DM
+    if len(dms_profile_vs_profile_partial_preferences.columns) != \
+            columns_size:
+        raise ValueError(
+            "DMs profile vs profile partial preferences should be passed "
+            "as a DataFrame with "
+            "number of columns equal to number of all profiles")
+
+    profiles_index = dms_profile_vs_profile_partial_preferences. \
+        index.droplevel(0).unique()
+
+    # Check if DMs profile vs profile partial preferences have the same
+    for index, profile_vs_profile_partial_preferences in \
+            dms_profile_vs_profile_partial_preferences.groupby(level=0):
+        if not ((profile_vs_profile_partial_preferences.droplevel(
+                0).index == profiles_index).all() and
+                (profile_vs_profile_partial_preferences.columns ==
+                 profiles_index).all()):
+            raise ValueError(
+                "DMs profile vs profile partial preferences should be passed "
+                "as a DataFrame with "
+                "identical index and columns")
+
+    # Check if DMs profile vs profile partial preferences have numeric values
+    if not dms_profile_vs_profile_partial_preferences.dtypes.values.all() in \
+           ['int32', 'int64', 'float32', 'float64']:
+        raise ValueError(
+            "DMs profile vs profile partial preferences should be passed"
+            " as a DataFrame with numeric values")
+
+
+def _check_number_of_dms_gdss(
+        dms_profiles_partial_preferences: List[pd.DataFrame],
+        dms_alternatives_partial_preferences: List[pd.DataFrame],
+        dms_profile_vs_profile_partial_preferences: pd.DataFrame):
+    """
+    Check if number of DMs in GDSS is valid in FlowSortGDSS method.
+
+    :param dms_profiles_partial_preferences: List with pd.DataFrame with
+    MultiIndex(criteria, profiles) and alternatives as
+    columns
+    :param dms_alternatives_partial_preferences: List with pd.DataFrame
+    with MultiIndex(criteria, alternatives)
+    and profiles as columns
+    :param dms_profile_vs_profile_partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, DMs, profiles) and MultiIndex(DMs, profiles)
+    as columns
+    :raise ValueError: if number of DMs in GDSS is not valid
+    """
+
+    # Check if number of DMs in GDSS is the same in every input
+    if not (len(dms_profiles_partial_preferences[0].
+                        index.get_level_values(0).unique()) ==
+            len(dms_alternatives_partial_preferences[0].
+                        index.get_level_values(0).unique()) ==
+            len(dms_profile_vs_profile_partial_preferences.
+                        index.get_level_values(0).unique())):
+        raise ValueError(
+            "Number of DMs should be the same in every DMs"
+            " partial preferences")
+
+
+def _check_dms_alternatives_partial_preferences(
+        dms_alternatives_partial_preferences: List[pd.DataFrame]):
+    """
+    Check if DMs alternatives partial preferences are valid in FlowSortGDSS
+    method.
+
+    :param dms_alternatives_partial_preferences: List with pd.DataFrame
+    with MultiIndex(criteria, alternatives) and profiles as columns
+    :raise ValueError: if DMs alternatives partial preferences are not valid
+    """
+
+    # Check if DMs alternatives partial preferences are passed in a list
+    if not isinstance(dms_alternatives_partial_preferences, list):
+        raise ValueError(
+            "DMS alternatives partial preferences should be passed "
+            "as a list of DataFrames")
+
+    # Check if DMs alternatives partial preferences are DataFrames
+    if not all(isinstance(dms_alternatives_partial_preference, pd.DataFrame)
+               for dms_alternatives_partial_preference in
+               dms_alternatives_partial_preferences):
+        raise ValueError(
+            "DMS alternatives partial preferences should be passed "
+            "as a list of DataFrames")
+
+    # Check if alternatives partial preferences have the same
+    # number of alternatives
+    if not all(len(dms_alternatives_partial_preference) ==
+               len(dms_alternatives_partial_preferences[0]) for
+               dms_alternatives_partial_preference in
+               dms_alternatives_partial_preferences):
+        raise ValueError(
+            "Number of alternatives in every DMs alternatives partial"
+            " preferences should be the same")
+
+    # Check if alternatives partial preferences have the same
+    # number of criteria
+    if not all(len(dms_alternatives_partial_preference.columns) ==
+               len(dms_alternatives_partial_preferences[0].columns)
+               for dms_alternatives_partial_preference in
+               dms_alternatives_partial_preferences):
+        raise ValueError(
+            "Number of criteria in every DMS alternatives partial "
+            "preferences should be the same")
+
+    if not all(dms_alternatives_partial_preference.dtypes.values.all() in
+               ['int32', 'int64', 'float32', 'float64']
+               for dms_alternatives_partial_preference in
+               dms_alternatives_partial_preferences):
+        raise ValueError(
+            "DMs alternatives partial preferences should be passed "
+            "as a list of DataFrames with "
+            "numeric values")
+
+
+def _check_dms_profiles_partial_preferences(
+        dms_profiles_partial_preferences: List[pd.DataFrame]):
+    """
+    Check if DMs profiles partial preferences are valid in FlowSortGDSS
+    method.
+
+    :param dms_profiles_partial_preferences: List with pd.DataFrame with
+    MultiIndex(criteria, profiles) and alternatives as columns
+    :raise ValueError: if DMs profiles partial preferences are not valid
+    """
+
+    # Check if DMs profiles partial preferences are passed in a list
+    if not isinstance(dms_profiles_partial_preferences, list):
+        raise ValueError(
+            "DMs profiles partial preferences should be passed "
+            "as a list of DataFrames")
+
+    # Check if DMs profiles partial preferences are DataFrames
+    if not all(isinstance(dms_profiles_partial_preference, pd.DataFrame)
+               for dms_profiles_partial_preference in
+               dms_profiles_partial_preferences):
+        raise ValueError(
+            "DMs profiles partial preferences should be passed "
+            "as a list of DataFrames")
+
+    # Check if profiles partial preferences have the
+    # same number of profiles for each DM
+    if not all(len(dms_profiles_partial_preference) ==
+               len(dms_profiles_partial_preferences[0]) for
+               dms_profiles_partial_preference in
+               dms_profiles_partial_preferences):
+        raise ValueError(
+            "Number of profiles in every DMs profiles partial "
+            "preferences should be the same")
+
+    # Check if profiles partial preferences have the same
+    # number of criteria for each DM
+    if not all(len(dms_profiles_partial_preference.columns) ==
+               len(dms_profiles_partial_preferences[0].columns)
+               for dms_profiles_partial_preference in
+               dms_profiles_partial_preferences):
+        raise ValueError(
+            "Number of criteria in every DMs profiles partial "
+            "preferences should be the same")
+
+    # Check if profiles partial preferences have numeric values
+    if not all(
+            dms_profiles_partial_preference.dtypes.values.all()
+            in ['int32', 'int64', 'float32', 'float64']
+            for dms_profiles_partial_preference in
+            dms_profiles_partial_preferences):
+        raise ValueError(
+            "DMs profiles partial preferences should be passed as "
+            "a list of DataFrames with "
+            "numeric values")
+
+
+def _check_weights(weights: pd.Series):
+    """
+    Check if weights are valid.
+
+    :param weights: pd.Series with criteria as index and weights as values
+    :raises ValueError: if weights are not valid
+    """
+
+    # Check if weights are a Series
+    if not isinstance(weights, pd.Series):
+        raise ValueError("Criteria weights should be passed as a"
+                         " Series object")
+
+    # Check if weights are numeric
+    if weights.dtype not in ['int32', 'int64', 'float32', 'float64']:
+        raise ValueError("Weights should be a numeric values")
+
+    # Check if all weights are positive
+    if (weights <= 0).any():
+        raise ValueError("Weights should be positive")
 
 
 def net_flow_score_validation(alternative_preferences: pd.DataFrame,
@@ -301,3 +590,38 @@ def check_outranking_flows_type(flow_type: FlowType):
     if flow_type not in [FlowType.PROMETHEE_I, FlowType.PROMETHEE_II]:
         raise ValueError(
             "Flow type should be either PROMETHEE_I or PROMETHEE_II")
+
+
+def net_flows_for_multiple_DM(
+        dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
+        dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
+        dms_profile_vs_profile_partial_preferences: pd.DataFrame,  # P(r,r)
+        criteria_weights: pd.Series):
+    """
+    Check if input for Net Flows for Multiple Decision Makers is valid.
+
+    :param dms_profiles_partial_preferences: List of pd.DataFrame with
+    MultiIndex(criteria, profiles) and alternatives as columns
+    :param dms_alternatives_partial_preferences: List of pd.DataFrame with
+    MultiIndex(criteria, alternatives) and profiles as columns
+    :param dms_profile_vs_profile_partial_preferences: pd.DataFrame with
+    MultiIndex(criteria, DMs, profiles) and MultiIndex(DMs, profiles)
+     as columns
+    :param criteria_weights: pd.Series with criteria as index and
+    criteria weights as values
+    :raise ValueError: if any input is not valid
+    """
+    _check_dms_profiles_partial_preferences(dms_profiles_partial_preferences)
+    _check_dms_alternatives_partial_preferences(
+        dms_alternatives_partial_preferences)
+    _check_dms_profile_vs_profile_partial_preferences(
+        dms_profile_vs_profile_partial_preferences)
+    _check_weights(criteria_weights)
+
+    _check_number_of_dms_gdss(dms_profiles_partial_preferences,
+                              dms_alternatives_partial_preferences,
+                              dms_profile_vs_profile_partial_preferences)
+    _check_criteria_weights_gdss(dms_profiles_partial_preferences,
+                                 dms_alternatives_partial_preferences,
+                                 dms_profile_vs_profile_partial_preferences,
+                                 criteria_weights)

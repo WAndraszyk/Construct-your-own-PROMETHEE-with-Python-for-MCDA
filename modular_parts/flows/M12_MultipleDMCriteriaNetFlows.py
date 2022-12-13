@@ -7,7 +7,7 @@ from typing import List, Tuple
 
 __all__ = ["calculate_gdss_flows"]
 
-from core.input_validation import multiple_dm_criteria_net_flows_validation
+from core.input_validation import net_flows_for_multiple_DM
 
 
 def _calculate_alternatives_general_net_flows(
@@ -194,7 +194,7 @@ def calculate_gdss_flows(
     dms_alternatives_partial_preferences = list(
         dms_alternatives_partial_preferences)
 
-    multiple_dm_criteria_net_flows_validation(
+    net_flows_for_multiple_DM(
         dms_profiles_partial_preferences,
         dms_alternatives_partial_preferences,
         dms_profile_vs_profile_partial_preferences,
