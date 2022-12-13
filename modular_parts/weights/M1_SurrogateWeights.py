@@ -112,6 +112,7 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
         return _weight_order(rc, weights)
 
     surrogate_weights_validation(criteria_ranks, decimal_place)
+    # choosing right method for calculations
     if method is SurrogateMethod.EW:
         return equal_weights(criteria_ranks, decimal_place)
     if method is SurrogateMethod.RS:
