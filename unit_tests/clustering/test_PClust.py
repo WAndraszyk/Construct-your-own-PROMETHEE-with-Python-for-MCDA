@@ -93,6 +93,8 @@ def test_cluster_using_pclust(alternatives_performances,
         sorted_actual_central_profiles[criterion] = \
             sorted_actual_central_profiles[criterion].sort_values(
                 ascending=bool(direction))
+
+    print(actual_central_profiles)
     assert_frame_equal(actual_central_profiles,
                        sorted_actual_central_profiles, atol=0.006)
 

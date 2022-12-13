@@ -8,7 +8,7 @@ __all__ = ["net_flow_score_validation", "promethee_group_ranking_validation",
            "prometheeI_outranking_flows_validation",
            "prometheeII_outranking_flows_validation",
            "calculate_net_outranking_flows_validation",
-           "check_outranking_flows_type"]
+           "check_outranking_flows_type", "net_flows_for_multiple_DM"]
 
 
 def _check_flows(flows: pd.DataFrame):

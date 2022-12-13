@@ -4,42 +4,11 @@ from typing import List, Tuple, Dict
 
 from core.input_validation import intervalp2clust_validation
 from core.enums import FlowType, Direction
+from core.clusters_commons import initialize_the_central_profiles
 from modular_parts.flows import calculate_promethee_outranking_flows
 from modular_parts.preference import compute_preference_indices
 
 __all__ = ['cluster_using_pclust']
-
-
-def _initialize_the_central_profiles(alternatives_performances: pd.DataFrame,
-                                     categories: pd.Index,
-                                     directions: pd.Series) -> pd.DataFrame:
-    """
-    First step of clustering. Initialization of the central profiles. Profiles
-    features have random values, but they
-    keep the rule of not being worse than the worse profile.
-    """
-    min_and_max_performances = pd.DataFrame(
-        {'Min': alternatives_performances.min(),
-         'Max': alternatives_performances.max()})
-
-    central_profiles = pd.DataFrame(index=categories, dtype=float)
-    for criterion, direction in zip(alternatives_performances.columns,
-                                    directions):
-        performances = []
-        for _ in categories:
-            value = random.uniform(
-                min_and_max_performances.loc[criterion, 'Min'],
-                min_and_max_performances.loc[criterion, 'Max'])
-            while value in performances:
-                value = random.uniform(
-                    min_and_max_performances.loc[criterion, 'Min'],
-                    min_and_max_performances.loc[criterion, 'Max'])
-            performances.append(value)
-
-        central_profiles[criterion] = sorted(performances,
-                                             reverse=not direction)
-
-    return central_profiles
 
 
 def _calculate_prometheeII_flows(central_profiles_performances: pd.DataFrame,
@@ -320,7 +289,8 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
     the central profiles
      and the global quality index as float.
     """
-    intervalp2clust_validation(alternatives_performances, preference_thresholds,
+    intervalp2clust_validation(alternatives_performances,
+                               preference_thresholds,
                                indifference_thresholds,
                                standard_deviations, generalized_criteria,
                                criteria_directions, criteria_weights,
@@ -338,7 +308,7 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
 
     iteration = 0
     iteration_without_change = 0
-    central_profiles_performances = _initialize_the_central_profiles(
+    central_profiles_performances = initialize_the_central_profiles(
         alternatives_performances, categories,
         criteria_directions)
 
@@ -391,7 +361,7 @@ def cluster_using_pclust(alternatives_performances: pd.DataFrame,
             alternatives_performances, central_profiles_performances,
             categories, criteria_directions)
 
-        if prev_principal_categories == principal_categories and\
+        if prev_principal_categories == principal_categories and \
                 prev_interval_categories == interval_categories:
             iteration_without_change += 1
         else:

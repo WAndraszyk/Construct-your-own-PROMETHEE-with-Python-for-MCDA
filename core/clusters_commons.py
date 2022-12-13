@@ -4,6 +4,8 @@ from typing import Any, Union
 import pandas as pd
 from collections import defaultdict
 
+from core.enums import Direction
+
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:
     """
@@ -54,7 +56,7 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
     return central_profiles_out
 
 
-def initialization_of_the_central_profiles(
+def initialize_the_central_profiles(
         alternatives_performances: pd.DataFrame,
         categories: pd.Index,
         directions: pd.Series) -> pd.DataFrame:
@@ -85,5 +87,8 @@ def initialization_of_the_central_profiles(
                     min_and_max_performances.loc[criterion, 'Min'],
                     min_and_max_performances.loc[criterion, 'Max'])
             performances.append(value)
-        central_profiles[criterion] = sorted(performances)
+
+        reverse = (direction == Direction.MIN)
+        central_profiles[criterion] = sorted(performances, reverse=reverse)
+
     return central_profiles

@@ -7,7 +7,7 @@ import pandas as pd
 import core.preference_commons as pc
 from core.enums import FlowType
 from core.clusters_commons import group_alternatives, \
-    calculate_new_profiles, initialization_of_the_central_profiles
+    calculate_new_profiles, initialize_the_central_profiles
 from core.input_validation import promethee_II_ordered_clustering_validation
 from core.promethee_check_dominance import check_dominance_condition
 from modular_parts.preference import compute_preference_indices
@@ -53,35 +53,41 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                                weights,
                                                n_categories)
     global assignments_old
-    alternatives_performances = pc.directed_alternatives_performances(
-        alternatives_performances, directions)
+
     categories = pd.Index([f'C{i}' for i in range(1, n_categories + 1)])
 
-    central_profiles = initialization_of_the_central_profiles(
+    central_profiles = initialize_the_central_profiles(
         alternatives_performances, categories, directions)
+    alternatives_performances = pc.directed_alternatives_performances(
+        alternatives_performances, directions)
+    central_profiles = pc.directed_alternatives_performances(
+        central_profiles, directions)
     assignments = _sort_alternatives_to_categories(alternatives_performances,
-                                              preference_thresholds,
-                                              indifference_thresholds,
-                                              s_parameters,
-                                              generalized_criteria,
-                                              directions, weights,
-                                              central_profiles, categories)
+                                                   preference_thresholds,
+                                                   indifference_thresholds,
+                                                   s_parameters,
+                                                   generalized_criteria,
+                                                   directions, weights,
+                                                   central_profiles,
+                                                   categories)
     assignments_old = None
     iteration = 0
 
-    while (not assignments.equals(assignments_old)) and iteration < max_iterations:
+    while (not assignments.equals(assignments_old)) and \
+            iteration < max_iterations:
         iteration += 1
         assignments_old = assignments
         central_profiles = _calculate_new_profiles_mean(
             central_profiles, alternatives_performances, assignments)
-        assignments = _sort_alternatives_to_categories(alternatives_performances,
-                                                  preference_thresholds,
-                                                  indifference_thresholds,
-                                                  s_parameters,
-                                                  generalized_criteria,
-                                                  directions, weights,
-                                                  central_profiles,
-                                                  categories)
+        assignments = _sort_alternatives_to_categories(
+            alternatives_performances,
+            preference_thresholds,
+            indifference_thresholds,
+            s_parameters,
+            generalized_criteria,
+            directions, weights,
+            central_profiles,
+            categories)
 
     cluster = group_alternatives(assignments)
     cluster.sort_index(inplace=True)
@@ -122,14 +128,15 @@ def _sort_alternatives_to_categories(
     prometheeII_flows = calculate_promethee_outranking_flows(
         alternatives_preference, FlowType.PROMETHEE_II,
         profiles_preference)
-    prometheeII_flows = calculate_net_outranking_flows(prometheeII_flows, True)
+    prometheeII_flows = calculate_net_outranking_flows(prometheeII_flows,
+                                                       True)
     redirected_profiles = pc.directed_alternatives_performances(
         central_profiles, directions)
     check_dominance_condition(directions, redirected_profiles)
     assignments = calculate_flowsort_assignment(categories,
-                                           prometheeII_flows)
+                                                prometheeII_flows)
     assignments = _force_alternative_to_empty_category(assignments,
-                                                  central_profiles.index)
+                                                       central_profiles.index)
     return assignments
 
 
