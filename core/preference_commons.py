@@ -235,15 +235,19 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
     Combines preference and discordance/veto indices to compute overall
     preference
 
-    :param preferences: aggregated preference indices
-    :param discordances: aggregated discordance/veto indices
+    :param preferences: DataFrame with aggregated preference indices as
+        values, alternatives/profiles as index and alternatives/profiles as
+        columns
+    :param discordances: DataFrame with aggregated discordance/veto indices as
+        values, alternatives/profiles as index and alternatives/profiles as
+        columns
     :param profiles: were the preferences and discordance/veto calculated
         with profiles
     :param decimal_place: the decimal place of the output numbers
     :returns: overall preference indices
     """
     if profiles:
-        # caclulating overall preference for both preference matrices
+        # calculating overall preference for both preference matrices
         # if profiles
         for discordance in discordances:
             for n in discordance.index:
