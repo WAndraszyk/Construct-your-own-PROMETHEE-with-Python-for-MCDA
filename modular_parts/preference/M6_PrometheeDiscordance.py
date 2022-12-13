@@ -29,16 +29,19 @@ def compute_discordance(criteria: List[str],
     :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker
         discordance
     :param decimal_place: the decimal place of the output numbers
-    :param preferences: if not None function returns already calculated
+    :param preferences: DataFrame of preference indices as value,
+        alternatives/profiles as index and columns,
+        if not None function returns already calculated overall
         preference instead of just discordance
     :param criteria: list of criteria
-    :param partial_preferences: partial preference of every alternative
-        over other alternatives or profiles
+    :param partial_preferences: DataFrame of partial preference indices as
+        value, alternatives/profiles and criteria as index and
+        alternatives/profiles as columns
     :param were_categories_profiles: were the preferences calculated
         for profiles
 
-    :return: matrix of overall discordance and matrix of partial discordance
-     indices. Alternatively: preference
+    :return: DataFrame of overall discordance and DataFrame of partial
+        discordance indices. Alternatively: DataFrame of overall preference.
     """
     # validate input data
     discordance_validation(criteria, partial_preferences, tau, decimal_place,
@@ -80,12 +83,15 @@ def _calculate_partial_discordance(criteria: List[str],
     Calculates partial discordance indices based on partial preference indices
 
     :param criteria: list of criteria
-    :param partial_preferences: partial preference of every alternative over 
-        other alternatives or profiles
-    :param other_partial_preferences: partial preference of every alternative 
-        over other alternatives or profiles or None
+    :param partial_preferences: DataFrame of partial preference indices as
+        value, alternatives/profiles and criteria as index and
+        alternatives/profiles as columns
+    :param other_partial_preferences: DataFrame of partial preference of 
+        every alternative over other alternatives or profiles or None
 
-    :returns: 3D matrix of partial discordance indices
+    :returns: DataFrame of partial discordance indices as value, 
+        alternatives/profiles and criteria as index and alternatives/profiles 
+        as columns
     """
     # check if there is a second partial preference DataFrame
     if other_partial_preferences is None:
@@ -113,12 +119,15 @@ def _overall_discordance(criteria: List[str],
     Calculates overall discordance by aggregating partial discordance indices.
 
     :param criteria: list of criteria names
-    :param partial_discordance: matrix of partial discordance indices
+    :param partial_discordance: DataFrame of partial discordance indices as
+        1value, alternatives/profiles and criteria as index and
+        alternatives/profiles as columns
     :param tau: technical parameter, τ ∈ [1, k], smaller τ → weaker
      discordance
-    :param decimal_place: with this you can choose the decimal_place of
-     the output numbers
-    :return: matrix of overall discordance
+    :param decimal_place: the decimal place of the output numbers
+
+    :returns: DataFrame of discordance indices as value and
+        alternatives/profiles as index and columns
     """
     discordance = []
     k = len(criteria)
@@ -131,7 +140,7 @@ def _overall_discordance(criteria: List[str],
             # aggregate partial discordance indices from each criterion
             for criterion in criteria:
                 D_a_b *= pow(
-                    1 - partial_discordance.loc[criterion, i][column],
+                    1 - min(partial_discordance.loc[criterion, i][column], 1),
                     tau / k)
             D_a_b = 1 - D_a_b
             aggregated_discordance.append(round(D_a_b, decimal_place))
