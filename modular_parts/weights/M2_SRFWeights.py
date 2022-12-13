@@ -1,5 +1,5 @@
 """
-    This module computes weights of criteria using the revised Simos
+    This module computes weights of criteria usiqng the revised Simos
     (or Simos-Roy-Figueira; SRF) method.
 
     Implementation and naming of conventions are taken from
