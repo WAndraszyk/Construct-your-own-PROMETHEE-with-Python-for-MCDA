@@ -10,11 +10,13 @@ def preferences():
     return pd.DataFrame([[0, 1.05, 1.04, 1.03],
                          [0, 0.00, 0.51, 1.02],
                          [0, 0.50, 0.00, 1.01],
-                         [0, 0.00, 0.00, 0.00]], index=alternatives, columns=alternatives)
+                         [0, 0.00, 0.00, 0.00]], index=alternatives,
+                        columns=alternatives)
 
 
 def test_ordered_clusters(preferences):
-    expected = pd.Series([['a'], ['b', 'c'], ['d']], name="Alternatives in clusters")
+    expected = pd.Series([['a'], ['b', 'c'], ['d']],
+                         name="Alternatives in clusters", index=[1, 2, 3])
     actual = group_into_ordered_clusters(preferences, 3)
     assert_series_equal(expected, actual)
 

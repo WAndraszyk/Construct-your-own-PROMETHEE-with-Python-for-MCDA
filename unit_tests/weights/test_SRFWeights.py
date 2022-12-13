@@ -4,9 +4,7 @@ import pandas as pd
 from pandas.testing import assert_series_equal
 from modular_parts.weights import calculate_srf_weights
 
-
 sys.path.append('../..')
-
 
 
 @pytest.fixture
@@ -37,7 +35,8 @@ def test_srf_weights(criteria_ranks, criteria_weight_ratio, decimal_place):
         'j': 8.9, 'k': 15.3, 'l': 2.4,
     })
 
-    actual = calculate_srf_weights(criteria_ranks, criteria_weight_ratio, decimal_place)
+    actual = calculate_srf_weights(criteria_ranks, criteria_weight_ratio,
+                                   decimal_place)
 
     assert_series_equal(expected, actual, atol=0.006)
 

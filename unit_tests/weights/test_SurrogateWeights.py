@@ -27,7 +27,8 @@ def test_equal_weights(criteria_ranks, decimal_place):
         'g': 0.083, 'h': 0.083, 'i': 0.083,
         'j': 0.083, 'k': 0.083, 'l': 0.083,
     }, name="weights")
-    actual = surrogate_weights(criteria_ranks, SurrogateMethod.EW, decimal_place)
+    actual = surrogate_weights(criteria_ranks, SurrogateMethod.EW,
+                               decimal_place)
     assert_series_equal(expected, actual, atol=0.006)
 
 
@@ -38,7 +39,8 @@ def test_rank_sum(criteria_ranks, decimal_place):
         'g': 0.154, 'h': 0.09, 'i': 0.115,
         'j': 0.115, 'k': 0.077, 'l': 0.154,
     }, name="weights")
-    actual = surrogate_weights(criteria_ranks, SurrogateMethod.RS, decimal_place)
+    actual = surrogate_weights(criteria_ranks, SurrogateMethod.RS,
+                               decimal_place)
     assert_series_equal(expected, actual, atol=0.006)
 
 
@@ -49,7 +51,8 @@ def test_reciprocal_of_ranks(criteria_ranks, decimal_place):
         'g': 0.322, 'h': 0.054, 'i': 0.081,
         'j': 0.081, 'k': 0.046, 'l': 0.322,
     }, name="weights")
-    actual = surrogate_weights(criteria_ranks, SurrogateMethod.RR, decimal_place)
+    actual = surrogate_weights(criteria_ranks, SurrogateMethod.RR,
+                               decimal_place)
     assert_series_equal(expected, actual, atol=0.006)
 
 
@@ -60,7 +63,8 @@ def test_rank_order_centroid(criteria_ranks, decimal_place):
         'g': 0.259, 'h': 0.068, 'i': 0.106,
         'j': 0.106, 'k': 0.054, 'l': 0.259,
     }, name="weights")
-    actual = surrogate_weights(criteria_ranks, SurrogateMethod.ROC, decimal_place)
+    actual = surrogate_weights(criteria_ranks, SurrogateMethod.ROC,
+                               decimal_place)
     assert_series_equal(expected, actual, atol=0.006)
 
 

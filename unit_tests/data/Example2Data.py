@@ -1,7 +1,5 @@
 import pandas as pd
-
-from core.preference_commons import GeneralCriterion
-from core.enums import *
+from core.preference_commons import GeneralCriterion, Direction
 
 alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
 criteria = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6']

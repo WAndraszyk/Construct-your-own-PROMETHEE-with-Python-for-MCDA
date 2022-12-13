@@ -1,7 +1,8 @@
 import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
-from modular_parts.preference import compute_preference_indices_with_interactions, compute_preference_indices
+from modular_parts.preference import \
+    compute_preference_indices_with_interactions
 from core.enums import GeneralCriterion, Direction, InteractionType
 
 
@@ -45,7 +46,9 @@ def standard_deviations(criteria):
 
 @pytest.fixture
 def generalized_criteria(criteria):
-    generalized_criteria_list = [GeneralCriterion.U_SHAPE, GeneralCriterion.V_SHAPE, GeneralCriterion.V_SHAPE]
+    generalized_criteria_list = [GeneralCriterion.U_SHAPE,
+                                 GeneralCriterion.V_SHAPE,
+                                 GeneralCriterion.V_SHAPE]
     return pd.Series(data=generalized_criteria_list, index=criteria)
 
 
@@ -66,34 +69,41 @@ def interactions():
     return pd.DataFrame(data=[['G2', 'G3', InteractionType.STN, 0.15],
                               ['G1', 'G2', InteractionType.ANT, 0.10],
                               ['G1', 'G2', InteractionType.WKN, -0.05]],
-                        columns=['criterion_1', 'criterion_2', 'type', 'coefficient'])
+                        columns=['criterion_1', 'criterion_2', 'type',
+                                 'coefficient'])
 
 
-def test_interactions_preference(alternatives, alternatives_performances, preference_thresholds,
-                                 indifference_thresholds, standard_deviations, directions,
+def test_interactions_preference(alternatives, alternatives_performances,
+                                 preference_thresholds,
+                                 indifference_thresholds, standard_deviations,
+                                 directions,
                                  generalized_criteria, weights, interactions):
     data = [[0.00, 0.000, 0.000, 0.259, 0.000],
             [1.00, 0.000, 0.000, 0.259, 0.000],
             [1.00, 0.824, 0.000, 0.259, 0.333],
             [0.71, 0.710, 0.710, 0.000, 0.500],
             [1.00, 1.000, 0.167, 0.444, 0.000]]
-    expected = pd.DataFrame(data=data, columns=alternatives, index=alternatives)
-    actual, _ = compute_preference_indices_with_interactions(alternatives_performances=alternatives_performances,
-                                                             preference_thresholds=preference_thresholds,
-                                                             indifference_thresholds=indifference_thresholds,
-                                                             standard_deviations=standard_deviations,
-                                                             generalized_criteria=generalized_criteria,
-                                                             directions=directions,
-                                                             weights=weights, interactions=interactions)
+    expected = pd.DataFrame(data=data, columns=alternatives,
+                            index=alternatives)
+    actual, _ = compute_preference_indices_with_interactions(
+        alternatives_performances=alternatives_performances,
+        preference_thresholds=preference_thresholds,
+        indifference_thresholds=indifference_thresholds,
+        # standard_deviations=standard_deviations,
+        s_parameters=standard_deviations,
+        generalized_criteria=generalized_criteria,
+        directions=directions,
+        weights=weights, interactions=interactions)
 
     assert_frame_equal(actual, expected, atol=0.006)
 
 
 if __name__ == '__main__':
-    test_interactions_preference(alternatives_performances=alternatives_performances,
-                                 preference_thresholds=preference_thresholds,
-                                 indifference_thresholds=indifference_thresholds,
-                                 standard_deviations=standard_deviations,
-                                 generalized_criteria=generalized_criteria,
-                                 directions=directions, alternatives=alternatives,
-                                 weights=weights, interactions=interactions)
+    test_interactions_preference(
+        alternatives_performances=alternatives_performances,
+        preference_thresholds=preference_thresholds,
+        indifference_thresholds=indifference_thresholds,
+        standard_deviations=standard_deviations,
+        generalized_criteria=generalized_criteria,
+        directions=directions, alternatives=alternatives,
+        weights=weights, interactions=interactions)

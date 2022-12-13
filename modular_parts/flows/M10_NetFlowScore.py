@@ -1,26 +1,26 @@
 """
-    This class computes Net Flow Score which bases on calculating scores associated with
+    This class computes Net Flow Score which bases on calculating scores
+    associated with
     each alternative.
 """
 import math
 
 import numpy as np
 import pandas as pd
-from core.aliases import PreferencesTable
 from core.enums import ScoringFunction, ScoringFunctionDirection
 from core.input_validation import net_flow_score_validation
-
 
 __all__ = ['calculate_net_flows_score']
 
 
-def _calculate_score(preferences: PreferencesTable,
+def _calculate_score(preferences: pd.Series,
                      function: ScoringFunction,
                      direction: ScoringFunctionDirection) -> np.array:
     """
     Calculates scores for passed preferences.
 
-    :param preferences: 2D List of aggregated preferences between alternatives.
+    :param preferences: 2D List of aggregated preferences between
+    alternatives.
     :return: List of Net Flow Scores for passed preferences.
     """
 
@@ -54,7 +54,7 @@ def _find_duplicates_values(array: np.ndarray) -> set:
     return duplicated_values
 
 
-def calculate_net_flows_score(preferences: PreferencesTable,
+def calculate_net_flows_score(preferences: pd.DataFrame,
                               function: ScoringFunction,
                               direction: ScoringFunctionDirection,
                               avoid_same_scores: bool = False) -> pd.Series:
@@ -63,13 +63,17 @@ def calculate_net_flows_score(preferences: PreferencesTable,
 
 
     :param preferences: Preference table of aggregated preferences.
-    :param function: Enum ScoringFunction - indicate which function should be used in calculating Net Flow Score.
-    :param direction: Enum ScoringFunctionDirection - indicate which function direction should be used in
-    :param avoid_same_scores: If True and calculate_scores returns some equal scores calculate once more scores for
+    :param function: Enum ScoringFunction - indicate which function should be
+    used in calculating Net Flow Score.
+    :param direction: Enum ScoringFunctionDirection - indicate which function
+    direction should be used in
+    :param avoid_same_scores: If True and calculate_scores returns some equal
+    scores calculate once more scores for
                               alternatives which get the same score.
     :return: List of Net Flow Scores for all preferences.
     """
-    net_flow_score_validation(preferences, function, direction, avoid_same_scores)
+    net_flow_score_validation(preferences, function, direction,
+                              avoid_same_scores)
     np.fill_diagonal(preferences.values, np.NaN)
 
     if avoid_same_scores:
@@ -77,9 +81,14 @@ def calculate_net_flows_score(preferences: PreferencesTable,
         if len(scores) != len(set(scores)):
             duplicated_values = _find_duplicates_values(scores)
             for duplicated_value in duplicated_values:
-                duplicated_score_indices = [i for i, score in enumerate(scores) if math.isclose(score, duplicated_value)]
-                sub_preferences = preferences.iloc[:, duplicated_score_indices].iloc[duplicated_score_indices, :]
-                sub_scores = _calculate_score(sub_preferences, function, direction)
+                duplicated_score_indices = \
+                    [i for i, score in enumerate(scores)
+                     if math.isclose(score, duplicated_value)]
+                sub_preferences = \
+                    preferences.iloc[:, duplicated_score_indices].iloc[
+                        duplicated_score_indices, :]
+                sub_scores = _calculate_score(sub_preferences, function,
+                                              direction)
                 for index, score in zip(duplicated_score_indices, sub_scores):
                     scores[index] = score
     else:

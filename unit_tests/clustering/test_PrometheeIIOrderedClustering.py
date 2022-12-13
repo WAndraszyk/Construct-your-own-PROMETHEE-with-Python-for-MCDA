@@ -54,14 +54,18 @@ def generalized_criteria():
 @pytest.fixture
 def criteria_directions():
     criteria = [f"g{i}" for i in range(1, 7)]
-    return pd.Series([Direction.MIN, Direction.MAX, Direction.MIN, Direction.MIN, Direction.MIN, Direction.MAX],
-                     index=criteria)
+    return pd.Series(
+        [Direction.MIN, Direction.MAX, Direction.MIN, Direction.MIN,
+         Direction.MIN, Direction.MAX],
+        index=criteria)
 
 
 @pytest.fixture
 def criteria_weights():
     criteria = [f"g{i}" for i in range(1, 7)]
-    return surrogate_weights(pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria), SurrogateMethod.EW)
+    return surrogate_weights(
+        pd.Series(data=[7, 1, 3, 2, 4, 5], index=criteria),
+        SurrogateMethod.EW)
 
 
 @pytest.fixture
@@ -69,18 +73,31 @@ def n_categories():
     return 2
 
 
-def test_cluster_using_prometheecluster(alternatives_performances, preference_thresholds, indifference_thresholds,
-                                        standard_deviations, generalized_criteria, criteria_directions,
+def test_cluster_using_prometheecluster(alternatives_performances,
+                                        preference_thresholds,
+                                        indifference_thresholds,
+                                        standard_deviations,
+                                        generalized_criteria,
+                                        criteria_directions,
                                         criteria_weights, n_categories):
-    assignment = promethee_II_ordered_clustering(alternatives_performances, preference_thresholds,
+    assignment = promethee_II_ordered_clustering(alternatives_performances,
+                                                 preference_thresholds,
                                                  indifference_thresholds,
-                                                 standard_deviations, generalized_criteria, criteria_directions,
-                                                 criteria_weights, n_categories)
-    assignment_to_check = pd.Series(data=[['a2', 'a5'], ['a1', 'a3', 'a4', 'a6']], index=['C1', 'C2'])
+                                                 standard_deviations,
+                                                 generalized_criteria,
+                                                 criteria_directions,
+                                                 criteria_weights,
+                                                 n_categories)
+    assignment_to_check = pd.Series(
+        data=[['a1', 'a3', 'a4', 'a6'], ['a2', 'a5']], index=['C1', 'C2'])
     assert_series_equal(assignment_to_check, assignment, atol=0.006)
 
 
 if __name__ == '__main__':
-    test_cluster_using_prometheecluster(alternatives_performances, preference_thresholds, indifference_thresholds,
-                                        standard_deviations, generalized_criteria, criteria_directions,
+    test_cluster_using_prometheecluster(alternatives_performances,
+                                        preference_thresholds,
+                                        indifference_thresholds,
+                                        standard_deviations,
+                                        generalized_criteria,
+                                        criteria_directions,
                                         criteria_weights, n_categories)

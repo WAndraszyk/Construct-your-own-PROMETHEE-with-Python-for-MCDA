@@ -1,22 +1,11 @@
-from typing import Union, List, Tuple
+from typing import Callable, Union
 
-import pandas as pd
+from pandas import DataFrame
 
-NumericValue = Union[int, float]
-PreferenceTable = Union[pd.DataFrame, Tuple[pd.DataFrame]]
-Id = str
+NumericValue = Union[float, int]
+Value = Union[float, str]
 
-Alternative = Id
-CategoryProfile = Id
-Criterion = Id
+PerformanceTable = DataFrame
 
-PerformanceTable = pd.DataFrame  # Alternatives performances or Category Profiles performances
-PreferencesTable = pd.DataFrame
-PreferencePartialTable = Union[pd.DataFrame, Tuple[pd.DataFrame]]
-Preferences = Tuple[PreferenceTable]
-FlowsTable = pd.DataFrame
-NetOutrankingFlows = pd.Series
-DMsTable = pd.DataFrame
-RankedCriteria = pd.Series
-
-DeviationsTable = List[Union[List[List[NumericValue]], List[List[List[NumericValue]]]]]
+Function = Callable[[Value], Value]
+NumericFunction = Callable[[NumericValue], NumericValue]

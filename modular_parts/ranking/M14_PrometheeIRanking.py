@@ -5,18 +5,18 @@
 import math
 
 import pandas as pd
-from core.aliases import FlowsTable
 from core.input_validation import promethee_i_ranking_validation
 
 
 __all__ = ["calculate_prometheeI_ranking"]
 
 
-def calculate_prometheeI_ranking(flows: FlowsTable,
+def calculate_prometheeI_ranking(flows: pd.DataFrame,
                                  weak_preference=True
                                  ) -> pd.DataFrame:
     """
-    Calculate outranking pairs - 1st alternative in pair | relation between variants | 2nd alternative in pair.
+    Calculate outranking pairs - 1st alternative in pair | relation between
+    variants | 2nd alternative in pair.
     Relationship types:
         P - preferred
         I - indifferent
@@ -24,9 +24,10 @@ def calculate_prometheeI_ranking(flows: FlowsTable,
         S - outranking relation
 
     :param flows: FlowsTable with positive and negative flows
-    :param weak_preference: If True the general method of computing the ranking is  generalized to the relation of
-                            the weak preference
-    :return: List of preference ranking pairs (alternative, relation, alternative)
+    :param weak_preference: If True the general method of computing
+    the ranking is  generalized to the relation of the weak preference
+    :return: List of preference ranking pairs (alternative, relation,
+     alternative)
     """
     promethee_i_ranking_validation(flows, weak_preference)
 
@@ -42,17 +43,23 @@ def calculate_prometheeI_ranking(flows: FlowsTable,
                 pairs[alternative_b][alternative_a] = None
                 continue
             if weak_preference:
-                if positive_flow[alternative_a] >= positive_flow[alternative_b] \
-                        and negative_flow[alternative_a] <= negative_flow[alternative_b]:
+                if positive_flow[alternative_a] >= \
+                        positive_flow[alternative_b] \
+                        and negative_flow[alternative_a] <= \
+                        negative_flow[alternative_b]:
                     pairs[alternative_b][alternative_a] = 'S'
                 else:
                     pairs[alternative_b][alternative_a] = '?'
             else:
-                if math.isclose(positive_flow[alternative_a], positive_flow[alternative_b]) \
-                        and math.isclose(negative_flow[alternative_a], negative_flow[alternative_b]):
+                if math.isclose(positive_flow[alternative_a],
+                                positive_flow[alternative_b]) \
+                        and math.isclose(negative_flow[alternative_a],
+                                         negative_flow[alternative_b]):
                     pairs[alternative_b][alternative_a] = 'I'
-                elif positive_flow[alternative_a] >= positive_flow[alternative_b] \
-                        and negative_flow[alternative_a] <= negative_flow[alternative_b]:
+                elif positive_flow[alternative_a] >= \
+                        positive_flow[alternative_b] \
+                        and negative_flow[alternative_a] <= \
+                        negative_flow[alternative_b]:
                     pairs[alternative_b][alternative_a] = 'P'
                 else:
                     pairs[alternative_b][alternative_a] = '?'

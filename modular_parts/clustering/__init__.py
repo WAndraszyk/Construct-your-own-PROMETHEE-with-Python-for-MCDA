@@ -1,7 +1,9 @@
-from .M24_OrderedClustering import *
-from .M26_PrometheeCluster import *
-from .M27_PClust import *
-from .M25_PrometheeIIOrderedClustering import *
+from .M25_OrderedClustering import *
+from .M27_PrometheeCluster import *
+from .M28_PClust import *
+from .M26_PrometheeIIOrderedClustering import *
 
-__all__ = M24_OrderedClustering.__all__ + M25_PrometheeIIOrderedClustering.__all__ + M26_PrometheeCluster.__all__ \
-          + M27_PClust.__all__
+__all__ = M25_OrderedClustering.__all__ + \
+          M26_PrometheeIIOrderedClustering.__all__ + \
+          M27_PrometheeCluster.__all__ \
+          + M28_PClust.__all__
