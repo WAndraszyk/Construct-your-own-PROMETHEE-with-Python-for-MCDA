@@ -27,7 +27,7 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
 
     alternatives = preferences.index
     shape = np.shape(preferences)
-    preferences = preferences.values.tolist()
+    preferences = list(preferences.values)
 
     graph = np.zeros(shape)
     clusters = []

@@ -40,26 +40,31 @@ def compute_discordance(criteria: List[str],
     :return: matrix of overall discordance and matrix of partial discordance
      indices. Alternatively: preference
     """
-
+    # validate input data
     discordance_validation(criteria, partial_preferences, tau, decimal_place,
                            preferences, were_categories_profiles)
 
+    # check if partial preferences were calculated with profiles
     if not were_categories_profiles:
+        # calculate partial_discordance and discordance
         partial_discordance = _calculate_partial_discordance(
             criteria, partial_preferences)
         discordance = _overall_discordance(criteria, partial_discordance, tau,
                                            decimal_place)
     else:
+        # calculate partial discordance for both DataFrames in tuple
         partial_discordance = [
             _calculate_partial_discordance(criteria, partial_preferences[0],
                                            partial_preferences[1]),
             _calculate_partial_discordance(criteria, partial_preferences[1],
                                            partial_preferences[0])]
+        # calculate discordance for both partial discordances in the list
         discordance = []
         for i in partial_discordance:
             discordance.append(
                 _overall_discordance(criteria, i, tau, decimal_place))
 
+    # check whether to calculate overall preference
     if preferences is not None:
         return overall_preference(preferences, discordance,
                                   were_categories_profiles, decimal_place)
@@ -82,12 +87,15 @@ def _calculate_partial_discordance(criteria: List[str],
 
     :returns: 3D matrix of partial discordance indices
     """
+    # check if there is a second partial preference DataFrame
     if other_partial_preferences is None:
+        # if there is not, use the first one for both
         other_partial_preferences = partial_preferences
 
     partial_discordance_data = []
 
     for criterion in criteria:
+        # calculate partial discordance for every criterion
         partial_discordance_on_criterion = other_partial_preferences.loc[
             criterion].T
         partial_discordance_data.append(partial_discordance_on_criterion)
@@ -120,6 +128,7 @@ def _overall_discordance(criteria: List[str],
         aggregated_discordance = []
         for column in columns:
             D_a_b = 1
+            # aggregate partial discordance indices from each criterion
             for criterion in criteria:
                 D_a_b *= pow(
                     1 - partial_discordance.loc[criterion, i][column],
