@@ -2,7 +2,7 @@ import pytest
 import sys
 import pandas as pd
 from pandas.testing import assert_series_equal
-from modular_parts.flows import calculate_promethee_group_ranking
+from modular_parts.flows import calculate_promethee_aggregated_flows
 
 sys.path.append('../..')
 
@@ -27,7 +27,7 @@ def test_promethee_group_ranking(dms_flows, dms_weights):
     expected = pd.Series([-0.18, 0.98, 0.57, -0.1, -0.89, -0.42],
                          index=alternatives)
 
-    actual = calculate_promethee_group_ranking(dms_flows, dms_weights)
+    actual = calculate_promethee_aggregated_flows(dms_flows, dms_weights)
 
     assert_series_equal(expected, actual, atol=0.006)
 
