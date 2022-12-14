@@ -40,7 +40,7 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
         """
         rank_summed = rc.replace([i + 1 for i in range(len(weights))],
                                  weights)
-        return pd.Series(rank_summed.index, rank_summed.values,
+        return pd.Series(rank_summed.values, rank_summed.index,
                          name="weights")
 
     def equal_weights(rc: pd.Series, dp: NumericValue = 3) -> pd.Series:
@@ -60,7 +60,7 @@ def surrogate_weights(criteria_ranks: pd.Series, method: SurrogateMethod,
         wi = round(1 / n, dp)
         for i in range(1, n + 1):
             weights.append(wi)
-        return pd.Series(rc.index, weights, name="weights")
+        return pd.Series(weights, rc.index, name="weights")
 
     def rank_sum(rc: pd.Series, dp: NumericValue = 3) -> pd.Series:
         """

@@ -274,3 +274,15 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
         overall_preferences = overall_preferences.round(decimal_place)
 
     return overall_preferences
+
+
+def criteria_series(criteria: pd.Index, weights: List[float]) -> pd.Series:
+    """
+    Connect criterion name with its weight.
+
+    :param criteria: criteria names as list of string.
+    :param weights: criteria weights as list of Numeric Values.
+
+    :return: dictionary of connection.
+    """
+    return pd.Series(weights, criteria, name="weights")
