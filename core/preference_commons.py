@@ -42,7 +42,10 @@ def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
         every criterion, index: alternatives, columns: criteria
     :param profile_performance_table: Dataframe of profiles' value at
         every criterion, index: profiles, columns: criteria
-    :return: 3D list matrix of deviations in evaluations on criteria
+    :return: 3D list of calculated deviations alternatives over
+        alternatives at every criterion or 4D list of calculated deviations
+        alternatives over profiles and profiles over alternatives at every
+        criterion
     """
 
     def dev_calc(i_iter: pd.DataFrame, j_iter: pd.DataFrame, n: int
@@ -96,8 +99,7 @@ def deviations(criteria: pd.Index, alternatives_performances: pd.DataFrame,
 def pp_deep(criteria: pd.Index, preference_thresholds: pd.Series,
             indifference_thresholds: pd.Series,
             s_parameters: pd.Series, generalized_criteria: pd.Series,
-            deviations: List[Union[List[List[NumericValue]],
-                                   List[List[List[NumericValue]]]]],
+            deviations: List[List[List[NumericValue]]],
             i_iter: pd.DataFrame, j_iter: pd.DataFrame) -> pd.DataFrame:
     """
     This function computes the preference indices for a given set of
@@ -114,10 +116,8 @@ def pp_deep(criteria: pd.Index, preference_thresholds: pd.Series,
         index: criteria
     :param generalized_criteria: Series with preference functions as values
         and criteria as index
-        :param deviations: 3D list of calculated deviations alternatives over
-        alternatives at every criterion or 3D list of calculated deviations
-        alternatives over profiles and profiles over alternatives at every
-        criterion
+    :param deviations: 3D list of calculated deviations alternatives/profiles
+        over alternatives/profiles at every criterion
     :param i_iter: pd.DataFrame of alternatives or categories profiles
         performances
     :param j_iter: pd.DataFrame alternatives or categories profiles
@@ -234,7 +234,7 @@ def partial_preference(criteria: pd.Index, preference_thresholds: pd.Series,
                            )
     # checking if categories_profiles exist
     if categories_profiles is None:
-        # calculating partial partial indices for alternatives over
+        # calculating partial indices for alternatives over
         # alternatives at every criterion
         ppIndices = pp_deep(deviations=deviation, criteria=criteria,
                             preference_thresholds=preference_thresholds,

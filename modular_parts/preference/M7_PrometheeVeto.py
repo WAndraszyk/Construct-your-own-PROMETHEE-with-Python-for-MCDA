@@ -212,8 +212,7 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
 
 
 def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
-               deviations: List[Union[
-                   List[List[NumericValue]], List[List[List[NumericValue]]]]],
+               deviations: List[List[List[NumericValue]]],
                i_iter: pd.DataFrame, j_iter: pd.DataFrame) -> pd.DataFrame:
     """
     This function computes the veto indices for a given set of alternatives
@@ -222,10 +221,8 @@ def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
     :param veto_thresholds: Series of veto threshold for each criterion,
         index: criteria
     :param criteria: pd.Index with criteria indices
-    :param deviations: 3D list of calculated deviations alternatives over
-        alternatives at every criterion or 3D list of calculated deviations
-        alternatives over profiles and profiles over alternatives at every
-        criterion
+    :param deviations: 3D list of calculated deviations alternatives/profiles
+        over alternatives/profiles at every criterion
     :param i_iter: pd.DataFrame of alternatives or categories profiles
         performances
     :param j_iter: pd.DataFrame alternatives or categories profiles
