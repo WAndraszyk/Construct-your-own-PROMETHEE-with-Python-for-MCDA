@@ -31,23 +31,32 @@ def compute_preference_indices_with_interactions(
     criteria effect.
 
     :param alternatives_performances: Dataframe of alternatives' value at
-        every criterion
-    :param preference_thresholds: preference threshold for each criterion
-    :param indifference_thresholds: indifference threshold for each criterion
-    :param s_parameters: s parameter for each criterion
-    :param generalized_criteria: list of preference functions
-    :param directions: directions of preference of criteria
-    :param weights: criteria with weights
+        every criterion, index: alternatives, columns: criteria
+    :param preference_thresholds: Series of preference threshold for
+        each criterion, index: criteria
+    :param indifference_thresholds: Series of indifference threshold for
+        each criterion, index: criteria
+    :param s_parameters: Series of s parameter for each criterion, s parameter
+        is a threshold used in Gaussian Criterion, it's defined as an
+        intermediate value between indifference and preference threshold,
+        index: criteria
+    :param generalized_criteria: Series with preference functions as values
+        and criteria as index
+    :param directions: Series with directions of preference as values and
+        criteria as index
+    :param weights: Series with weights as values and criteria as index
     :param interactions: DataFrame of interactions between criteria with
-     coefficients
+     coefficients, index: default , columns: criterion_1, criterion_2, type
+     of interaction, coefficient
     :param profiles_performance: Dataframe of profiles performance (value)
-        at every criterion
+        at every criterion, index: profiles, columns: criteria
     :param decimal_place: the decimal place of the output numbers
     :param minimum_interaction_effect: boolean representing function used to
-     capture the interaction effects in the ambiguity zone. DM can choose 2
-     different functions: minimum (true) or multiplication (false)
+        capture the interaction effects in the ambiguity zone. DM can choose 2
+        different functions: minimum (true) or multiplication (false)
     :return: preferences and partial preferences
     """
+    # input data validation
     promethee_interaction_preference_validation(alternatives_performances,
                                                 preference_thresholds,
                                                 indifference_thresholds,
@@ -60,16 +69,24 @@ def compute_preference_indices_with_interactions(
                                                 decimal_place)
     alternatives = alternatives_performances.index
     criteria = weights.index
+
+    # changing values of alternatives' performances according to direction
+    # of criterion for further calculations
     alternatives_performances = pc.directed_alternatives_performances(
         alternatives_performances, directions)
+
+    # checking if profiles' performances were given
     if profiles_performance is not None:
         categories_profiles = profiles_performance.index
+        # changing values of profiles' performances according to direction
+        # of criterion for further calculations
         profile_performance_table = pc.directed_alternatives_performances(
             profiles_performance, directions)
     else:
         categories_profiles = None
         profile_performance_table = None
 
+    # calculating partial preference indices
     partialPref = pc.partial_preference(
         criteria=criteria, preference_thresholds=preference_thresholds,
         indifference_thresholds=indifference_thresholds,
@@ -78,12 +95,17 @@ def compute_preference_indices_with_interactions(
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
         profile_performance_table=profile_performance_table)
+
+    # checking if categories_profiles exist
     if categories_profiles is None:
+        # calculating preference indices for alternatives over alternatives
         return _preferences(minimum_interaction_effect, interactions, weights,
                             criteria, partialPref, decimal_place,
                             alternatives
                             ), partialPref
     else:
+        # calculating preference indices for alternatives over profiles
+        # and profiles over alternatives
         return (
                    _preferences(minimum_interaction_effect, interactions,
                                 weights,
@@ -105,20 +127,26 @@ def _preferences(minimum_interaction_effect: bool,
     Calculates aggregated preference indices.
 
     :param minimum_interaction_effect: boolean representing function used to
-     capture the interaction effects in the ambiguity zone.
+        capture the interaction effects in the ambiguity zone.
     :param interactions: DataFrame of interactions between criteria with
-     coefficients
-    :param weights: criteria with weights
-    :param criteria: list of criteria
-    :param partialPref: partial preference indices
+        coefficients, index: default , columns: criterion_1, criterion_2, type
+        of interaction, coefficient
+    :param weights: Series with weights as values and criteria as index
+    :param criteria: pd.Index with criteria indices
+    :param partialPref: DataFrame of partial preference indices as
+        value, alternatives/profiles and criteria as index and
+        alternatives/profiles as columns
     :param decimal_place: the decimal place of the output numbers
-    :param i_perf: alternatives or categories profiles performances
-    :param j_perf: alternatives or categories profiles performances or None
+    :param i_iter: alternatives or categories profiles
+    :param j_iter: alternatives or categories profiles or None
 
     :return: aggregated preference indices
     """
+    # checking if second set of alternatives/profiles is given
     if j_iter is None:
+        # if there is not, use the first one for both
         j_iter = i_iter
+
     preferences = []
     for i in i_iter:
         aggregatedPI = []
@@ -127,20 +155,25 @@ def _preferences(minimum_interaction_effect: bool,
             interaction_ab = 0
             for k in criteria:
                 Pi_A_B += partialPref.loc[k, i][j] * weights[k]
+
+            # calculating interaction effect for every interaction
             for key in interactions.index.values:
                 k1 = interactions['criterion_1'].loc[key]
                 k2 = interactions['criterion_2'].loc[key]
                 coefficient = interactions['coefficient'].loc[key] * (
                     1 if interactions['type'].loc[key].value > 0 else -1)
+                # if interaction's type is antagonistic
                 if interactions['type'].loc[key].value == -1:
                     interaction_ab += _interaction_effects(
                         minimum_interaction_effect, partialPref.loc[k1, i][j],
                         partialPref.loc[k2, j][i]) * coefficient
+                # if interaction's type is strengthening or weakening
                 else:
                     interaction_ab += _interaction_effects(
                         minimum_interaction_effect, partialPref.loc[k1, i][j],
                         partialPref.loc[k2, i][j]) * coefficient
-
+            # aggregate partial preference indices and interation effect
+            # from each criterion
             aggregated = round((Pi_A_B + interaction_ab) / (
                     sum(weights.values) + interaction_ab), decimal_place)
             aggregatedPI.append(aggregated if aggregated >= 0 else 0)
@@ -156,7 +189,7 @@ def _interaction_effects(minimum_interaction_effect: bool, pi: NumericValue,
     ambiguity zone
 
     :param minimum_interaction_effect: boolean representing function used to
-     capture the interaction effects in the ambiguity zone.
+        capture the interaction effects in the ambiguity zone.
     :param pi: partial pref index
     :param pj: partial pref index
     """
