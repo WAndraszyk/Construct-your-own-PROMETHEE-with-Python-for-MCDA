@@ -40,8 +40,14 @@ def compute_discordance(criteria: List[str],
     :param were_categories_profiles: were the preferences calculated
         for profiles
 
-    :return: DataFrame of overall discordance and DataFrame of partial
-        discordance indices. Alternatively: DataFrame of overall preference.
+    :return: Tuple of DataFrame of overall discordance (alternatives/profiles
+     as index and columns) and DataFrame of partial discordance indices
+     (alternatives/profiles and criteria as index, alternatives/profiles as
+     columns). With profiles, it's going to be Tuple of tuples of DataFrames
+     of overall discordance and DataFrames of partial
+     discordance indices. Alternatively: DataFrame of overall preference
+     (alternatives/profiles as index and columns) or
+     tuple of DataFrames of overall preference with profiles.
     """
     # validate input data
     discordance_validation(criteria, partial_preferences, tau, decimal_place,
@@ -127,7 +133,7 @@ def _overall_discordance(criteria: List[str],
     :param decimal_place: the decimal place of the output numbers
 
     :returns: DataFrame of discordance indices as value and
-        alternatives/profiles as index and columns
+        alternatives/profiles as index and columns.
     """
     discordance = []
     k = len(criteria)

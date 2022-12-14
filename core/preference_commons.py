@@ -244,7 +244,9 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
     :param profiles: were the preferences and discordance/veto calculated
         with profiles
     :param decimal_place: the decimal place of the output numbers
-    :returns: overall preference indices
+
+    :returns: DataFrame of overall preference (alternatives/profiles as index
+     and columns) or tuple of DataFrames of overall preference with profiles.
     """
     if profiles:
         # calculating overall preference for both preference matrices
