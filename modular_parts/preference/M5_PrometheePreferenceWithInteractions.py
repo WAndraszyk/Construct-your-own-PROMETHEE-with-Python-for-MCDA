@@ -54,7 +54,11 @@ def compute_preference_indices_with_interactions(
     :param minimum_interaction_effect: boolean representing function used to
         capture the interaction effects in the ambiguity zone. DM can choose 2
         different functions: minimum (true) or multiplication (false)
-    :return: preferences and partial preferences
+    :return: Tuple of preferences DataFrame (alternatives/profiles as index
+        and columns) and partial preferences DataFrame (alternatives/profiles and
+        criteria as index, alternatives/profiles as columns). With profiles, it's
+        going to be Tuple of tuples of preferences DataFrames and partial
+        preferences DataFrames.
     """
     # input data validation
     promethee_interaction_preference_validation(alternatives_performances,
@@ -94,7 +98,7 @@ def compute_preference_indices_with_interactions(
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
-        profile_performance_table=profile_performance_table)
+        profile_performance=profile_performance_table)
 
     # checking if categories_profiles exist
     if categories_profiles is None:
@@ -140,7 +144,9 @@ def _preferences(minimum_interaction_effect: bool,
     :param i_iter: alternatives or categories profiles
     :param j_iter: alternatives or categories profiles or None
 
-    :return: aggregated preference indices
+
+    :return: DataFrame of aggregated preference indices as values,
+        alternatives/profiles as index and columns.
     """
     # checking if second set of alternatives/profiles is given
     if j_iter is None:
@@ -192,6 +198,8 @@ def _interaction_effects(minimum_interaction_effect: bool, pi: NumericValue,
         capture the interaction effects in the ambiguity zone.
     :param pi: partial pref index
     :param pj: partial pref index
+    :return: Numeric value, result of Z function used to capture the
+        interaction effects in the ambiguity zone
     """
     if not minimum_interaction_effect:
         return pi * pj

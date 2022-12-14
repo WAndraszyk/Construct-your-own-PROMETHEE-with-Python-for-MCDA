@@ -2,10 +2,6 @@
 This module implements the basic way of calculating preference indices with
 Promethee Preference method.
 """
-from typing import Tuple, Union
-
-from pandas import DataFrame
-
 from core.aliases import NumericValue
 import core.preference_commons as pc
 from core.input_validation import promethee_preference_validation
@@ -93,8 +89,7 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
-        profile_performance_table=profile_performance_table)
-
+        profile_performance=profile_performance_table)
     # checking if categories_profiles exist
     if categories_profiles is None:
         # calculating preference indices for alternatives over alternatives

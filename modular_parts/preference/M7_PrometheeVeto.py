@@ -42,10 +42,16 @@ def compute_veto(
     :param preferences: DataFrame of preference indices as value,
         alternatives/profiles as index and columns,
         if not None function returns already calculated overall
-        preference instead of just discordance
+        preference instead of just veto
      
-    :return: DataFrame of overall veto and DataFrame of partial
-        veto indices. Alternatively: DataFrame of overall preference.
+    :return: Tuple of DataFrame of overall veto (alternatives/profiles
+        as index and columns) and DataFrame of partial veto indices
+        (alternatives/profiles and criteria as index, alternatives/profiles as
+        columns). With profiles, it's going to be Tuple of tuples of DataFrames
+        of overall veto and DataFrames of partial
+        veto indices. Alternatively: DataFrame of overall preference
+        (alternatives/profiles as index and columns) or
+        tuple of DataFrames of overall preference with profiles.
     """
     # input data validation
     veto_validation(alternatives_performances, weights, veto_thresholds,
@@ -216,11 +222,14 @@ def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
     :param veto_thresholds: Series of veto threshold for each criterion,
         index: criteria
     :param criteria: pd.Index with criteria indices
-    :param deviations: list of calculated deviations
-    :param deviations: list of calculated deviations
-    :param i_iter: alternatives or categories profiles performances
-    :param j_iter: alternatives or categories profiles performances
-        or None
+    :param deviations: 3D list of calculated deviations alternatives over
+        alternatives at every criterion or 3D list of calculated deviations
+        alternatives over profiles and profiles over alternatives at every
+        criterion
+    :param i_iter: pd.DataFrame of alternatives or categories profiles
+        performances
+    :param j_iter: pd.DataFrame alternatives or categories profiles
+        performances or None
 
     :return: DataFrame of partial veto indices as value,
         alternatives/profiles and criteria as index and alternatives/profiles
