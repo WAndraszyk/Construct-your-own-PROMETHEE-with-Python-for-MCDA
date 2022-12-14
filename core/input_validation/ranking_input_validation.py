@@ -169,8 +169,7 @@ def promethee_ii_ranking_validation(net_flow: pd.DataFrame):
 
 def net_flow_score_iterative_validation(alternative_preferences: pd.DataFrame,
                                         function: ScoringFunction,
-                                        direction: ScoringFunctionDirection,
-                                        avoid_same_scores: bool):
+                                        direction: ScoringFunctionDirection):
     """
     Check if all inputs are valid for Net Flow Score Iterative.
 
@@ -178,11 +177,10 @@ def net_flow_score_iterative_validation(alternative_preferences: pd.DataFrame,
     and alternatives as columns
     :param function: ScoringFunction object
     :param direction: ScoringFunctionDirection object
-    :param avoid_same_scores: boolean which indicates if same scores are
     :raise ValueError: if any input is not valid
     """
     net_flow_score_validation(alternative_preferences, function, direction,
-                              avoid_same_scores)
+                              True)
 
 
 def promethee_i_ranking_validation(flows: pd.DataFrame,

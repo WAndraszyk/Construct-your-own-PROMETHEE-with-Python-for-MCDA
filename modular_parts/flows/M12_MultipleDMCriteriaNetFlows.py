@@ -244,6 +244,7 @@ def calculate_gdss_flows(
     dms_alternatives_partial_preferences = list(
         dms_alternatives_partial_preferences)
 
+    # Input validation
     net_flows_for_multiple_DM_validation(
         dms_profiles_partial_preferences,
         dms_alternatives_partial_preferences,
