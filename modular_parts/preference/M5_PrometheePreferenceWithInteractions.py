@@ -55,10 +55,10 @@ def compute_preference_indices_with_interactions(
         capture the interaction effects in the ambiguity zone. DM can choose 2
         different functions: minimum (true) or multiplication (false)
     :return: Tuple of preferences DataFrame (alternatives/profiles as index
-        and columns) and partial preferences DataFrame (alternatives/profiles and
-        criteria as index, alternatives/profiles as columns). With profiles, it's
-        going to be Tuple of tuples of preferences DataFrames and partial
-        preferences DataFrames.
+        and columns) and partial preferences DataFrame (alternatives/profiles
+        and criteria as index, alternatives/profiles as columns). With
+        profiles, it's going to be Tuple of tuples of preferences DataFrames
+        and partial preferences DataFrames.
     """
     # input data validation
     promethee_interaction_preference_validation(alternatives_performances,
