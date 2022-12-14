@@ -50,7 +50,11 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
         at every criterion, index: profiles, columns: criteria
     :param decimal_place: the decimal place of the output numbers
 
-    :return: preferences and partial preferences
+    :return: Tuple of preferences DataFrame (alternatives/profiles as index
+     and columns) and partial preferences DataFrame (alternatives/profiles and
+     criteria as index, alternatives/profiles as columns). With profiles, it's
+     going to be Tuple of tuples of preferences DataFrames and partial
+     preferences DataFrames.
     """
     # input data validation
     promethee_preference_validation(alternatives_performances,
@@ -120,7 +124,8 @@ def _preferences(weights: pd.Series, criteria: pd.Index,
     :param i_iter: alternatives or categories profiles
     :param j_iter: alternatives or categories profiles or None
 
-    :return: aggregated preference indices
+    :return: DataFrame of aggregated preference indices as values,
+        alternatives/profiles as index and columns.
     """
     # calculating sum of weights
     weight_sum = sum(weights.values)
