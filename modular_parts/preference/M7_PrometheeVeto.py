@@ -42,10 +42,16 @@ def compute_veto(
     :param preferences: DataFrame of preference indices as value,
         alternatives/profiles as index and columns,
         if not None function returns already calculated overall
-        preference instead of just discordance
+        preference instead of just veto
      
-    :return: DataFrame of overall veto and DataFrame of partial
-        veto indices. Alternatively: DataFrame of overall preference.
+    :return: Tuple of DataFrame of overall veto (alternatives/profiles
+        as index and columns) and DataFrame of partial veto indices
+        (alternatives/profiles and criteria as index, alternatives/profiles as
+        columns). With profiles, it's going to be Tuple of tuples of DataFrames
+        of overall veto and DataFrames of partial
+        veto indices. Alternatively: DataFrame of overall preference
+        (alternatives/profiles as index and columns) or
+        tuple of DataFrames of overall preference with profiles.
     """
     # input data validation
     veto_validation(alternatives_performances, weights, veto_thresholds,
