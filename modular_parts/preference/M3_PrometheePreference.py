@@ -66,7 +66,7 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
-        profile_performance_table=profile_performance_table)
+        profile_performance=profile_performance_table)
     if categories_profiles is None:
         return _preferences(weights, criteria, decimal_place, partialPref,
                             alternatives), partialPref

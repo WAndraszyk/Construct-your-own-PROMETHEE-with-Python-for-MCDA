@@ -98,7 +98,7 @@ def compute_preference_indices_with_interactions(
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
-        profile_performance_table=profile_performance_table)
+        profile_performance=profile_performance_table)
 
     # checking if categories_profiles exist
     if categories_profiles is None:
