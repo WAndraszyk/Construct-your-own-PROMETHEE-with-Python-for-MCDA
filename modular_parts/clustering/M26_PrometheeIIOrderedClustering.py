@@ -51,6 +51,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
     :return: Series with alternatives grouped into k ordered clusters
     """
 
+    # input data validation
     promethee_II_ordered_clustering_validation(alternatives_performances,
                                                preference_thresholds,
                                                indifference_thresholds,
@@ -60,7 +61,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
                                                weights,
                                                n_categories)
 
-    # initialize central profiles
+    # initialize central profiles_performances
     categories = pd.Index([f'C{i}' for i in range(1, n_categories + 1)])
     central_profiles = initialize_the_central_profiles(
         alternatives_performances, categories, directions)
@@ -90,7 +91,7 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
         iteration += 1
         assignments_old = assignments
 
-        # update central profiles performance
+        # update central profiles_performances
         central_profiles = _calculate_new_profiles_mean(
             central_profiles, alternatives_performances, assignments)
 
@@ -105,8 +106,8 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
             central_profiles,
             categories)
 
-    # change output from Series with alternatives indices and categories
-    # values to catego
+    # change output from Series with alternatives indices and categories as
+    # values to categories indices and alternatives as values
     cluster = group_alternatives(assignments)
     cluster.sort_index(inplace=True)
     return cluster
@@ -139,17 +140,21 @@ def _sort_alternatives_to_categories(
     :param directions: Series with directions of preference as values and
         criteria as index
     :param weights: Series with weights as values and criteria as index
+    :param central_profiles: Dataframe of profiles_performances' value at
+        every criterion, index: profiles_performances, columns: criteria
+    :param categories: list of categories indices
 
     :return: Series with precise assignments of alternatives to categories
 
     """
-    # calculating preference indices alternatives over profiles
+    # calculating preference indices alternatives over profiles_performances
     alternatives_preference, _ = compute_preference_indices(
         alternatives_performances, preference_thresholds,
         indifference_thresholds, s_parameters,
         generalized_criteria, directions, weights, central_profiles)
 
-    # calculating preference indices profiles over profiles
+    # calculating preference indices profiles_performances over
+    # profiles_performances
     profiles_preference, _ = compute_preference_indices(
         central_profiles, preference_thresholds, indifference_thresholds,
         s_parameters, generalized_criteria, directions, weights)
@@ -164,7 +169,7 @@ def _sort_alternatives_to_categories(
     redirected_profiles = pc.directed_alternatives_performances(
         central_profiles, directions)
 
-    # Promethee II demands profiles to be dominated
+    # Promethee II demands profiles_performances to be dominated
     check_dominance_condition(directions, redirected_profiles)
 
     # sorting alternatives into categories
@@ -182,17 +187,18 @@ def _calculate_new_profiles_mean(profiles_performances: pd.DataFrame,
                                  alternatives_performances: pd.DataFrame,
                                  assignment: pd.Series) -> pd.DataFrame:
     """
-    This function updates profiles performances on the basis of the
-    alternatives belonging to it using math mean function.
+    This function updates profiles_performances performances on the basis of
+    the alternatives belonging to it using math mean function.
 
-    :param profiles_performances: Dataframe of profiles performance (value)
-        at every criterion, index: profiles, columns: criteria
+    :param profiles_performances: Dataframe of profiles_performances
+        performance (value) at every criterion, index: profiles_performances,
+        columns: criteria
     :param alternatives_performances: Dataframe of alternatives' value at
         every criterion, index: alternatives, columns: criteria
     :param assignment: Series with precise assignments of alternatives to
         categories
 
-    :return: DataFrame of updated profiles' performances
+    :return: DataFrame of updated profiles_performances' performances
     """
     profiles = calculate_new_profiles(profiles_performances,
                                       alternatives_performances,
@@ -254,13 +260,13 @@ def calculate_flowsort_assignment(categories: pd.Index,
 
     alternative_assignments = {}
 
-    # Iterate over flow groups (profiles + alternative)
+    # Iterate over flow groups (profiles_performances + alternative)
     for Ralternative, alternative_group_flows in prometheeII_flows.groupby(
             level=0):
         # Get alternative name
         alternative = Ralternative[1:]
 
-        # Separate profiles and alternative flows
+        # Separate profiles_performances and alternative flows
         profiles_flows = alternative_group_flows.iloc[:-1]
         alternative_flows = alternative_group_flows.iloc[-1]
 
