@@ -117,6 +117,7 @@ def _preferences(weights: pd.Series, criteria: pd.Index,
     Calculates aggregated preference indices.
 
     :param weights: Series with weights as values and criteria as index
+    :param criteria: list of criteria
     :param decimal_place: the decimal place of the output numbers
     :param partialPref: DataFrame with partial preference indices as values,
         alternatives/profiles and criteria as indexes, alternatives/profiles
