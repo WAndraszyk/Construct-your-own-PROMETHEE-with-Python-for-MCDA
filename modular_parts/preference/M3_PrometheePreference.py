@@ -2,6 +2,8 @@
 This module implements the basic way of calculating preference indices with
 Promethee Preference method.
 """
+from typing import Tuple, Union
+
 from core.aliases import NumericValue
 import core.preference_commons as pc
 from core.input_validation import promethee_preference_validation
@@ -19,10 +21,11 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
                                weights: pd.Series,
                                profiles_performance: pd.DataFrame = None,
                                decimal_place: NumericValue = 3
-                               ) -> Tuple[Union[
-                                    DataFrame, Tuple[DataFrame, DataFrame]],
-                                    Union[
-                                    DataFrame, Tuple[DataFrame, DataFrame]]]:
+                               ) -> Tuple[
+    Union[
+        pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
+    Union[
+        pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]]:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences.
@@ -90,7 +93,7 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
         profile_performance=profile_performance_table)
-    # checking if categories_profiles exist
+    # checking if categories profiles exist
     if categories_profiles is None:
         # calculating preference indices for alternatives over alternatives
         return _preferences(weights, criteria, decimal_place, partialPref,

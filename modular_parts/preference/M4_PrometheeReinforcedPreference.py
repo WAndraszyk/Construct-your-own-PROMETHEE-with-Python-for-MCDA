@@ -34,23 +34,31 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
     Includes reinforced preference effect.
 
     :param alternatives_performances: Dataframe of alternatives' value at
-        every criterion
-    :param weights: criteria with weights
-    :param generalized_criteria: list of preference functions
-    :param preference_thresholds: preference threshold for each criterion
-    :param indifference_thresholds: indifference threshold for each criterion
-    :param directions: directions of preference of criteria
-    :param reinforced_preference_thresholds: list of reinforced preference
-        thresholds for each criterion
-    :param reinforcement_factors: list of reinforcement factors for
-        each criterion
-    :param weights: criteria with weights
+        every criterion, index: alternatives, columns: criteria
+    :param weights: Series with weights as values and criteria as index
+    :param generalized_criteria: Series with preference functions as values
+        and criteria as index
+    :param preference_thresholds: Series of preference threshold for
+        each criterion, index: criteria
+    :param indifference_thresholds: Series of indifference threshold for
+        each criterion, index: criteria
+    :param directions: Series with directions of preference as values and
+        criteria as index
+    :param reinforced_preference_thresholds: Series of reinforced preference
+        thresholds for each criterion, index: criteria
+    :param reinforcement_factors: Series of reinforcement factors
+        for each criterion, index: criteria
     :param profiles_performance: Dataframe of profiles performance (value)
-        at every criterion
+        at every criterion, index: profiles, columns: criteria
     :param decimal_place: the decimal place of the output numbers
 
-    :return: preferences and partial preferences
+    :return: Tuple of preferences DataFrame (alternatives/profiles as index
+     and columns) and partial preferences DataFrame (alternatives/profiles and
+     criteria as index, alternatives/profiles as columns). With profiles, it's
+     going to be Tuple of tuples of preferences DataFrames and partial
+     preferences DataFrames.
     """
+    # input data validation
     reinforced_preference_validation(alternatives_performances,
                                      preference_thresholds,
                                      indifference_thresholds,
@@ -60,11 +68,17 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
                                      profiles_performance, decimal_place)
 
     criteria = weights.index
+
+    # changing values of alternatives' performances according to direction
+    # of criterion for further calculations
     alternatives_performances = pc.directed_alternatives_performances(
         alternatives_performances, directions)
 
+    # checking if profiles' performances were given
     if profiles_performance is not None:
         categories_profiles = profiles_performance.index
+        # changing values of profiles' performances according to direction
+        # of criterion for further calculations
         profile_performance_table = pc.directed_alternatives_performances(
             profiles_performance, directions)
     else:
@@ -72,6 +86,7 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
         profile_performance_table = None
     decimal_place = decimal_place
 
+    # calculating partial preference indices
     partialPref, Frp = _partial_preference(criteria, generalized_criteria,
                                            preference_thresholds,
                                            indifference_thresholds,
@@ -80,19 +95,23 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
                                            alternatives_performances,
                                            profile_performance_table,
                                            categories_profiles)
+    # checking if categories profiles exist
     if categories_profiles is None:
+        # calculating preference indices for alternatives over alternatives
         return _preferences(criteria, weights, reinforcement_factors,
                             partialPref, decimal_place, Frp,
-                            alternatives_performances), partialPref
+                            alternatives_performances.index), partialPref
     else:
+        # calculating preference indices for alternatives over profiles
+        # and profiles over alternatives
         return (_preferences(criteria, weights, reinforcement_factors,
                              partialPref[0], decimal_place, Frp[0],
-                             alternatives_performances,
-                             profile_performance_table),
+                             alternatives_performances.index,
+                             profile_performance_table.index),
                 _preferences(criteria, weights, reinforcement_factors,
                              partialPref[1], decimal_place, Frp[1],
-                             profile_performance_table,
-                             alternatives_performances)), partialPref
+                             profile_performance_table.index,
+                             alternatives_performances.index)), partialPref
 
 
 def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
@@ -101,7 +120,7 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
                         reinforced_preference_thresholds: pd.Series,
                         reinforcement_factors: pd.Series,
                         alternatives_performances: pd.DataFrame,
-                        profile_performance_table: pd.DataFrame,
+                        profiles_performance: pd.DataFrame,
                         categories_profiles: pd.Index
                         ) -> Tuple[pd.DataFrame,
                                    Union[List[List[List[List[int]]]],
@@ -115,22 +134,31 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
     :param criteria: list of criteria
     :param alternatives_performances: Dataframe of alternatives' value at
         every criterion
-    :param generalized_criteria: list of preference functions
-    :param preference_thresholds: preference threshold for each criterion
-    :param indifference_thresholds: indifference threshold for each criterion
-    :param reinforced_preference_thresholds: list of reinforced preference
-        thresholds for each criterion
-    :param reinforcement_factors: list of reinforcement factors for
-        each criterion
-    :param profile_performance_table: Dataframe of profiles' value at
-        every criterion
+    :param generalized_criteria: Series with preference functions as values
+        and criteria as index
+    :param preference_thresholds: Series of preference threshold for
+        each criterion, index: criteria
+    :param indifference_thresholds: Series of indifference threshold for
+        each criterion, index: criteria
+    :param reinforced_preference_thresholds: Series of reinforced preference
+        thresholds for each criterion, index: criteria
+    :param reinforcement_factors: Series of reinforcement factors
+        for each criterion, index: criteria
+    :param profiles_performance: Dataframe of profiles performance (value)
+        at every criterion, index: profiles, columns: criteria
     :param categories_profiles: list of categories profiles
 
-    :return: partial preference indices
+    :return: DataFrame of partial preferences (alternatives/profiles and
+        criteria as index, alternatives/profiles as columns). With profiles,
+        it's going to be Tuple partial preferences DataFrames.
     """
+    # calculate deviations
     deviations = pc.deviations(criteria, alternatives_performances,
-                               profile_performance_table)
+                               profiles_performance)
+
+    # check if categories profiles were given
     if categories_profiles is None:
+        # calculate partial preference indices
         ppIndices, Frp = _pp_deep(criteria, generalized_criteria,
                                   preference_thresholds,
                                   indifference_thresholds,
@@ -139,20 +167,20 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
                                   alternatives_performances,
                                   alternatives_performances)
     else:
-
+        # calculate partial preference indices
         ppIndices0, Frp0 = _pp_deep(criteria, generalized_criteria,
                                     preference_thresholds,
                                     indifference_thresholds,
                                     reinforced_preference_thresholds,
                                     reinforcement_factors, deviations[0],
                                     alternatives_performances,
-                                    profile_performance_table)
+                                    profiles_performance)
         ppIndices1, Frp1 = _pp_deep(criteria, generalized_criteria,
                                     preference_thresholds,
                                     indifference_thresholds,
                                     reinforced_preference_thresholds,
                                     reinforcement_factors, deviations[1],
-                                    profile_performance_table,
+                                    profiles_performance,
                                     alternatives_performances)
         ppIndices = [ppIndices0, ppIndices1]
         Frp = [Frp0, Frp1]
@@ -173,21 +201,28 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
     alternatives and criteria.
 
     :param criteria: list of criteria
-    :param preference_thresholds: preference thresholds
-    :param indifference_thresholds: indifference thresholds
-    :param reinforced_preference_thresholds: list of reinforced preference
-        thresholds for each criterion
-    :param reinforcement_factors: list of reinforcement factors for
-        each criterion
-    :param generalized_criteria: list of preference functions
+    :param preference_thresholds: Series of preference threshold for
+        each criterion, index: criteria
+    :param indifference_thresholds: Series of indifference threshold for
+        each criterion, index: criteria
+    :param reinforced_preference_thresholds: Series of reinforced preference
+        thresholds for each criterion, index: criteria
+    :param reinforcement_factors: Series of reinforcement factors
+        for each criterion, index: criteria
+    :param generalized_criteria: Series with preference functions as values
+        and criteria as index
     :param deviations: list of calculated deviations
     :param i_iter: alternatives or categories profiles performances
     :param j_iter: alternatives or categories profiles performances
         or None
 
-    :return: partial preference indices
+    :return: DataFrame of partial preference indices as
+        value, alternatives/profiles and criteria as index and
+        alternatives/profiles as columns; 3D matrix of reinforced criteria.
     """
+    # initialize partial preference indices matrix
     ppIndices = []
+    # initialize reinforced criteria matrix
     FrpList = []
     for k in range(len(criteria)):
         method = generalized_criteria[k]
@@ -199,12 +234,18 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
             alternativeIndices = []
             alternativeFrp = []
             for j in range(j_iter.shape[0]):
+                # if reinforced preference threshold exceeded:
                 if deviations[k][i][j] > \
                         reinforced_preference_thresholds[criteria[k]]:
+                    # partial preference index takes value of reinforcement
+                    # factor
                     alternativeIndex = reinforcement_factors[criteria[k]]
+                    # mark criterion k as reinforced for preference between
+                    # alternative i and j
                     Frp = 1
                 else:
                     Frp = 0
+                    # calculate partial preference index with chosen method
                     if method is GeneralCriterion.USUAL:
                         alternativeIndex = \
                             gc.usual_criterion(deviations[k][i][j])
@@ -260,36 +301,44 @@ def _preferences(criteria: pd.Index, weights: pd.Series,
                  reinforcement_factors: pd.Series, partialPref: pd.DataFrame,
                  decimal_place: int, Frp: Union[List[List[List[int]]],
                                                 List[List[int]]],
-                 i_perf: pd.DataFrame, j_perf: pd.DataFrame = None
+                 i_iter: pd.Index, j_iter: pd.Index = None
                  ) -> pd.DataFrame:
     """
     Calculates aggregated preference indices.
 
-    :param weights: criteria with weights
+    :param weights: Series with weights as values and criteria as index
     :param criteria: list of criteria
     :param reinforcement_factors: list of reinforcement factors
-    :param partialPref: partial preference indices
+    :param partialPref: DataFrame with partial preference indices as values,
+        alternatives/profiles and criteria as indexes, alternatives/profiles
+        as columns
     :param decimal_place: the decimal place of the output numbers
-    :param i_perf: alternatives or categories profiles performances
-    :param j_perf: alternatives or categories profiles performances or None
+    :param Frp: 3D matrix of reinforced criteria.
+        Frp[k][i][j] = 1 means that a reinforced preference occurs between
+        alternative i and j on criterion k
+    :param i_iter: alternatives or categories profiles
+    :param j_iter: alternatives or categories profiles or None
 
-    :return: aggregated preference indices
+    :return: DataFrame of aggregated preference indices as values,
+        alternatives/profiles as index and columns.
     """
-    i_iter = i_perf.index
-    if j_perf is None:
+    # checking if second set of alternatives/profiles is given
+    if j_iter is None:
+        # if there is not, use the first one for both
         j_iter = i_iter
-    else:
-        j_iter = j_perf.index
+
     preferences = []
     for i in range(len(i_iter)):
         aggregatedPI = []
         for j in range(len(j_iter)):
             Pi_A_B_nom = 0
             Pi_A_B_denom = 0
+            # aggregate partial preference indices from each criterion
             for k in range(len(criteria)):
                 Pi_A_B_nom += \
                     partialPref.loc[criteria[k], i_iter[i]][j_iter[j]] \
                     * weights[criteria[k]]
+                # check if reinforcement occurs at criterion
                 if Frp[k][i][j] == 1:
                     Pi_A_B_denom += weights[criteria[k]] \
                                     * reinforcement_factors[criteria[k]]
