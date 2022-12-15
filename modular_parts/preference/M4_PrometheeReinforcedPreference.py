@@ -18,6 +18,7 @@ __all__ = ['compute_reinforced_preference']
 def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
                                   preference_thresholds: pd.Series,
                                   indifference_thresholds: pd.Series,
+                                  s_parameters: pd.Series,
                                   generalized_criteria: pd.Series,
                                   directions: pd.Series,
                                   reinforced_preference_thresholds: pd.Series,
@@ -42,6 +43,10 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
         each criterion, index: criteria
     :param indifference_thresholds: Series of indifference threshold for
         each criterion, index: criteria
+    :param s_parameters: Series of s parameter for each criterion, s parameter
+        is a threshold used in Gaussian Criterion, it's defined as an
+        intermediate value between indifference and preference threshold,
+        index: criteria
     :param directions: Series with directions of preference as values and
         criteria as index
     :param reinforced_preference_thresholds: Series of reinforced preference
@@ -90,6 +95,7 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
     partialPref, Frp = _partial_preference(criteria, generalized_criteria,
                                            preference_thresholds,
                                            indifference_thresholds,
+                                           s_parameters,
                                            reinforced_preference_thresholds,
                                            reinforcement_factors,
                                            alternatives_performances,
@@ -117,6 +123,7 @@ def compute_reinforced_preference(alternatives_performances: pd.DataFrame,
 def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
                         preference_thresholds: pd.Series,
                         indifference_thresholds: pd.Series,
+                        s_parameters: pd.Series,
                         reinforced_preference_thresholds: pd.Series,
                         reinforcement_factors: pd.Series,
                         alternatives_performances: pd.DataFrame,
@@ -162,6 +169,7 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
         ppIndices, Frp = _pp_deep(criteria, generalized_criteria,
                                   preference_thresholds,
                                   indifference_thresholds,
+                                  s_parameters,
                                   reinforced_preference_thresholds,
                                   reinforcement_factors, deviations,
                                   alternatives_performances,
@@ -171,6 +179,7 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
         ppIndices0, Frp0 = _pp_deep(criteria, generalized_criteria,
                                     preference_thresholds,
                                     indifference_thresholds,
+                                    s_parameters,
                                     reinforced_preference_thresholds,
                                     reinforcement_factors, deviations[0],
                                     alternatives_performances,
@@ -178,6 +187,7 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
         ppIndices1, Frp1 = _pp_deep(criteria, generalized_criteria,
                                     preference_thresholds,
                                     indifference_thresholds,
+                                    s_parameters,
                                     reinforced_preference_thresholds,
                                     reinforcement_factors, deviations[1],
                                     profiles_performance,
@@ -191,6 +201,7 @@ def _partial_preference(criteria: pd.Index, generalized_criteria: pd.Series,
 def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
              preference_thresholds: pd.Series,
              indifference_thresholds: pd.Series,
+             s_parameters: pd.Series,
              reinforced_preference_thresholds: pd.Series,
              reinforcement_factors: pd.Series,
              deviations: List[List[List[NumericValue]]], i_iter: pd.DataFrame,
@@ -205,6 +216,10 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
         each criterion, index: criteria
     :param indifference_thresholds: Series of indifference threshold for
         each criterion, index: criteria
+    :param s_parameters: Series of s parameter for each criterion, s parameter
+        is a threshold used in Gaussian Criterion, it's defined as an
+        intermediate value between indifference and preference threshold,
+        index: criteria
     :param reinforced_preference_thresholds: Series of reinforced preference
         thresholds for each criterion, index: criteria
     :param reinforcement_factors: Series of reinforcement factors
@@ -228,15 +243,25 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
         method = generalized_criteria[k]
         q = indifference_thresholds[k]
         p = preference_thresholds[k]
+        s = s_parameters[k]
         criterionIndices = []
         criterionFrp = []
         for i in range(i_iter.shape[0]):
             alternativeIndices = []
             alternativeFrp = []
             for j in range(j_iter.shape[0]):
+                exceeds = False
+                is_rp_none = True
+                # check if there is a rp threshold
+                if reinforced_preference_thresholds[criteria[k]].dtype \
+                        in ["int", "int32", "int64", "float", "float32",
+                            "float64"]:
+                    is_rp_none = False
+                    # check if deviation exceeds the rp threshold
+                    exceeds = deviations[k][i][j] > \
+                        reinforced_preference_thresholds[criteria[k]]
                 # if reinforced preference threshold exceeded:
-                if deviations[k][i][j] > \
-                        reinforced_preference_thresholds[criteria[k]]:
+                if exceeds:
                     # partial preference index takes value of reinforcement
                     # factor
                     alternativeIndex = reinforcement_factors[criteria[k]]
@@ -276,6 +301,12 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
                         alternativeIndex =\
                             gc.v_shape_indifference_criterion(
                                 deviations[k][i][j], p, q)
+                    elif method is GeneralCriterion.GAUSSIAN and is_rp_none:
+                        if s <= 0:
+                            raise ValueError(
+                                "s parameter should be grater than 0")
+                        alternativeIndex = \
+                            gc.gaussian_criterion(deviations[k][i][j], s)
                     else:
                         raise ValueError(
                             "pref_func "

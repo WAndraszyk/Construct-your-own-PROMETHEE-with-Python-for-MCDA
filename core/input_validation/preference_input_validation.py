@@ -397,10 +397,12 @@ def _check_reinforcement_factors(reinforcement_factors: pd.Series,
 
     _check_if_criteria_are_the_same(reinforcement_factors.index, criteria)
 
-    # Check if reinforced factors are numeric
-    if reinforcement_factors.dtype not in ['int32', 'int64',
-                                           'float32', 'float64']:
-        raise ValueError("Reinforced factors should be a numeric values")
+    # Check if reinforcement factors are numeric
+    for factor in reinforcement_factors:
+        if not (isinstance(factor, int) or isinstance(factor, float)
+                or factor is None):
+            raise ValueError("Reinforcement factors should be a numeric "
+                             "values or None")
 
     # Check if reinforcement factors are greater than 1
     if (reinforcement_factors < 1).any():

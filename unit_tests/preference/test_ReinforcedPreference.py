@@ -78,9 +78,15 @@ def directions(criteria):
     directions = [Direction.MAX, Direction.MIN]
     return pd.Series(data=directions, index=criteria)
 
+@pytest.fixture
+def s_parameters(criteria):
+    s_parameters = [None, None]
+    return pd.Series(data=s_parameters, index=criteria)
+
 
 def test_reinforced_preference(alternatives, alternatives_performances,
                                preference_thresholds, indifference_thresholds,
+                               s_parameters,
                                generalized_criteria, directions,
                                reinforcement_thresholds,
                                reinforcement_factors,
@@ -93,6 +99,7 @@ def test_reinforced_preference(alternatives, alternatives_performances,
     actual, _ = compute_reinforced_preference(alternatives_performances,
                                               preference_thresholds,
                                               indifference_thresholds,
+                                              s_parameters,
                                               generalized_criteria,
                                               directions,
                                               reinforcement_thresholds,
@@ -106,6 +113,7 @@ def test_reinforced_preference(alternatives, alternatives_performances,
 if __name__ == '__main__':
     test_reinforced_preference(alternatives, alternatives_performances,
                                preference_thresholds, indifference_thresholds,
+                               s_parameters,
                                generalized_criteria, directions,
                                reinforcement_thresholds,
                                reinforcement_factors,
