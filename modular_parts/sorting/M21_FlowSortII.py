@@ -139,7 +139,7 @@ def _central_profiles_sorting(alternative: str,
 
 def calculate_flowsortII_sorted_alternatives(
         categories: List[str],
-        category_profiles_performances: pd.DataFrame,
+        profiles_performances: pd.DataFrame,
         criteria_directions: pd.Series,
         prometheeII_flows: pd.DataFrame,
         comparison_with_profiles: CompareProfiles) -> pd.DataFrame:
@@ -148,7 +148,7 @@ def calculate_flowsortII_sorted_alternatives(
     and Promethee II flows.
 
     :param categories: List of categories names as strings
-    :param category_profiles_performances: pd.DataFrame with profiles as index
+    :param profiles_performances: pd.DataFrame with profiles as index
     and criteria as columns
     :param criteria_directions: pd.Series with criteria as index and
     Direction enums as values. Indicates if criterion has to be maximized
@@ -164,13 +164,13 @@ def calculate_flowsortII_sorted_alternatives(
     """
 
     # Input validation
-    flow_sort_ii_validation(categories, category_profiles_performances,
+    flow_sort_ii_validation(categories, profiles_performances,
                             criteria_directions, prometheeII_flows,
                             comparison_with_profiles)
 
     # Check dominance condition
     check_dominance_condition(criteria_directions,
-                              category_profiles_performances)
+                              profiles_performances)
 
     # Init classification structure
     classification = pd.DataFrame(dtype=str,
