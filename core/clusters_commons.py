@@ -33,8 +33,7 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
     Redefines profiles_performances' performances based on alternatives
     assigned to it.
 
-    :param profiles_performances: DataFrame of profiles_performances'
-        performances
+    :param profiles_performances: DataFrame of profiles' performances
     :param alternatives_performances: DataFrame of alternatives' performances
     :param assignment: Series with precise assignments of alternatives to
         categories
@@ -62,14 +61,14 @@ def initialize_the_central_profiles(
         directions: pd.Series) -> pd.DataFrame:
     """
     First step of clustering. Initialization of the central
-    profiles_performances. Profiles features have random values, but they
+    profiles. Profiles features have random values, but they
     keep the rule of not being worse than the worse profile.
 
     :param alternatives_performances: DataFrame of alternatives' performances
     :param categories: Categories' indices
     :param directions: directions of preference of criteria
 
-    :return: New DataFrame of profiles_performances' performances
+    :return: New DataFrame of profiles' performances
     """
     min_and_max_performances = pd.DataFrame(
         {'Min': alternatives_performances.min(),
