@@ -6,11 +6,13 @@ from core.preference_commons import directed_alternatives_performances
 def check_dominance_condition(criteria_directions: pd.Series,
                               category_profiles: pd.DataFrame):
     """
-    Check if each boundary profile is strictly worse in each criterion
+    Check if each boundary profile is strictly worse on each criterion
     than betters profiles
 
-    :param criteria_directions: ...
-    :param category_profiles: ...
+    :param criteria_directions: pd.Series with criteria as index and
+    Direction as values
+    :param category_profiles: pd.DataFrame with profiles as index and criteria
+    as columns
     :raise ValueError: if any profile is not strictly worse in any
     criterion than anny better profile
     """
@@ -33,14 +35,14 @@ def check_dominance_condition_GDSS(profiles: pd.Index,
     Check if each boundary profile is strictly worse in each criterion
     than betters profiles (even from other DM's).
 
-    :param profiles: Index with profiles names
-    :param profiles_performances: List with DataFrames with profiles
-        performances for each DM
-    :param criteria_directions: Series with criteria directions
-        (max or min)
+    :param profiles: pd.Index with profiles names
+    :param profiles_performances: List with pd.DataFrame objects with profiles
+    as index and criteria as columns
+    :param criteria_directions: pd.Series with criteria as index and
+    Direction as values
 
-    :raise ValueError: if any profile is not strictly worse in any
-        criterion than any better profile
+    :raise ValueError: if any profile is not strictly worse on any
+    criterion than any better profile
     """
     for criterion in criteria_directions.index:
         for DM_i_profiles_performances in profiles_performances:
@@ -61,12 +63,13 @@ def check_if_profiles_are_strictly_worse(criteria_thresholds: pd.Series,
     Check if each boundary profile is strictly worse in each criterion
     by specified threshold than betters profiles.
 
-    :param criteria_thresholds: Series with criteria thresholds
-    :param category_profiles: Performance table with category profiles
-        performances
+    :param criteria_thresholds: pd.Series with criteria as index and
+    thresholds as values
+    :param category_profiles: pd.DataFrame with profiles as index and criteria
+    as columns
 
-    :raise ValueError: if any profile is not strictly worse in any
-        criterion than anny better profile
+    :raise ValueError: if any profile is not strictly worse on any criterion
+    than anny better profile
     """
     for criterion, threshold in criteria_thresholds.items():
         for i, (_, profile_i) in enumerate(

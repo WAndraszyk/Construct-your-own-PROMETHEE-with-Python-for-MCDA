@@ -11,7 +11,13 @@ class SurrogateMethod(Enum):
 
 
 class ScoringFunction(Enum):
-    """Enumeration of the scoring functions."""
+    """
+    Enumeration of the scoring functions.
+
+    MAX: represent a max function
+    MIN: represent a min function
+    SUM: represent a sum function
+    """
 
     MAX = 1
     MIN = 2
@@ -33,7 +39,13 @@ class ScoringFunctionDirection(Enum):
 
 
 class CompareProfiles(Enum):
-    """Enumeration of the compare profiles types."""
+    """
+    Enumeration of the compare profiles types.
+
+    CENTRAL_PROFILES: represents a central profiles type
+    BOUNDARY_PROFILES: represents a boundary profiles type
+    LIMITING_PROFILES: represents a limiting profiles type
+    """
 
     CENTRAL_PROFILES = 1
     BOUNDARY_PROFILES = 2
@@ -53,11 +65,11 @@ class GeneralCriterion(Enum):
 
 class InteractionType(Enum):
     """
-    The InteractionType class represents the type of interaction between
-    two variables in a mathematical model. It is an enumeration (Enum) with
-    three possible values: STN: represents a strengthening interaction,
-    WKN: represents a weakening interaction, ANT: represents an
-    antagonistic interaction.
+    Enumeration of interaction type.
+
+    STN: represents a strengthening interaction,
+    WKN: represents a weakening interaction,
+    ANT: represents an antagonistic interaction.
     """
     STN = 2
     WKN = 1
@@ -65,14 +77,24 @@ class InteractionType(Enum):
 
 
 class Direction(Enum):
-    """Enumeration of criteria direction."""
+    """
+    Enumeration of criteria direction.
+
+    MAX: represents a maximized criterion
+    MIN: represents a minimized criterion
+    """
 
     MAX = 1
     MIN = 0
 
 
 class FlowType(Enum):
-    """Enumeration of flows type used to calculation."""
+    """
+    Enumeration of flows type used to calculation.
+
+    PROMETHEE_I = represent flows of Promethee I
+    PROMETHEE_II = represent flows of Promethee II
+    """
 
     PROMETHEE_I = 1
     PROMETHEE_II = 2
