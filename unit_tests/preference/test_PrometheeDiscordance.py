@@ -111,6 +111,15 @@ def test_overall_preference(criteria, alternatives, alternatives_performances,
         generalized_criteria,
         criteria_directions, weights)
 
+    expected_discordance = pd.DataFrame(data=[
+        [0.000, 1.000, 1.000, 1.000, 1.000, 1.000],
+        [1.000, 0.000, 0.523, 1.000, 1.000, 1.000],
+        [1.000, 1.000, 0.000, 1.000, 1.000, 1.000],
+        [0.728, 1.000, 1.000, 0.000, 1.000, 1.000],
+        [0.368, 1.000, 0.184, 1.000, 0.000, 0.553],
+        [1.000, 1.000, 1.000, 1.000, 1.000, 0.000]],
+        columns=alternatives, index=alternatives)
+
     expected = pd.DataFrame(data=[[0.000, 0.000, 0.000, 0.000, 0.000, 0.000],
                                   [0.000, 0.000, 0.186, 0.000, 0.000, 0.000],
                                   [0.000, 0.000, 0.000, 0.000, 0.000, 0.000],
@@ -119,9 +128,11 @@ def test_overall_preference(criteria, alternatives, alternatives_performances,
                                   [0.000, 0.000, 0.000, 0.000, 0.000, 0.000]],
                             columns=alternatives, index=alternatives)
 
-    actual = compute_discordance(criteria, partial, 3, 3, preference)
+    actual_discordance, _, actual = compute_discordance(criteria, partial,
+                                                        3, 3, preference)
 
     assert_frame_equal(actual, expected, atol=0.006)
+    assert_frame_equal(actual_discordance, expected_discordance, atol=0.006)
 
 
 if __name__ == '__main__':

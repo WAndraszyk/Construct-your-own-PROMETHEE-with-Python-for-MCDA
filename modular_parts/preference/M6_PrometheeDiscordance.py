@@ -20,9 +20,13 @@ def compute_discordance(criteria: List[str],
                                            Tuple[pd.DataFrame]] = None,
                         were_categories_profiles: bool = False
                         ) -> Union[
-    Tuple[Union[pd.DataFrame, List[pd.DataFrame]], Union[
-        pd.DataFrame, List[pd.DataFrame]]], pd.DataFrame, Tuple[
-        pd.DataFrame]]:
+    Tuple[
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, List[pd.DataFrame]]],
+    Tuple[
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, Tuple[pd.DataFrame]]]]:
     """
     Calculates overall discordance by aggregating partial discordance indices.
 
@@ -31,7 +35,7 @@ def compute_discordance(criteria: List[str],
     :param decimal_place: the decimal place of the output numbers
     :param preferences: DataFrame of preference indices as value,
         alternatives/profiles as index and columns,
-        if not None function returns already calculated overall
+        if not None function additionally returns calculated overall
         preference instead of just discordance
     :param criteria: list of criteria
     :param partial_preferences: DataFrame of partial preference indices as
@@ -45,8 +49,8 @@ def compute_discordance(criteria: List[str],
      (alternatives/profiles and criteria as index, alternatives/profiles as
      columns). With profiles, it's going to be Tuple of tuples of DataFrames
      of overall discordance and DataFrames of partial
-     discordance indices. Alternatively: DataFrame of overall preference
-     (alternatives/profiles as index and columns) or
+     discordance indices. Additionally, if preferences given: DataFrame of
+     overall preference (alternatives/profiles as index and columns) or
      tuple of DataFrames of overall preference with profiles.
     """
     # validate input data
@@ -75,8 +79,8 @@ def compute_discordance(criteria: List[str],
 
     # check whether to calculate overall preference
     if preferences is not None:
-        return overall_preference(preferences, discordance,
-                                  were_categories_profiles, decimal_place)
+        return discordance, partial_discordance, overall_preference(
+            preferences, discordance, were_categories_profiles, decimal_place)
     else:
         return discordance, partial_discordance
 
