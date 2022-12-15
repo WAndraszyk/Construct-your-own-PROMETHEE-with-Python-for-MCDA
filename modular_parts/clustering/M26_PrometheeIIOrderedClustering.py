@@ -70,6 +70,8 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
     # of criterion for further calculations
     alternatives_performances = pc.directed_alternatives_performances(
         alternatives_performances, directions)
+    central_profiles = pc.directed_alternatives_performances(
+        central_profiles, directions)
 
     # sorting alternatives into categories
     assignments = _sort_alternatives_to_categories(alternatives_performances,
@@ -160,21 +162,20 @@ def _sort_alternatives_to_categories(
         s_parameters, generalized_criteria, directions, weights)
 
     # calculating Net Outranking Flow
-    prometheeII_flows = calculate_promethee_outranking_flows(
+    promethee_ii_flows = calculate_promethee_outranking_flows(
         alternatives_preference, FlowType.PROMETHEE_II,
         profiles_preference)
-    prometheeII_flows = calculate_net_outranking_flows(prometheeII_flows,
-                                                       True)
+    promethee_ii_flows = calculate_net_outranking_flows(promethee_ii_flows,
+                                                        True)
 
     redirected_profiles = pc.directed_alternatives_performances(
         central_profiles, directions)
-
     # Promethee II demands profiles_performances to be dominated
     check_dominance_condition(directions, redirected_profiles)
 
     # sorting alternatives into categories
     assignments = calculate_flowsort_assignment(categories,
-                                                prometheeII_flows)
+                                                promethee_ii_flows)
 
     # if the category is empty, the algorithm force one alternative to
     # belonging to it
@@ -245,14 +246,14 @@ def _force_alternative_to_empty_category(assignments: pd.Series,
 
 
 def calculate_flowsort_assignment(categories: pd.Index,
-                                  prometheeII_flows: pd.DataFrame) \
+                                  promethee_ii_flows: pd.DataFrame) \
         -> pd.Series:
     """
     This function assign alternatives to the category which has the closet
     profile.
 
     :param categories: list of categories
-    :param prometheeII_flows: DataFrame with Promethee II flows (positive,
+    :param promethee_ii_flows: DataFrame with Promethee II flows (positive,
     negative and net)
 
     :return: Series of assignments
@@ -261,7 +262,7 @@ def calculate_flowsort_assignment(categories: pd.Index,
     alternative_assignments = {}
 
     # Iterate over flow groups (profiles_performances + alternative)
-    for Ralternative, alternative_group_flows in prometheeII_flows.groupby(
+    for Ralternative, alternative_group_flows in promethee_ii_flows.groupby(
             level=0):
         # Get alternative name
         alternative = Ralternative[1:]

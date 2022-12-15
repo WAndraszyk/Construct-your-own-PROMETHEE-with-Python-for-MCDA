@@ -27,8 +27,8 @@ def compute_preference_indices_with_interactions(
         Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]]:
     """
     Calculates preference of every alternative over other alternatives
-    or profiles based on partial preferences. Includes interactions between
-    criteria effect.
+    or profiles based on partial preferences. Includes
+    interactions between criteria effect.
 
     :param alternatives_performances: Dataframe of alternatives' value at
         every criterion, index: alternatives, columns: criteria
@@ -48,8 +48,8 @@ def compute_preference_indices_with_interactions(
     :param interactions: DataFrame of interactions between criteria with
      coefficients, index: default , columns: criterion_1, criterion_2, type
      of interaction, coefficient
-    :param profiles_performance: Dataframe of profiles performance (value)
-        at every criterion, index: profiles, columns: criteria
+    :param profiles_performance: Dataframe of profiles performance (value) at
+        every criterion, index: profiles, columns: criteria
     :param decimal_place: the decimal place of the output numbers
     :param minimum_interaction_effect: boolean representing function used to
         capture the interaction effects in the ambiguity zone. DM can choose 2
@@ -91,40 +91,40 @@ def compute_preference_indices_with_interactions(
         profile_performance_table = None
 
     # calculating partial preference indices
-    partialPref = pc.partial_preference(
+    partial_pref = pc.partial_preference(
         criteria=criteria, preference_thresholds=preference_thresholds,
         indifference_thresholds=indifference_thresholds,
         s_parameters=s_parameters,
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
-        profile_performance=profile_performance_table)
+        profiles_performances=profile_performance_table)
 
     # checking if categories_profiles exist
     if categories_profiles is None:
         # calculating preference indices for alternatives over alternatives
         return _preferences(minimum_interaction_effect, interactions, weights,
-                            criteria, partialPref, decimal_place,
+                            criteria, partial_pref, decimal_place,
                             alternatives
-                            ), partialPref
+                            ), partial_pref
     else:
         # calculating preference indices for alternatives over profiles
         # and profiles over alternatives
         return (
                    _preferences(minimum_interaction_effect, interactions,
                                 weights,
-                                criteria, partialPref[0], decimal_place,
+                                criteria, partial_pref[0], decimal_place,
                                 alternatives, categories_profiles),
                    _preferences(minimum_interaction_effect, interactions,
                                 weights,
-                                criteria, partialPref[1], decimal_place,
+                                criteria, partial_pref[1], decimal_place,
                                 categories_profiles, alternatives)
-               ), partialPref
+               ), partial_pref
 
 
 def _preferences(minimum_interaction_effect: bool,
                  interactions: pd.DataFrame, weights: pd.Series,
-                 criteria: pd.Index, partialPref: pd.DataFrame,
+                 criteria: pd.Index, partial_pref: pd.DataFrame,
                  decimal_place: NumericValue, i_iter: pd.Index,
                  j_iter: pd.Index = None) -> pd.DataFrame:
     """
@@ -137,7 +137,7 @@ def _preferences(minimum_interaction_effect: bool,
         of interaction, coefficient
     :param weights: Series with weights as values and criteria as index
     :param criteria: pd.Index with criteria indices
-    :param partialPref: DataFrame of partial preference indices as
+    :param partial_pref: DataFrame of partial preference indices as
         value, alternatives/profiles and criteria as index and
         alternatives/profiles as columns
     :param decimal_place: the decimal place of the output numbers
@@ -155,12 +155,12 @@ def _preferences(minimum_interaction_effect: bool,
 
     preferences = []
     for i in i_iter:
-        aggregatedPI = []
+        aggregated_pi = []
         for j in j_iter:
-            Pi_A_B = 0
+            pi_a_b = 0
             interaction_ab = 0
             for k in criteria:
-                Pi_A_B += partialPref.loc[k, i][j] * weights[k]
+                pi_a_b += partial_pref.loc[k, i][j] * weights[k]
 
             # calculating interaction effect for every interaction
             for key in interactions.index.values:
@@ -171,19 +171,21 @@ def _preferences(minimum_interaction_effect: bool,
                 # if interaction's type is antagonistic
                 if interactions['type'].loc[key].value == -1:
                     interaction_ab += _interaction_effects(
-                        minimum_interaction_effect, partialPref.loc[k1, i][j],
-                        partialPref.loc[k2, j][i]) * coefficient
+                        minimum_interaction_effect,
+                        partial_pref.loc[k1, i][j],
+                        partial_pref.loc[k2, j][i]) * coefficient
                 # if interaction's type is strengthening or weakening
                 else:
                     interaction_ab += _interaction_effects(
-                        minimum_interaction_effect, partialPref.loc[k1, i][j],
-                        partialPref.loc[k2, i][j]) * coefficient
+                        minimum_interaction_effect,
+                        partial_pref.loc[k1, i][j],
+                        partial_pref.loc[k2, i][j]) * coefficient
             # aggregate partial preference indices and interation effect
             # from each criterion
-            aggregated = round((Pi_A_B + interaction_ab) / (
+            aggregated = round((pi_a_b + interaction_ab) / (
                     sum(weights.values) + interaction_ab), decimal_place)
-            aggregatedPI.append(aggregated if aggregated >= 0 else 0)
-        preferences.append(aggregatedPI)
+            aggregated_pi.append(aggregated if aggregated >= 0 else 0)
+        preferences.append(aggregated_pi)
     preferences = pd.DataFrame(data=preferences, columns=j_iter, index=i_iter)
     return preferences
 
