@@ -37,9 +37,9 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
     :param alternatives_performances: DataFrame of alternatives' performances
     :param assignment: Series with precise assignments of alternatives to
         categories
-    :param method: Math method used for profiles_performances' redefinition.
+    :param method: Math method used for profiles' redefinition.
 
-    :return: Redefined profiles_performances' performances
+    :return: Dataframe with redefined profiles' performances
     """
     central_profiles_out = profiles_performances.copy()
     profile_alternatives = defaultdict(list)
