@@ -20,9 +20,13 @@ def compute_veto(
         profiles_performance: pd.DataFrame = None,
         decimal_place: NumericValue = 3,
         preferences=None) -> Union[
-    Tuple[Union[pd.DataFrame, List[pd.DataFrame]], Union[
-        pd.DataFrame, List[pd.DataFrame]]], pd.DataFrame, Tuple[
-        pd.DataFrame]]:
+    Tuple[
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, List[pd.DataFrame]]],
+    Tuple[
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, Tuple[pd.DataFrame]]]]:
     """
     Calculates veto of every alternative over other alternatives
     or profiles_performances based on partial veto
@@ -49,8 +53,8 @@ def compute_veto(
         (alternatives/profiles and criteria as index, alternatives/profiles as
         columns). With profiles, it's going to be Tuple of tuples of
         DataFrames of overall veto and DataFrames of partial
-        veto indices. Alternatively: DataFrame of overall preference
-        (alternatives/profiles as index and columns) or
+        veto indices. Additionally, if preferences given: DataFrame of
+        overall preference (alternatives/profiles as index and columns) or
         tuple of DataFrames of overall preference with profiles.
     """
     # input data validation
@@ -109,7 +113,7 @@ def compute_veto(
 
     # check whether to calculate overall preference
     if preferences is not None:
-        return pc.overall_preference(preferences, veto, profiles,
+        return veto, partial_veto, pc.overall_preference(preferences, veto, profiles,
                                      decimal_place)
     else:
         return veto, partial_veto
