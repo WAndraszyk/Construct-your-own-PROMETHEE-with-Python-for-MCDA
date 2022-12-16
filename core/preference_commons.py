@@ -291,7 +291,7 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
         for discordance in discordances_copy:
             for n in discordance.index:
                 for i in discordance.columns:
-                    discordance[n][i] = 1 - discordance[n][i]
+                    discordance[i][n] = 1 - discordance[i][n]
         overall_preferences = (preferences[0] * discordances_copy[0],
                                preferences[1] * discordances_copy[1])
     else:
