@@ -92,7 +92,7 @@ def compute_preference_indices(alternatives_performances: pd.DataFrame,
         generalized_criteria=generalized_criteria,
         categories_profiles=categories_profiles,
         alternatives_performances=alternatives_performances,
-        profile_performance=profile_performance_table)
+        profiles_performances=profile_performance_table)
     # checking if categories profiles exist
     if categories_profiles is None:
         # calculating preference indices for alternatives over alternatives
