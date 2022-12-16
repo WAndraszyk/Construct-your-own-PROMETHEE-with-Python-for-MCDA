@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 from core.enums import GeneralCriterion, Direction
 from pandas.testing import assert_frame_equal
-from modular_parts.clustering import cluster_using_pclust
+from modular_parts.clustering import cluster_using_interval_p2clust
 
 sys.path.append('../..')
 
@@ -79,7 +79,7 @@ def test_cluster_using_pclust(alternatives_performances,
                               criteria_directions,
                               criteria_weights, n_categories):
     actual_assigments, actual_central_profiles, \
-        actual_global_quality_index = cluster_using_pclust(
+        actual_global_quality_index = cluster_using_interval_p2clust(
             alternatives_performances, preference_thresholds,
             indifference_thresholds, standard_deviations,
             generalized_criteria, criteria_directions, criteria_weights,
