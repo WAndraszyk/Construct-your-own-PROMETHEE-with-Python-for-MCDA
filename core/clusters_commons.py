@@ -1,9 +1,7 @@
 import random
 from typing import Any, Union
-
 import pandas as pd
 from collections import defaultdict
-
 from core.enums import Direction
 
 
@@ -16,7 +14,7 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
     :param assignment: Series with precise assignments of alternatives to
         categories
 
-    :return: Alternatives assignment, Redefined profiles_performances
+    :return: Series with alternatives grouped into k ordered clusters
     """
     cluster = pd.Series([], dtype=pd.StringDtype())
     for key, value in assignment.items():
@@ -32,7 +30,8 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
                            assignment: Union[pd.DataFrame, pd.Series],
                            method: Any) -> pd.DataFrame:
     """
-    Redefines profiles' performances based on alternatives assigned to it.
+    Redefines profiles_performances' performances based on alternatives
+    assigned to it.
 
     :param profiles_performances: DataFrame of profiles' performances
     :param alternatives_performances: DataFrame of alternatives' performances
@@ -40,7 +39,7 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
         categories
     :param method: Math method used for profiles' redefinition.
 
-    :return: Redefined profiles' performances
+    :return: Dataframe with redefined profiles' performances
     """
     central_profiles_out = profiles_performances.copy()
     profile_alternatives = defaultdict(list)
@@ -61,9 +60,9 @@ def initialize_the_central_profiles(
         categories: pd.Index,
         directions: pd.Series) -> pd.DataFrame:
     """
-    First step of clustering. Initialization of the central profiles.
-    Profiles features have random values, but they keep the rule of not
-    being worse than the worse profile.
+    First step of clustering. Initialization of the central
+    profiles. Profiles features have random values, but they
+    keep the rule of not being worse than the worse profile.
 
     :param alternatives_performances: DataFrame of alternatives' performances
     :param categories: Categories' indices

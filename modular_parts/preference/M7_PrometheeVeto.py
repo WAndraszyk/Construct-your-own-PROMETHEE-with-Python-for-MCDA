@@ -20,12 +20,16 @@ def compute_veto(
         profiles_performance: pd.DataFrame = None,
         decimal_place: NumericValue = 3,
         preferences=None) -> Union[
-    Tuple[Union[pd.DataFrame, List[pd.DataFrame]], Union[
-        pd.DataFrame, List[pd.DataFrame]]], pd.DataFrame, Tuple[
-        pd.DataFrame]]:
+    Tuple[
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, List[pd.DataFrame]]],
+    Tuple[
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, List[pd.DataFrame]],
+        Union[pd.DataFrame, Tuple[pd.DataFrame]]]]:
     """
     Calculates veto of every alternative over other alternatives
-    or profiles based on partial veto
+    or profiles_performances based on partial veto
 
     :param alternatives_performances: Dataframe of alternatives' value at
         every criterion, index: alternatives, columns: criteria
@@ -36,7 +40,7 @@ def compute_veto(
         criteria as index
     :param strong_veto: boolean value representing strong veto or discordance
         like veto
-    :param profiles_performance: Dataframe of profiles performance (value)
+    :param profiles_performance: Dataframe of profiles' performance (value)
         at every criterion, index: profiles, columns: criteria
     :param decimal_place: the decimal place of the output numbers
     :param preferences: DataFrame of preference indices as value,
@@ -47,10 +51,10 @@ def compute_veto(
     :return: Tuple of DataFrame of overall veto (alternatives/profiles
         as index and columns) and DataFrame of partial veto indices
         (alternatives/profiles and criteria as index, alternatives/profiles as
-        columns). With profiles, it's going to be Tuple of tuples of DataFrames
-        of overall veto and DataFrames of partial
-        veto indices. Alternatively: DataFrame of overall preference
-        (alternatives/profiles as index and columns) or
+        columns). With profiles, it's going to be Tuple of tuples of
+        DataFrames of overall veto and DataFrames of partial
+        veto indices. Additionally, if preferences given: DataFrame of
+        overall preference (alternatives/profiles as index and columns) or
         tuple of DataFrames of overall preference with profiles.
     """
     # input data validation
@@ -78,10 +82,10 @@ def compute_veto(
         profile_performance_table = None
 
     # calculating partial veto indices
-    partialVet = _partial_veto(veto_thresholds, criteria,
-                               alternatives_performances,
-                               profile_performance_table,
-                               categories_profiles)
+    partial_vet = _partial_veto(veto_thresholds, criteria,
+                                alternatives_performances,
+                                profile_performance_table,
+                                categories_profiles)
 
     # were the preferences calculated for profiles
     profiles = False
@@ -89,27 +93,27 @@ def compute_veto(
     # checking if categories_profiles exist
     if categories_profiles is None:
         # calculating veto indices for alternatives over alternatives
-        veto = _vetoes(criteria, weights, strong_veto, partialVet,
+        veto = _vetoes(criteria, weights, strong_veto, partial_vet,
                        decimal_place, alternatives)
-        partial_veto = partialVet
+        partial_veto = partial_vet
     else:
         profiles = True
         # calculating veto indices for alternatives over profiles
         # and profiles over alternatives
-        partial_veto = partialVet[1], partialVet[0]
+        partial_veto = partial_vet[1], partial_vet[0]
         veto = (
-            _vetoes(criteria, weights, strong_veto, partialVet[1],
+            _vetoes(criteria, weights, strong_veto, partial_vet[1],
                     decimal_place,
                     categories_profiles,
                     alternatives),
-            _vetoes(criteria, weights, strong_veto, partialVet[0],
+            _vetoes(criteria, weights, strong_veto, partial_vet[0],
                     decimal_place,
                     alternatives,
                     categories_profiles))
 
     # check whether to calculate overall preference
     if preferences is not None:
-        return pc.overall_preference(preferences, veto, profiles,
+        return veto, partial_veto, pc.overall_preference(preferences, veto, profiles,
                                      decimal_place)
     else:
         return veto, partial_veto
@@ -139,28 +143,28 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
     """
     if j_iter is None:
         j_iter = i_iter
-    Vetoes = []
+    vetoes = []
     index = partial_veto.loc[criteria[0]].index
     columns = partial_veto.loc[criteria[0]].columns
     for j in j_iter:
         aggregated_v = []
         for i in i_iter:
-            Pi_A_B = 0
+            pi_a_b = 0
             # aggregate partial veto indices from each criterion
             for k in criteria:
                 if strong_veto:
                     # for strong veto single partial veto is enough to reject
                     # alternative preference over other alternative
                     if partial_veto.loc[k, j][i] == 1:
-                        Pi_A_B = 1
+                        pi_a_b = 1
                         break
                 else:
-                    Pi_A_B += partial_veto.loc[k, j][i] * weights[k]
+                    pi_a_b += partial_veto.loc[k, j][i] * weights[k]
 
-            aggregated_v.append(round(Pi_A_B, decimal_place))
-        Vetoes.append(aggregated_v)
+            aggregated_v.append(round(pi_a_b, decimal_place))
+        vetoes.append(aggregated_v)
 
-    return pd.DataFrame(data=Vetoes, index=index, columns=columns)
+    return pd.DataFrame(data=vetoes, index=index, columns=columns)
 
 
 def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
@@ -177,7 +181,7 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
     :param criteria: pd.Index with criteria indices
     :param alternatives_performances: Dataframe of alternatives' value at
         every criterion, index: alternatives, columns: criteria
-    :param profile_performances: Dataframe of profiles performance (value)
+    :param profile_performances: Dataframe of profiles' performance (value)
         at every criterion, index: profiles, columns: criteria
     :param categories_profiles: pd.Index with profiles' indices
 
@@ -188,7 +192,7 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
     deviations = pc.deviations(
         criteria=criteria,
         alternatives_performances=alternatives_performances,
-        profile_performance_table=profile_performances)
+        profiles_performances=profile_performances)
     if categories_profiles is None:
         # calculating veto partial indices for alternatives over alternatives
         # at every criterion
@@ -235,18 +239,18 @@ def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
     pvetos = []
     for k in range(criteria.size):
         v = veto_thresholds[k]
-        criterionIndices = []
+        criterion_indices = []
         for j in range(i_iter.shape[0]):
-            alternative_Vetoes = []
+            alternative_vetoes = []
             for i in range(j_iter.shape[0]):
                 if v is None:
-                    alternative_Vetoes.append(0)
+                    alternative_vetoes.append(0)
                 elif deviations[k][i][j] >= v:
-                    alternative_Vetoes.append(1)
+                    alternative_vetoes.append(1)
                 else:
-                    alternative_Vetoes.append(0)
-            criterionIndices.append(alternative_Vetoes)
-        pvetos.append(criterionIndices)
+                    alternative_vetoes.append(0)
+            criterion_indices.append(alternative_vetoes)
+        pvetos.append(criterion_indices)
 
     names = ['criteria'] + i_iter.index.names
     pvetos = pd.concat(
