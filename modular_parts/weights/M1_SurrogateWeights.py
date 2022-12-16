@@ -2,7 +2,7 @@
 This module computes weights of criteria. It requires the user to specify the
 criteria ranking. In this ranking each criterion is associated with a rank
 which represents its importance.
-The lowest and rank is 1, and it represents the highest importance.
+The lowest rank is 1, and it represents the highest importance.
 """
 from core.aliases import NumericValue
 from core.enums import SurrogateMethod
