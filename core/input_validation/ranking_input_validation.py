@@ -6,7 +6,6 @@ import pandas as pd
 
 __all__ = ["promethee_i_ranking_validation",
            "promethee_iii_ranking_validation",
-
            "net_flow_score_iterative_validation",
            "promethee_ii_ranking_validation"]
 

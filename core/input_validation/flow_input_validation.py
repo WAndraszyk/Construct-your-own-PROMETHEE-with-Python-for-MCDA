@@ -5,8 +5,8 @@ from typing import Tuple, Union, List
 from core.enums import ScoringFunction, ScoringFunctionDirection, FlowType
 
 __all__ = ["net_flow_score_validation", "promethee_group_ranking_validation",
-           "prometheeI_outranking_flows_validation",
-           "prometheeII_outranking_flows_validation",
+           "basic_outranking_flows_validation",
+           "profile_based_outranking_flows_validation",
            "calculate_net_outranking_flows_validation",
            "check_outranking_flows_type",
            "net_flows_for_multiple_DM_validation"]
@@ -535,10 +535,10 @@ def promethee_group_ranking_validation(dms_flows: pd.DataFrame,
     _check_if_criteria_are_the_same(dms_from_flows, dms_from_weights)
 
 
-def prometheeI_outranking_flows_validation(
+def basic_outranking_flows_validation(
         preferences: Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]):
     """
-    Check if parameters for PROMETHEE I outranking flows are valid.
+    Check if parameters for basic(PROMETHEE I) outranking flows are valid.
 
     :param preferences: pd.DataFrame with alternatives as index and
     alternatives as columns or tuple of two pd.DataFrame with alternatives
@@ -549,11 +549,11 @@ def prometheeI_outranking_flows_validation(
     _check_preferences(preferences)
 
 
-def prometheeII_outranking_flows_validation(
+def profile_based_outranking_flows_validation(
         preferences: Tuple[pd.DataFrame, pd.DataFrame],
         profiles_preferences: pd.DataFrame):
     """
-    Check if parameters for PROMETHEE II outranking flows are valid.
+    Check if parameters for profile-based outranking flows method are valid.
 
     :param preferences: tuple of two pd.DataFrame with alternatives
     as index and profiles as columns in first pd.DataFrame and profiles as
@@ -588,9 +588,9 @@ def check_outranking_flows_type(flow_type: FlowType):
     :param flow_type: FlowType enum
     :raises ValueError: if FlowType enum is not valid
     """
-    if flow_type not in [FlowType.PROMETHEE_I, FlowType.PROMETHEE_II]:
+    if flow_type not in [FlowType.BASIC, FlowType.PROFILE_BASED]:
         raise ValueError(
-            "Flow type should be either PROMETHEE_I or PROMETHEE_II")
+            "Flow type should be either BASIC or PROFILE_BASED")
 
 
 def net_flows_for_multiple_DM_validation(

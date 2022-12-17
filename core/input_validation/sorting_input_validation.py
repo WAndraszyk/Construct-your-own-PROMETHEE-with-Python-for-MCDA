@@ -351,46 +351,46 @@ def _check_compare_profiles_type_and_profiles_and_categories_length(
                 "central profiles")
 
 
-def _check_prometheeII_flows(prometheeII_flows: pd.DataFrame,
-                             category_profiles: pd.DataFrame):
+def _check_profile_based_flows(profile_based_flows: pd.DataFrame,
+                               category_profiles: pd.DataFrame):
     """
-    Check if Promethee II flows are valid.
+    Check if profile-based flows are valid.
 
-    :param prometheeII_flows: pd.DataFrame with alternatives/profiles
+    :param profile_based_flows: pd.DataFrame with alternatives/profiles
     as index and 'positive', 'negative' and 'net' columns
     :param category_profiles: pd.DataFrame with profiles as index and
     criteria as columns
-    :raise ValueError: if Promethee II flows are not valid
+    :raise ValueError: if profile-based flows are not valid
     """
 
-    # Check if Promethee II flows are a DataFrame
-    if not isinstance(prometheeII_flows, pd.DataFrame):
+    # Check if profile-based flows are a DataFrame
+    if not isinstance(profile_based_flows, pd.DataFrame):
         raise ValueError(
-            "PrometheeII flows should be passed as a DataFrame object")
+            "Profile-based flows should be passed as a DataFrame object")
 
-    # Check if Promethee II flows have MultiIndex
-    if not isinstance(prometheeII_flows.index, pd.MultiIndex):
+    # Check if profile-based flows have MultiIndex
+    if not isinstance(profile_based_flows.index, pd.MultiIndex):
         raise ValueError(
-            "PrometheeII flows should be passed as a DataFrame with "
+            "Profile-based flows should be passed as a DataFrame with "
             "MultiIndex")
 
-    # Check if Promethee II flows have proper columns
-    if prometheeII_flows.columns.tolist() != ['positive', 'negative', 'net']:
+    # Check if profile-based flows have proper columns
+    if profile_based_flows.columns.tolist() != ['positive', 'negative', 'net']:
         raise ValueError(
-            "PrometheeII flows should be passed as a DataFrame with "
+            "Profile-based flows should be passed as a DataFrame with "
             "columns: positive, negative, net")
 
-    # Check if Promethee II flows 'groups' have equal length
-    for index, prometheeII_alternative_flows in prometheeII_flows.groupby(
+    # Check if profile-based flows 'groups' have equal length
+    for index, profile_based_alternative_flows in profile_based_flows.groupby(
             level=0):
-        if not len(prometheeII_alternative_flows) == len(
+        if not len(profile_based_alternative_flows) == len(
                 category_profiles) + 1:
             raise ValueError(
-                f"Number of alternative's group objects in PrometheeII"
+                f"Number of alternative's group objects in profile-based"
                 f" flows should be equals to "
                 f"number of profiles in category profiles plus 1. "
                 f"Alternative's group {index} has "
-                f"{len(prometheeII_alternative_flows)} object")
+                f"{len(profile_based_alternative_flows)} object")
 
 
 def _check_net_flows(net_flows: pd.Series):
@@ -678,7 +678,7 @@ def flow_sort_i_validation(categories: List[str],
 def flow_sort_ii_validation(categories: List[str],
                             category_profiles: pd.DataFrame,
                             criteria_directions: pd.Series,
-                            prometheeII_flows: pd.DataFrame,
+                            profile_based_flows: pd.DataFrame,
                             comparison_with_profiles: CompareProfiles):
     """
     Check if inputs are valid in FlowSortII method.
@@ -688,7 +688,7 @@ def flow_sort_ii_validation(categories: List[str],
     profiles as columns
     :param criteria_directions: pd.Series with criteria as index and
     directions as values
-    :param prometheeII_flows: pd.DataFrame with MultiIndex(categories,
+    :param profile_based_flows: pd.DataFrame with MultiIndex(categories,
     profiles) and criteria as columns
     :param comparison_with_profiles: CompareProfiles object
     :raise ValueError: if inputs are not valid
@@ -696,7 +696,7 @@ def flow_sort_ii_validation(categories: List[str],
     _check_categories(categories)
     _check_performances(category_profiles)
     _check_criteria_directions(criteria_directions)
-    _check_prometheeII_flows(prometheeII_flows, category_profiles)
+    _check_profile_based_flows(profile_based_flows, category_profiles)
     _check_compare_profiles_type_and_profiles_and_categories_length(
         comparison_with_profiles, categories,
         category_profiles)

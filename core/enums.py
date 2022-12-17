@@ -92,9 +92,12 @@ class FlowType(Enum):
     """
     Enumeration of flows type used to calculation.
 
-    PROMETHEE_I = represent flows of Promethee I
-    PROMETHEE_II = represent flows of Promethee II
+    BASIC = represent flows of Promethee I (positive and negative flows)
+    PROFILE_BASED = represent Promethee I flows, where the procedure for
+    calculating flows for an alternative is to add the alternative to a
+    group of profiles and calculate preferences in that group and use those
+    preferences to calculate positive and negative flows
     """
 
-    PROMETHEE_I = 1
-    PROMETHEE_II = 2
+    BASIC = 1
+    PROFILE_BASED = 2

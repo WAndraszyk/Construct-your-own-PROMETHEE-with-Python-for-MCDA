@@ -1,6 +1,6 @@
 """
     This module computes the assignments of given alternatives to categories
-     using FlowSort procedure based on Promethee II flows.
+     using FlowSort procedure based on profile-based and Promethee II flows.
 
     Implementation and naming convention are taken from the
     :cite:p:'NemeryLamboray2007'
@@ -145,7 +145,7 @@ def calculate_flowsortII_sorted_alternatives(
         comparison_with_profiles: CompareProfiles) -> pd.DataFrame:
     """
     Sort alternatives to proper categories using FlowSort method
-    and Promethee II flows.
+    and profile-based and Promethee II flows.
 
     :param categories: List of categories names as strings
     :param profiles_performances: pd.DataFrame with profiles as index

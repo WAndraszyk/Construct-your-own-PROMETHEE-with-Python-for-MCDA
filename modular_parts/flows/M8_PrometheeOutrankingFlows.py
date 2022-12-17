@@ -1,6 +1,6 @@
 """
-    This module computes the outranking flows if PROMETHEE I or
-    PROMETHEE II style.
+    This module computes the outranking flows if basic(PROMETHEE I) or
+    profile-based style.
 
     Implementation and naming of conventions are taken from
     :cite:p:'BransMareschal2005'
@@ -11,8 +11,8 @@ from typing import Tuple, Union
 
 __all__ = ["calculate_promethee_outranking_flows"]
 
-from core.input_validation import prometheeI_outranking_flows_validation, \
-    prometheeII_outranking_flows_validation, \
+from core.input_validation import basic_outranking_flows_validation, \
+    profile_based_outranking_flows_validation, \
     check_outranking_flows_type
 
 
@@ -20,7 +20,8 @@ def _calculate_flow(preferences: Union[Tuple[pd.DataFrame, pd.DataFrame],
                                        pd.DataFrame],
                     positive: bool = True) -> pd.Series:
     """
-    Calculate positive or negative outranking flow in PROMETHEE I style.
+    Calculate positive or negative outranking flow in basic(PROMETHEE I)
+     style.
 
     :param preferences: pd.DataFrame with alternatives as index and
     alternatives as columns or Tuple of pd.DataFrame with alternatives as
@@ -47,12 +48,12 @@ def _calculate_flow(preferences: Union[Tuple[pd.DataFrame, pd.DataFrame],
         return aggregated_preferences
 
 
-def _calculate_prometheeII_style_flow(preferences: Tuple[pd.DataFrame,
-                                                         pd.DataFrame],
-                                      profiles_preferences: pd.DataFrame,
-                                      positive: bool = True) -> pd.Series:
+def _calculate_profile_based_flow(preferences: Tuple[pd.DataFrame,
+                                                     pd.DataFrame],
+                                  profiles_preferences: pd.DataFrame,
+                                  positive: bool = True) -> pd.Series:
     """
-    Calculate positive or negative outranking flow in PrometheeII style.
+    Calculate positive or negative outranking profile-based flows.
 
     :param preferences: Tuple of pd.DataFrame with alternatives as index
     and profiles as columns and pd.DataFrame with profiles as index
@@ -98,14 +99,14 @@ def calculate_promethee_outranking_flows(
         flow_type: FlowType,
         profiles_preferences: pd.DataFrame = None) -> pd.DataFrame:
     """
-    Calculate outranking flows for PROMETHEE I or PROMETHEE II style.
-    PROMETHEE I flows are calculated as mean of subtractions of
+    Calculate outranking flows in basic(PROMETHEE I) or profile-based style.
+    Basic(PROMETHEE I) flows are calculated as mean of subtractions of
     preferences where current alternative is preferred to
     profiles/alternatives and preferences where profiles/alternatives
     is preferred to current alternative.
-    PROMETHEE II flows are calculated by creating
+    Profile-based flows are calculated by creating
     subsets: profiles + current alternative and calculating flows in that
-    set as in PROMETHEE I style. Because of modularity of this project
+    set as in basic style. Because of modularity of this project
     preferences for that flows are obtained in different way (needs
     alternatives vs profiles and profiles vs profiles preferences).
 
@@ -114,21 +115,21 @@ def calculate_promethee_outranking_flows(
     index and alternatives as columns and pd.DataFrame with profiles as index
     and alternatives as columns.
     :param flow_type: FlowType enum with type of outranking
-    flows (PROMETHEE I OR PROMETHEE II).
+    flows (BASIC OR PROFILE_BASED).
     :param profiles_preferences: pd.DataFrame with profiles as index and
     profiles as columns.
     :return: pd.DataFrame with alternatives as index and 'positive' and
-    'negative' columns if flow_type is PROMETHEE I or pd.DataFrame with
+    'negative' columns if flow_type is BASIC or pd.DataFrame with
      MultiIndex("R" + alternatives, profiles+alternative) as index and
-     'positive' and 'negative' columns if flow_type is PROMETHEE II.
+     'positive' and 'negative' columns if flow_type is PROFILE_BASED.
     """
 
     # flow_type validation
     check_outranking_flows_type(flow_type)
 
-    if flow_type == FlowType.PROMETHEE_I:
-        # Input validation for PROMETHEE I style
-        prometheeI_outranking_flows_validation(preferences)
+    if flow_type == FlowType.BASIC:
+        # Input validation for basic(PROMETHEE I) style
+        basic_outranking_flows_validation(preferences)
 
         # Get alternatives as index
         index = preferences[0].index if isinstance(preferences, tuple) \
@@ -138,12 +139,12 @@ def calculate_promethee_outranking_flows(
                                  _calculate_flow(preferences, positive=False)
                              }, index=index)
 
-    elif flow_type == FlowType.PROMETHEE_II:
-        # Input validation for PROMETHEE II style
-        prometheeII_outranking_flows_validation(preferences,
-                                                profiles_preferences)
-        return pd.DataFrame({'positive': _calculate_prometheeII_style_flow(
+    elif flow_type == FlowType.PROFILE_BASED:
+        # Input validation for profile-based style
+        profile_based_outranking_flows_validation(preferences,
+                                                  profiles_preferences)
+        return pd.DataFrame({'positive': _calculate_profile_based_flow(
             preferences, profiles_preferences),
-            'negative': _calculate_prometheeII_style_flow(
+            'negative': _calculate_profile_based_flow(
                 preferences, profiles_preferences,
                 positive=False)})

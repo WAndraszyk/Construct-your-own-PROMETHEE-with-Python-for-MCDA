@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 from core.enums import GeneralCriterion, Direction
 from pandas.testing import assert_frame_equal
-from modular_parts.clustering import cluster_using_interval_p2clust
+from modular_parts.clustering import cluster_using_interval_pclust
 
 sys.path.append('../..')
 
@@ -73,13 +73,13 @@ def n_categories():
     return 3
 
 
-def test_cluster_using_pclust(alternatives_performances,
-                              preference_thresholds, indifference_thresholds,
-                              standard_deviations, generalized_criteria,
-                              criteria_directions,
-                              criteria_weights, n_categories):
+def test_cluster_using_interval_pclust(alternatives_performances,
+                                       preference_thresholds, indifference_thresholds,
+                                       standard_deviations, generalized_criteria,
+                                       criteria_directions,
+                                       criteria_weights, n_categories):
     actual_assigments, actual_central_profiles, \
-        actual_global_quality_index = cluster_using_interval_p2clust(
+        actual_global_quality_index = cluster_using_interval_pclust(
             alternatives_performances, preference_thresholds,
             indifference_thresholds, standard_deviations,
             generalized_criteria, criteria_directions, criteria_weights,
@@ -99,8 +99,8 @@ def test_cluster_using_pclust(alternatives_performances,
 
 
 if __name__ == '__main__':
-    test_cluster_using_pclust(alternatives_performances,
-                              preference_thresholds, indifference_thresholds,
-                              standard_deviations, generalized_criteria,
-                              criteria_directions,
-                              criteria_weights, n_categories)
+    test_cluster_using_interval_pclust(alternatives_performances,
+                                       preference_thresholds, indifference_thresholds,
+                                       standard_deviations, generalized_criteria,
+                                       criteria_directions,
+                                       criteria_weights, n_categories)

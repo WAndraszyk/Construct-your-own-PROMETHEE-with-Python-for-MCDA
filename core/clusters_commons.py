@@ -7,9 +7,9 @@ from core.enums import Direction
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:
     """
-    Converts output from @calculate_prometheetri_sorted_alternatives into
+    Converts output from Promethee Tri module into
     pd.Series with clusters as indexes assignment by numbers of assigned
-    alternatives .
+    alternatives.
 
     :param assignment: Series with precise assignments of alternatives to
         categories

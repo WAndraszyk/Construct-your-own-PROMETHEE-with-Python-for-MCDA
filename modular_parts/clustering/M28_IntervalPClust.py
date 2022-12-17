@@ -16,20 +16,20 @@ from core.clusters_commons import initialize_the_central_profiles
 from modular_parts.flows import calculate_promethee_outranking_flows
 from modular_parts.preference import compute_preference_indices
 
-__all__ = ['cluster_using_interval_p2clust']
+__all__ = ['cluster_using_interval_pclust']
 
 
-def _calculate_prometheeII_flows(central_profiles_performances: pd.DataFrame,
-                                 alternatives_performances: pd.DataFrame,
-                                 preference_thresholds: pd.Series,
-                                 indifference_thresholds: pd.Series,
-                                 standard_deviations: pd.Series,
-                                 generalized_criteria: pd.Series,
-                                 directions: pd.Series,
-                                 weights: pd.Series
-                                 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _calculate_profile_based_flows(central_profiles_performances: pd.DataFrame,
+                                   alternatives_performances: pd.DataFrame,
+                                   preference_thresholds: pd.Series,
+                                   indifference_thresholds: pd.Series,
+                                   standard_deviations: pd.Series,
+                                   generalized_criteria: pd.Series,
+                                   directions: pd.Series,
+                                   weights: pd.Series
+                                   ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Calculate the profiles net flows using Promethee II outranking flows
+    Calculate the profiles net flows using profile-based outranking flows
     method.
 
     :param: central_profiles_performances: pd.DataFrame with the profiles as
@@ -81,23 +81,23 @@ def _calculate_prometheeII_flows(central_profiles_performances: pd.DataFrame,
         weights)
 
     # Use above calculated preferences to calculate the profiles-based flows
-    prometheeII_flows = calculate_promethee_outranking_flows(
+    profile_based_flows = calculate_promethee_outranking_flows(
         alternatives_vs_profiles_preferences,
-        FlowType.PROMETHEE_II,
+        FlowType.PROFILE_BASED,
         profiles_preferences)
 
-    return prometheeII_flows, profiles_preferences
+    return profile_based_flows, profiles_preferences
 
 
 def _assign_the_alternatives_to_the_categories(
-        prometheeII_flows: pd.DataFrame,
+        profile_based_flows: pd.DataFrame,
         categories: pd.Index) -> Tuple[Dict[str, List[str]],
                                        Dict[str, Dict[str, List[str]]]]:
     """
     Second step of clustering. Assignment of the alternatives to the
     categories(principal or interval).
 
-    :param: prometheeII_flows: pd.DataFrame with the MultiIndex("R" +
+    :param: profile_based_flows: pd.DataFrame with the MultiIndex("R" +
     alternatives, profiles + alternatives) as index and 'positive' and
     'negative' columns. Contains the profiles-based flows.
     :param: categories: pd.Index with the principal categories names.
@@ -115,7 +115,7 @@ def _assign_the_alternatives_to_the_categories(
          for i, category in enumerate(categories)}
 
     # Iterate over alternatives "groups" in profile-based flows
-    for Ralternative, alternative_group_flows in prometheeII_flows.groupby(
+    for Ralternative, alternative_group_flows in profile_based_flows.groupby(
             level=0):
         # Get the alternative name
         alternative = Ralternative[1:]
@@ -387,16 +387,16 @@ def _calculate_global_quality_index(homogeneity_indices: pd.Series,
     return heterogeneity_indices.sum() / homogeneity_indices.sum()
 
 
-def cluster_using_interval_p2clust(alternatives_performances: pd.DataFrame,
-                                   preference_thresholds: pd.Series,
-                                   indifference_thresholds: pd.Series,
-                                   standard_deviations: pd.Series,
-                                   generalized_criteria: pd.Series,
-                                   criteria_directions: pd.Series,
-                                   criteria_weights: pd.Series,
-                                   n_categories: int,
-                                   max_iterations: int = 100
-                                   ) -> Tuple[pd.Series, pd.DataFrame, float]:
+def cluster_using_interval_pclust(alternatives_performances: pd.DataFrame,
+                                  preference_thresholds: pd.Series,
+                                  indifference_thresholds: pd.Series,
+                                  standard_deviations: pd.Series,
+                                  generalized_criteria: pd.Series,
+                                  criteria_directions: pd.Series,
+                                  criteria_weights: pd.Series,
+                                  n_categories: int,
+                                  max_iterations: int = 100
+                                  ) -> Tuple[pd.Series, pd.DataFrame, float]:
     """
     Cluster the alternatives using modified P2Clust algorithm. The idea of the
      algorithm is to classify the alternatives to central profiles and
@@ -461,8 +461,8 @@ def cluster_using_interval_p2clust(alternatives_performances: pd.DataFrame,
         criteria_directions)
 
     # Calculate flows between alternatives and central profiles
-    prometheeII_flows, central_profiles_preferences = \
-        _calculate_prometheeII_flows(
+    profile_based_flows, central_profiles_preferences = \
+        _calculate_profile_based_flows(
             central_profiles_performances,
             alternatives_performances,
             preference_thresholds,
@@ -476,7 +476,7 @@ def cluster_using_interval_p2clust(alternatives_performances: pd.DataFrame,
     # using above flows
     principal_categories, interval_categories = \
         _assign_the_alternatives_to_the_categories(
-            prometheeII_flows,
+            profile_based_flows,
             categories)
 
     # Update central profiles performances basing on
@@ -500,8 +500,8 @@ def cluster_using_interval_p2clust(alternatives_performances: pd.DataFrame,
 
         # Calculate flows between alternatives and central profiles
         # (again, because profiles performances changed)
-        prometheeII_flows, central_profiles_preferences = \
-            _calculate_prometheeII_flows(
+        profile_based_flows, central_profiles_preferences = \
+            _calculate_profile_based_flows(
                 central_profiles_performances,
                 alternatives_performances,
                 preference_thresholds,
@@ -515,7 +515,7 @@ def cluster_using_interval_p2clust(alternatives_performances: pd.DataFrame,
         # using above flows
         principal_categories, interval_categories = \
             _assign_the_alternatives_to_the_categories(
-                prometheeII_flows,
+                profile_based_flows,
                 categories)
 
         # Update central profiles performances basing on

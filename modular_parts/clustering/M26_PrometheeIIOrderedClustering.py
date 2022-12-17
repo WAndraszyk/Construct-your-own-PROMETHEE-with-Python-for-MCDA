@@ -162,10 +162,10 @@ def _sort_alternatives_to_categories(
         s_parameters, generalized_criteria, directions, weights)
 
     # calculating Net Outranking Flow
-    promethee_ii_flows = calculate_promethee_outranking_flows(
-        alternatives_preference, FlowType.PROMETHEE_II,
+    profile_based_flows = calculate_promethee_outranking_flows(
+        alternatives_preference, FlowType.PROFILE_BASED,
         profiles_preference)
-    promethee_ii_flows = calculate_net_outranking_flows(promethee_ii_flows,
+    promethee_ii_flows = calculate_net_outranking_flows(profile_based_flows,
                                                         True)
 
     redirected_profiles = pc.directed_alternatives_performances(
@@ -231,7 +231,7 @@ def _force_alternative_to_empty_category(assignments: pd.Series,
         item = assignments_copy.sample()
         unique_category = assignments_copy.unique()
         # categories which are not in unique categories are empty
-        if list(set(categories.values) - set(unique_category)) == []:
+        if not list(set(categories.values) - set(unique_category)):
             break
 
         # if the alternative's category is in old_value, that is its category

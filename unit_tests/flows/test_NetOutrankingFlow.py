@@ -27,7 +27,7 @@ def test_net_outranking_flows(flows):
     assert_series_equal(expected, actual, atol=0.006)
 
 
-def test__net_outranking_flows_for_prometheeII(flows):
+def test__net_outranking_flows_for_profile_based(flows):
     alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
     expected = pd.DataFrame(
         {'positive': [0.04151, 0.12188, 0.26870, 0.60934, 0.26058, 0.03652],
@@ -40,4 +40,4 @@ def test__net_outranking_flows_for_prometheeII(flows):
 
 if __name__ == '__main__':
     test_net_outranking_flows(flows)
-    test__net_outranking_flows_for_prometheeII(flows)
+    test__net_outranking_flows_for_profile_based(flows)
