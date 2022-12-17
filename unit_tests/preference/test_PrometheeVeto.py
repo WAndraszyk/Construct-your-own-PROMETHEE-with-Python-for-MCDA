@@ -102,7 +102,7 @@ def test_overall_preference(alternatives, alternatives_performances, weights,
                                   [0.000, 0.000, 0.000, 0.000, 0.000],
                                   [0.000, 0.000, 0.000, 0.000, 0.000]],
                             columns=alternatives, index=alternatives)
-    actual = compute_veto(alternatives_performances=alternatives_performances,
+    _, _, actual = compute_veto(alternatives_performances=alternatives_performances,
                           weights=weights, veto_thresholds=vetoes,
                           directions=directions, preferences=preference)
 

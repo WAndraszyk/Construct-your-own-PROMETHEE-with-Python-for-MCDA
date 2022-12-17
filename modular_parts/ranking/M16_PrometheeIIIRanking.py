@@ -27,26 +27,37 @@ def calculate_promethee_iii_ranking(flows: pd.DataFrame,
 
     I - indifferent
 
-    :param flows: Flows table of both positive and negative outranking flows.
-    :param preferences: Preference table of alternatives over alternatives
+    :param flows: DataFrame of both positive and negative outranking flows.
+        Index: alternatives, columns: flows type.
+    :param preferences: DataFrame of preference indices with alternatives as
+        index and columns.
     :param alpha: parameter used in calculating intervals
     :param decimal_place: the decimal place of the output numbers
 
-    :return: Intervals; Preference ranking pairs
+    :return: DataFrame of intervals with alternatives as index and
+     x, y intervals as columns; DataFrame of preference outranking pairs  with
+     alternatives as index and columns.
     """
+    # input data validation
     promethee_iii_ranking_validation(flows, preferences, alpha, decimal_place)
 
     alternatives = preferences.index
+
+    # calculate net flows
     flow = pd.Series(data=np.subtract(flows['positive'].values,
                                       flows['negative'].values),
                      index=alternatives)
 
+    # calculate intervals
     intervals_list, intervals = _calculate_intervals(alternatives, flow,
                                                      preferences,
                                                      alpha, decimal_place)
+
+    # create outranking pairs matrix
     pairs_data = np.zeros(np.shape(preferences), dtype=str)
     for num_a in range(len(alternatives)):
         for num_b in range(len(alternatives)):
+            # compare alternatives' intervals
             if intervals_list[0][num_a] > intervals_list[1][num_b]:
                 pairs_data[num_a][num_b] = 'P'
             elif intervals_list[0][num_a] <= intervals_list[1][num_b] \
@@ -69,13 +80,16 @@ def _calculate_intervals(alternatives: pd.Index, flow: pd.Series,
     Calculates intervals used in alternatives comparison.
 
     :param alternatives: list of alternatives
-    :param flow: net flow
-    :param preferences: Preference table of alternatives over alternatives
+    :param flow: Series of net flows with alternatives as index
+    :param preferences: DataFrame of preference indices with alternatives as
+        index and columns.
     :param alpha: parameter used in calculating intervals
     :param decimal_place: the decimal place of the output numbers
 
-    :return: intervals in a list, intervals as a DataFrame
+    :return: intervals x, y in a matrix;  DataFrame of intervals with
+     alternatives as index and x, y intervals as columns
     """
+    # calculate sigma values
     sigmas = []
     n = len(alternatives)
     for i in preferences.index:
@@ -86,6 +100,7 @@ def _calculate_intervals(alternatives: pd.Index, flow: pd.Series,
         sigma = np.sqrt((1 / n) * total)
         sigmas.append(sigma)
 
+    # calculate intervals
     x = []
     y = []
     for i in range(n):

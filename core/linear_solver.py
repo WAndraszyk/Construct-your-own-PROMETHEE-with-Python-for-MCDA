@@ -15,18 +15,24 @@ def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue],
     :param n: number of components
     :return: tuple of boolean values of components in the goal function
     """
+    # generate possible solutions
     combinations = list(itertools.product([0, 1], repeat=n))
 
     max_Z = 0
     decision = ()
     for combination in combinations:
+        # calculate value for a given solution
         Z = np.dot(C, combination)
+        # check if new solution value is greater than current maximum value
         if Z >= max_Z:
             flag = True
+            # check if solution meets the constraints
             for constraint in constraints:
                 if not check_constraint(constraint, combination):
                     flag = False
                     break
+            # if solution meets the constraints set the solution as current
+            # decision and its value as maximum value
             if flag:
                 max_Z = Z
                 decision = combination
