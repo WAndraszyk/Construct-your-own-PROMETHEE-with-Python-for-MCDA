@@ -1,6 +1,6 @@
 """
-    This module computes the assignments of given alternatives to categories using FlowSort procedure based on
-    PrometheeI flows.
+    This module computes the assignments of given alternatives to categories
+    using FlowSort procedure based on PrometheeI flows.
 """
 
 import pandas as pd
@@ -17,6 +17,19 @@ def _append_to_classification(
         categories: List[str], classification: pd.DataFrame,
         pessimistic_category: str,
         optimistic_category: str, alternative_name: Hashable) -> None:
+    """
+    This function assign alternatives to correctly class.
+
+    :param categories: List with categories names as strings
+    :param classification: pd.DataFrame with alternatives as index and
+    assignments as columns named (worse and better)
+    :param pessimistic_category: str that determines category names chosen of
+    negative flow
+    :param optimistic_category: str that determines category name chosen of
+    positive flow
+    :param alternative_name: Hashable that determines the alternative name
+    assigned to the category
+    """
     pessimistic_category_index = categories.index(pessimistic_category)
     optimistic_category_index = categories.index(optimistic_category)
     if pessimistic_category_index > optimistic_category_index:
@@ -32,15 +45,17 @@ def _limiting_profiles_sorting(categories: List[str],
                                category_profiles_flows: pd.DataFrame
                                ) -> pd.DataFrame:
     """
-    Comparing positive and negative flows of each alternative with all
-    limiting profiles and assign them to
-    correctly class.
+    This function compares positive and negative flows of each alternative
+    with all limiting profiles and assign them to correctly class.
 
-    :param categories: List of categories names (strings only)
-    :param alternatives_flows: Flows table with alternatives flows
-    :param category_profiles_flows: Flows table with category profiles flows
+    :param categories: List with categories names as strings
+    :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
 
-    :return: DataFrame with alternatives assigned to proper classes
+    :return: pd.DataFrame with alternatives as index and assignments as
+    columns named (worse and better)
     """
 
     classification = pd.DataFrame(index=alternatives_flows.index,
@@ -55,7 +70,7 @@ def _limiting_profiles_sorting(categories: List[str],
                 if i != len(category_profiles_flows) - 1:
                     if category_row['positive'] < alternative_row[
                         'positive'] <= category_profiles_flows.iloc[i + 1][
-                        'positive']:
+                         'positive']:
                         positive_flow_category = categories[i]
             if not negative_flow_category:
                 if i != len(category_profiles_flows) - 1:
@@ -78,16 +93,19 @@ def _boundary_profiles_sorting(categories: List[str],
                                category_profiles_flows: pd.DataFrame
                                ) -> pd.DataFrame:
     """
-    Comparing positive and negative flows of each alternative with all
-     boundary profiles and assign them to
-    correctly class.
+    This function compares positive and negative flows of each alternative
+    with all boundary profiles and assign them to correctly class.
 
-    :param categories: List of categories names (strings only)
-    :param category_profiles: Preference table with category profiles
-    :param alternatives_flows: Flows table with alternatives flows
-    :param category_profiles_flows: Flows table with category profiles flows
+    :param categories: List with categories names as strings
+    :param category_profiles: pd.DataFrame with profiles as index and criteria
+    as columns
+    :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
 
-    :return: DataFrame with alternatives assigned to proper classes
+    :return: pd.DataFrame with alternatives as index and assignments as
+    columns named (worse and better)
     """
     classification = pd.DataFrame(index=alternatives_flows.index,
                                   columns=['worse', 'better'], dtype=str)
@@ -100,7 +118,7 @@ def _boundary_profiles_sorting(categories: List[str],
             if not positive_flow_category:
                 if i == 0:
                     if alternative_row['positive'] <= category_row[
-                        'positive']:
+                         'positive']:
                         positive_flow_category = categories[i]
                 elif i == category_profiles.shape[0] - 1:
                     if alternative_row['positive'] > \
@@ -109,7 +127,7 @@ def _boundary_profiles_sorting(categories: List[str],
                 else:
                     if category_profiles_flows.iloc[i - 1]['positive'] < \
                             alternative_row['positive'] <= category_row[
-                        'positive']:
+                         'positive']:
                         positive_flow_category = categories[i]
             if not negative_flow_category:
                 if i == 0:
@@ -122,7 +140,7 @@ def _boundary_profiles_sorting(categories: List[str],
                 else:
                     if category_profiles_flows.iloc[i - 1]['negative'] >= \
                             alternative_row['negative'] > category_row[
-                        'negative']:
+                         'negative']:
                         negative_flow_category = categories[i]
             if positive_flow_category and negative_flow_category:
                 _append_to_classification(categories, classification,
@@ -140,15 +158,19 @@ def _central_profiles_sorting(categories: List[str],
                               category_profiles_flows: pd.DataFrame
                               ) -> pd.DataFrame:
     """
-    Comparing positive and negative flows of each alternative with all
-     central profiles and assign them to correct class.
+    This function compares positive and negative flows of each alternative
+    with all central profiles and assign them to correct class.
 
-    :param categories: List of categories names (strings only)
-    :param category_profiles: Preference table with category profiles
-    :param alternatives_flows: Flows table with alternatives flows
-    :param category_profiles_flows: Flows table with category profiles flows
+    :param categories: List with categories names as strings
+    :param category_profiles: pd.DataFrame with profiles as index and criteria
+    as columns
+    :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
 
-    :return: DataFrame with alternatives assigned to proper classes
+    :return: pd.DataFrame with alternatives as index and assignments as
+    columns named (worse and better)
     """
     classification = pd.DataFrame(index=alternatives_flows.index,
                                   columns=['worse', 'better'], dtype=str)
@@ -215,17 +237,23 @@ def calculate_flowsortI_sorted_alternatives(
         category_profiles_flows: pd.DataFrame,
         comparison_with_profiles: CompareProfiles) -> pd.DataFrame:
     """
-    Sort alternatives to proper categories.
+    This function sorts alternatives to proper categories
+    (based on FlowSort I).
 
-    :param categories: List of categories names (strings only)
-    :param category_profiles: Performances table with category profiles
-    :param criteria_directions: Series with criteria directions
-    :param alternatives_flows: Flows table with alternatives flows
-    :param category_profiles_flows: Flows table with category profiles flows
-    :param comparison_with_profiles: Enum CompareProfiles - indicate
+    :param categories: List with categories names as strings
+    :param category_profiles: pd.DataFrame with profiles as index and criteria
+    as columns
+    :param criteria_directions: pd.Series with criteria as index and
+    Direction as values
+    :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param comparison_with_profiles: CompareProfiles - indicate
     information of profiles types used in calculation.
 
-    :return: DataFrame with alternatives assigned to proper classes
+    :return: pd.DataFrame with alternatives as index and assignments as
+    columns named (worse and better)
     """
     flow_sort_i_validation(categories, category_profiles, criteria_directions,
                            alternatives_flows, category_profiles_flows,

@@ -19,12 +19,14 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
     'Net outranking flow' is a difference between positive and negative flow
     for each alternative.
 
-    :param flows: FlowsTable of both positive and negative outranking flows.
+    :param flows: pd.Dataframe of both positive and negative outranking flows.
+        index: alternatives, columns: positive, negative
     :param promethee_II_format: boolean value describe whether net flow should
         be return alone or as DataFrame together with outranking flows
 
-    :return: Series of net outranking flow or DataFrame of
-        outranking flows wit net outranking flow
+    :return: Series of net outranking flow - index: alternatives or DataFrame
+        of outranking flows with net outranking flow, index: alternatives,
+        columns: positive, negative, net
     """
 
     calculate_net_outranking_flows_validation(flows)
@@ -32,6 +34,8 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
     negative_flow = flows['negative'].values
     alternatives = flows.index
     flow_data = []
+
+    # calculating net flow
     for num_a, alternative_a in enumerate(positive_flow):
         flow_data.append(positive_flow[num_a] - negative_flow[num_a])
 
@@ -43,4 +47,3 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
         return net_flow
     else:
         return net
-

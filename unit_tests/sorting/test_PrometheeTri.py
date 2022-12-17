@@ -115,7 +115,7 @@ def alternatives_partial_preferences():
          g5_profiles_vs_alternatives], keys=criteria)
 
     return alterntives_vs_profiles_partial_preferences, \
-           profiles_vs_alternatives_partial_preferences
+        profiles_vs_alternatives_partial_preferences
 
 
 @pytest.fixture

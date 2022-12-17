@@ -9,7 +9,6 @@
     :cite:p:'DamartDiasMousseau2007'
 """
 import math
-
 import pandas as pd
 from typing import List, Tuple
 from core.input_validation import group_class_acceptabilities_validation
@@ -20,8 +19,8 @@ __all__ = ["calculate_alternatives_support"]
 def _calculate_votes(alternatives: pd.Index, categories: List[str],
                      assignments: List[pd.DataFrame]) -> pd.DataFrame:
     """
-    Calculate how many votes are for putting each alternative in
-     each category.
+    This function calculates how many votes are for putting each alternative
+    in each category.
 
     :param alternatives: pd.Index with alternatives names
     :param categories: List of categories names as strings
@@ -91,8 +90,10 @@ def _calculate_unimodal_alternatives_support(
     :return: pd.DataFrame with alternatives as index
     and categories as columns. Contains for each alternative the uni-modal
     percentage of votes assigned for each category
+
     """
 
+    # Calculate unimodal alternatives support for single row of DataFrame
     def unimodal_single_row(row: pd.Series) -> pd.Series:
         """
         Simple function with logic for calculating uni-modal support for

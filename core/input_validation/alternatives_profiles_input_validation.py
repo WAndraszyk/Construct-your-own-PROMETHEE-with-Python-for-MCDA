@@ -9,7 +9,7 @@ def _check_weights(weights: pd.Series):
     """
     Check if weights are valid.
 
-    :param weights: pd.Series with criteria as index an weights as values
+    :param weights: pd.Series with criteria as index and weights as values
     :raises ValueError: if weights are not valid
     """
 
@@ -53,7 +53,7 @@ def _check_partial_preferences(
                 partial_preferences[1].index.equals(
                     partial_preferences[0].columns):
             raise ValueError("Partial preferences for "
-                             "alternatives vs profiles must have oposite"
+                             "alternatives vs profiles must have opposite"
                              " indexes and columns")
     else:
         # Check if partial preferences are passed as a DataFrame
