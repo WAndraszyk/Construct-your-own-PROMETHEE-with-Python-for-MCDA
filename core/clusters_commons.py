@@ -41,7 +41,7 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
 
     :return: Dataframe with redefined profiles' performances
     """
-    central_profiles_out = profiles_performances.copy()
+    central_profiles_out = profiles_performances.copy(deep=True)
     profile_alternatives = defaultdict(list)
     for index, value in assignment.items():
         profile_alternatives[value].append(index)

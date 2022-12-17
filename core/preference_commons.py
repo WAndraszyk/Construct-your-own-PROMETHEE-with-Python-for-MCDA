@@ -284,7 +284,7 @@ def overall_preference(preferences: Union[pd.DataFrame, Tuple[pd.DataFrame]],
     :returns: DataFrame of overall preference (alternatives/profiles as index
      and columns) or tuple of DataFrames of overall preference with profiles.
     """
-    discordances_copy = discordances.copy()
+    discordances_copy = copy.deepcopy(discordances)
     if profiles:
         # calculating overall preference for both preference matrices
         # if profiles

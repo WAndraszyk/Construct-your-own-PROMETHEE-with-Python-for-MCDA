@@ -82,7 +82,7 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
 
     # algorithm ends when assignment doesn't change anymore
     while not old_assignment.equals(assignment):
-        old_assignment = assignment.copy()
+        old_assignment = assignment.copy(deep=True)
         assignment, profiles = _calculate_sorted_alternatives(
             alternatives_performances, preference_thresholds,
             indifference_thresholds, s_parameters,
