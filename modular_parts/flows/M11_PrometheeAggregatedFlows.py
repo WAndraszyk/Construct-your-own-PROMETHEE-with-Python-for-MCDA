@@ -6,19 +6,20 @@
 import pandas as pd
 from core.input_validation import promethee_group_ranking_validation
 
-__all__ = ['calculate_promethee_group_ranking']
+__all__ = ['calculate_promethee_aggregated_flows']
 
 
-def calculate_promethee_group_ranking(dms_flows: pd.DataFrame,
-                                      dms_weights: pd.Series) -> pd.Series:
+def calculate_promethee_aggregated_flows(dms_flows: pd.DataFrame,
+                                         dms_weights: pd.Series) -> pd.Series:
     """
-    Calculates aggregated flows.
+    This function calculates Promethee aggregated flows.
 
-    :param dms_flows: DataFrame with DMs as columns and alternatives as rows
-    :param dms_weights: Series with DMs as index and weights as values
+    :param dms_flows: pd.DataFrame with alternatives names as index and DMs
+    as columns
+    :param dms_weights: pd.Series with DMs as index and weights as values
 
-    :return: DataFrame with aggregated flows(column 'aggregated') and
-    weighted flows(column 'weighted')
+    :return: pd.Series with alternatives names as index and aggregated flows
+    as values
     """
     promethee_group_ranking_validation(dms_flows, dms_weights)
 

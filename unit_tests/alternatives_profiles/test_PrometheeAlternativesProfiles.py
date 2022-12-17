@@ -49,12 +49,6 @@ def criteria_weights():
 
 def test_promethee_alternatives_profiles(partial_preferences,
                                          criteria_weights):
-    # not_aggregated_net_flows = pd.DataFrame([[-0.47, 0.4, -0.2],
-    #                                          [1, -0.8, 0],
-    #                                          [0.27, 0.4, 0],
-    #                                          [-0.23, -0.4, 0.3],
-    #                                          [0.17, -0.6, 0.5],
-    #                                          [-0.74, 1, -0.6]])
     alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
     expected = pd.Series([-0.92, 1.36, 0.86, -0.33, 0.61, -1.58],
                          index=alternatives)

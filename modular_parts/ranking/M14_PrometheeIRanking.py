@@ -15,19 +15,21 @@ def calculate_prometheeI_ranking(flows: pd.DataFrame,
                                  weak_preference=True
                                  ) -> pd.DataFrame:
     """
-    Calculate outranking pairs - 1st alternative in pair | relation between
-    variants | 2nd alternative in pair.
+    This function calculates outranking pairs - 1st alternative in pair |
+    relation between variants | 2nd alternative in pair.
     Relationship types:
         P - preferred
         I - indifferent
         ? - incomparable
         S - outranking relation
 
-    :param flows: FlowsTable with positive and negative flows
-    :param weak_preference: If True the general method of computing
-    the ranking is  generalized to the relation of the weak preference
-    :return: List of preference ranking pairs (alternative, relation,
-     alternative)
+    :param flows: pd.DataFrame with alternatives names as index and flows
+    as columns named (positive and negative)
+    :param weak_preference: bool that determines if general method of
+    computing the ranking is  generalized to the relation of the
+    weak preference
+
+    :return: pd.DataFrame with alternatives names as index and columns
     """
     promethee_i_ranking_validation(flows, weak_preference)
 
@@ -37,6 +39,7 @@ def calculate_prometheeI_ranking(flows: pd.DataFrame,
 
     pairs = pd.DataFrame(index=alternatives, columns=alternatives)
 
+    # Outranking relation among all alternatives calculation
     for alternative_a in alternatives:
         for alternative_b in alternatives:
             if alternative_a == alternative_b:

@@ -2,7 +2,6 @@
     This module calculates alternatives support (basic and unimodal).
 """
 import math
-
 import pandas as pd
 from typing import List, Tuple
 from core.input_validation import group_class_acceptabilities_validation
@@ -13,15 +12,16 @@ __all__ = ["calculate_alternatives_support"]
 def _calculate_votes(alternatives: List[str], categories: List[str],
                      assignments: List[pd.DataFrame]) -> pd.DataFrame:
     """
-    Calculate how many votes are for putting each alternative in
-     each category.
+    This function calculates how many votes are for putting each alternative
+    in each category.
 
-    :param alternatives: List of alternatives names (strings only)
-    :param categories: List of categories names (strings only)
-    :param assignments: List of imprecise alternatives assignments of each DM
+    :param alternatives: List with alternatives names as strings
+    :param categories: List with categories names as strings
+    :param assignments: List with pd.DataFrame objects with alternatives as
+    index and assignments as columns named (worse and better)
 
-    :return: DataFrame with votes for each category for each alternative
-     (index: alternatives, columns: categories)
+    :return: pd.DataFrame with alternatives names as index and categories
+    names as columns
     """
     votes = pd.DataFrame([[0 for __ in categories] for _ in alternatives],
                          index=alternatives,
@@ -40,15 +40,16 @@ def _calculate_votes(alternatives: List[str], categories: List[str],
 def _calculate_alternatives_support(assignments: List[pd.DataFrame],
                                     votes: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculates alternatives support for each alternative and category
-     (percentage).
+    This function calculates alternatives support for each alternative
+    and category (percentage).
 
-    :param assignments: List of imprecise alternatives assignments of each DM
-    :param votes: DataFrame with votes for each category
-     for each alternative (index: alternatives, columns: categories)
+    :param assignments: List with pd.DataFrame objects with alternatives as
+    index and assignments as columns named (worse and better)
+    :param votes: pd.DataFrame with alternatives names as index and categories
+    names as columns
 
-    :return: DataFrame with alternative support for each category
-     for each alternative (index: alternatives, columns: categories)
+    :return: pd.DataFrame with alternatives names as index and categories
+    names as columns
     """
     n_DM = len(assignments)
     alternatives_support = votes / n_DM * 100
@@ -59,16 +60,17 @@ def _calculate_alternatives_support(assignments: List[pd.DataFrame],
 def _calculate_unimodal_alternatives_support(
         alternatives_support: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculates unimodal alternatives support for each alternative
-     and category (percentage).
+    This function calculates unimodal alternatives support for each
+    alternative and category (percentage).
 
-    :param alternatives_support: 2D List with alternative support for
-    each category for each alternative
+    :param alternatives_support: pd.DataFrame with alternatives names as index
+    and categories names as columns
 
-    :return: 2D List with unimodal alternative support for each category
-    for each alternative
+    :return: pd.DataFrame with alternatives names as index and categories
+    names as columns
     """
 
+    # Calculate unimodal alternatives support for single row of DataFrame
     def unimodal_single_row(row: pd.Series) -> pd.Series:
         row_len = len(row)
         unimodal_row = pd.Series([0 for _ in range(row_len)], index=row.index)
@@ -92,15 +94,15 @@ def calculate_alternatives_support(categories: List[str],
                                    assignments: List[pd.DataFrame]
                                    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Transforms DM assignments, count votes and basing on them calculates
-     alternatives support and
-     unimodal alternatives support
+    This function transforms DM assignments, count votes and basing on them
+    calculates alternatives support and unimodal alternatives support.
 
-    :param categories: List of categories names (strings only)
-    :param assignments: List of imprecise alternatives assignments of each DM
+    :param categories: List with categories names as strings
+    :param assignments: List with pd.DataFrame objects with alternatives as
+    index and assignments as columns named (worse and better)
 
-    :return: Tuple with DataFrames as alternatives support and unimodal
-    alternatives support
+    :return: Tuple with pd.DataFrame objects with alternatives names as index
+    and categories names as columns
     """
     group_class_acceptabilities_validation(categories, assignments)
     alternatives = list(assignments[0].index)
