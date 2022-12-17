@@ -29,8 +29,7 @@ def test_net_flow_score_sum_favor(alternatives_preferences):
     actual = calculate_netflow_score_ranking(
         alternatives_preferences,
         ScoringFunction.SUM,
-        ScoringFunctionDirection.IN_FAVOR,
-        avoid_same_scores=True)
+        ScoringFunctionDirection.IN_FAVOR)
 
     assert_series_equal(expected, actual, atol=0.006)
 
@@ -43,8 +42,7 @@ def test_net_flow_score_min_against(alternatives_preferences):
     expected = net_flow_score.sort_values(ascending=False)
     actual = calculate_netflow_score_ranking(alternatives_preferences,
                                              ScoringFunction.MIN,
-                                             ScoringFunctionDirection.AGAINST,
-                                             avoid_same_scores=True)
+                                             ScoringFunctionDirection.AGAINST)
 
     assert_series_equal(expected, actual, atol=0.006)
 
@@ -58,8 +56,7 @@ def test_net_flow_score_max_difference(alternatives_preferences):
     actual = calculate_netflow_score_ranking(
         alternatives_preferences,
         ScoringFunction.MAX,
-        ScoringFunctionDirection.DIFFERENCE,
-        avoid_same_scores=True)
+        ScoringFunctionDirection.DIFFERENCE)
 
     assert_series_equal(expected, actual, atol=0.006)
 

@@ -8,7 +8,8 @@ __all__ = ["net_flow_score_validation", "promethee_group_ranking_validation",
            "prometheeI_outranking_flows_validation",
            "prometheeII_outranking_flows_validation",
            "calculate_net_outranking_flows_validation",
-           "check_outranking_flows_type", "net_flows_for_multiple_DM"]
+           "check_outranking_flows_type",
+           "net_flows_for_multiple_DM_validation"]
 
 
 def _check_flows(flows: pd.DataFrame):
@@ -592,7 +593,7 @@ def check_outranking_flows_type(flow_type: FlowType):
             "Flow type should be either PROMETHEE_I or PROMETHEE_II")
 
 
-def net_flows_for_multiple_DM(
+def net_flows_for_multiple_DM_validation(
         dms_profiles_partial_preferences: List[pd.DataFrame],  # P(r,a)
         dms_alternatives_partial_preferences: List[pd.DataFrame],  # P(a,r)
         dms_profile_vs_profile_partial_preferences: pd.DataFrame,  # P(r,r)
