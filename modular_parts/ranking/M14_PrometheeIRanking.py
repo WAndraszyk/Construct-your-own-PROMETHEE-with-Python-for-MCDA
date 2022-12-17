@@ -32,7 +32,7 @@ def calculate_prometheeI_ranking(flows: pd.DataFrame,
     computing the ranking is  generalized to the relation of the
     weak preference
 
-    :return: pd.DataFrame with alternatives names as index and columns
+    :return: List with outranking pars (str, str, RelationType)
     """
     promethee_i_ranking_validation(flows, weak_preference)
 
