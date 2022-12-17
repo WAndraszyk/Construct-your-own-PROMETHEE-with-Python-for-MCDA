@@ -62,7 +62,7 @@ def _check_partial_preferences(
                 partial_preferences[1].index.equals(
                     partial_preferences[0].columns):
             raise ValueError("Partial preferences for "
-                             "alternatives vs profiles must have oposite"
+                             "alternatives vs profiles must have opposite"
                              " indexes and columns")
     else:
         # Check if partial preferences are passed as a DataFrame
@@ -375,7 +375,8 @@ def _check_profile_based_flows(profile_based_flows: pd.DataFrame,
             "MultiIndex")
 
     # Check if profile-based flows have proper columns
-    if profile_based_flows.columns.tolist() != ['positive', 'negative', 'net']:
+    if profile_based_flows.columns.tolist() != \
+            ['positive', 'negative', 'net']:
         raise ValueError(
             "Profile-based flows should be passed as a DataFrame with "
             "columns: positive, negative, net")
@@ -560,8 +561,8 @@ def _check_number_of_dms(profiles_general_net_flows: pd.DataFrame,
     """
 
     # Check if number of DMs are equal in every input of FlowSortGDSS method
-    if not len(profiles_performances) == len(dms_weights.index) == \
-           len(profiles_general_net_flows.index.get_level_values(0).unique()):
+    if not len(profiles_general_net_flows.index.get_level_values(0).unique())\
+            == len(profiles_performances) == len(dms_weights.index):
         raise ValueError(
             "Number of DMs in profiles performances should be"
             " the same as in DMS weights and "

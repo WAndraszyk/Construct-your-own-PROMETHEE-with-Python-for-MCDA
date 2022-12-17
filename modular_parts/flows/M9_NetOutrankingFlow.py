@@ -21,8 +21,8 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
 
     :param flows: pd.Dataframe of both positive and negative outranking flows.
         index: alternatives, columns: positive, negative
-    :param profile_based_format: boolean value describe whether net flow s
-        hould be return alone or as DataFrame together with outranking flows
+    :param profile_based_format: boolean value describe whether net flow
+        should be return alone or as DataFrame together with outranking flows
 
     :return: Series of net outranking flow - index: alternatives or DataFrame
         of outranking flows with net outranking flow, index: alternatives,

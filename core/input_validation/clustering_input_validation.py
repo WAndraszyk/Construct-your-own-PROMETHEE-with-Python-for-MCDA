@@ -177,7 +177,7 @@ def _check_weights(weights: pd.Series):
     """
     Check if weights are valid.
 
-    :param weights: pd.Series with criteria as index an weights as values
+    :param weights: pd.Series with criteria as index a weights as values
     :raises ValueError: if weights are not valid
     """
 

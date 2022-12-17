@@ -152,7 +152,7 @@ def _check_partial_preferences(
                 partial_preferences[1].index.equals(
                     partial_preferences[0].columns):
             raise ValueError("Partial preferences for "
-                             "alternatives vs profiles must have oposite"
+                             "alternatives vs profiles must have opposite"
                              " indexes and columns")
     else:
         # Check if partial preferences are passed as a DataFrame
@@ -265,10 +265,11 @@ def _check_criteria_weights_gdss(
     # Check if number of criteria weights is the same in every input
     if not len(dms_profiles_partial_preferences[0].index.get_level_values(
             0).unique()) == \
-           len(dms_alternatives_partial_preferences[0].index.get_level_values(
-               0).unique()) == \
-           len(dms_profile_vs_profile_partial_preferences.index.
-                       get_level_values(0).unique()) == len(criteria_weights):
+            len(dms_alternatives_partial_preferences[
+                    0].index.get_level_values(0).unique()) == \
+            len(dms_profile_vs_profile_partial_preferences.index.
+                        get_level_values(0).unique()) == \
+            len(criteria_weights):
         raise ValueError(
             "Number of criteria should be the same in every DMs partial "
             "preferences and criteria weights")
@@ -326,7 +327,7 @@ def _check_dms_profile_vs_profile_partial_preferences(
 
     # Check if DMs profile vs profile partial preferences have numeric values
     if not dms_profile_vs_profile_partial_preferences.dtypes.values.all() in \
-           ['int32', 'int64', 'float32', 'float64']:
+            ['int32', 'int64', 'float32', 'float64']:
         raise ValueError(
             "DMs profile vs profile partial preferences should be passed"
             " as a DataFrame with numeric values")

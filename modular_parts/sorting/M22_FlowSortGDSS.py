@@ -95,8 +95,8 @@ def _calculate_first_step_assignments(
 
     :param alternatives: pd.Index with alternatives names as strings
     :param dms: pd.Index with DMs names as strings
-    :param alternatives_general_net_flows: pd.Series with alternatives as index
-    and alternatives general net flows as values
+    :param alternatives_general_net_flows: pd.Series with alternatives as
+    index and alternatives general net flows as values
     :param profiles: pd.Index with profiles names as strings
     :param profiles_general_net_flows: pd.DataFrame with
     MultiIndex(DMs, profiles) as index and alternatives as columns
@@ -197,8 +197,8 @@ def _calculate_final_assignments(alternatives_general_net_flows: pd.Series,
      If distances are the same, alternative is classified by using
      param 'assign_to_better_class'.
 
-    :param alternatives_general_net_flows: pd.Series with alternatives as index
-    and alternatives general net flows as values
+    :param alternatives_general_net_flows: pd.Series with alternatives as
+    index and alternatives general net flows as values
     :param profiles: pd.Index with profiles names
     :param profiles_general_net_flows: pd.DataFrame with
     MultiIndex(DMs, profiles) as index and alternatives as columns

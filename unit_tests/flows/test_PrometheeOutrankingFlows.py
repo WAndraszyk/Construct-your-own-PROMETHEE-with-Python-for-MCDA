@@ -149,8 +149,8 @@ def test_basic_outranking_flows(alternatives_preferences):
     assert_frame_equal(expected, actual, atol=0.006)
 
 
-def test_profile_based_outranking_flows(alternatives_vs_profiles_preferencesII,
-                                        profiles_preferences):
+def test_profile_based_outrank_flows(alternatives_vs_profiles_preferencesII,
+                                     profiles_preferences):
     alternatives = [f"a{i}" for i in range(1, 4)]
     profiles = [f"p{i}" for i in range(1, 5)]
     external_index = []
@@ -222,7 +222,7 @@ def test_basic_outranking_flows_for_alternatives_vs_profiles(
 
 if __name__ == '__main__':
     test_basic_outranking_flows(alternatives_preferences)
-    test_profile_based_outranking_flows(alternatives_vs_profiles_preferencesII,
-                                        profiles_preferences)
+    test_profile_based_outrank_flows(alternatives_vs_profiles_preferencesII,
+                                     profiles_preferences)
     test_basic_outranking_flows_for_alternatives_vs_profiles(
         alternatives_vs_profiles_preferences)

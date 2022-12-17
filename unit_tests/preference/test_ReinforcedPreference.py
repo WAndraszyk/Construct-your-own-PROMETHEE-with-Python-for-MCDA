@@ -78,6 +78,7 @@ def directions(criteria):
     directions = [Direction.MAX, Direction.MIN]
     return pd.Series(data=directions, index=criteria)
 
+
 @pytest.fixture
 def s_parameters(criteria):
     s_parameters = [None, None]

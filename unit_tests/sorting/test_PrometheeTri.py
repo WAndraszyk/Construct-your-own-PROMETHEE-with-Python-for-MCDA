@@ -65,7 +65,7 @@ def alternatives_partial_preferences():
          [1.0, 1.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0],
          [1.0, 1.0, 0.0]], index=alternatives, columns=profiles)
 
-    alterntives_vs_profiles_partial_preferences = pd.concat(
+    alternatives_vs_profiles_partial_preferences = pd.concat(
         [g1_alternatives_profiles_preferences,
          g2_alternatives_profiles_preferences,
          g3_alternatives_profiles_preferences,
@@ -114,7 +114,7 @@ def alternatives_partial_preferences():
          g3_profiles_vs_alternatives, g4_profiles_vs_alternatives,
          g5_profiles_vs_alternatives], keys=criteria)
 
-    return alterntives_vs_profiles_partial_preferences, \
+    return alternatives_vs_profiles_partial_preferences, \
         profiles_vs_alternatives_partial_preferences
 
 

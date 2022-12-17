@@ -406,7 +406,7 @@ def _check_reinforcement_factors(reinforcement_factors: pd.Series,
 
     # Check if reinforcement factors are greater than 1
     if (reinforcement_factors < 1).any():
-        raise ValueError("Reinforcement factores must be grater than 1")
+        raise ValueError("Reinforcement factories must be grater than 1")
 
 
 def _check_criteria(criteria: List[str]):
@@ -453,7 +453,7 @@ def _check_partial_preferences(
                 partial_preferences[1].index.equals(
                     partial_preferences[0].columns):
             raise ValueError("Partial preferences for "
-                             "alternatives vs profiles must have oposite"
+                             "alternatives vs profiles must have opposite"
                              " indexes and columns")
     else:
         # Check if partial preferences are passed as a DataFrame

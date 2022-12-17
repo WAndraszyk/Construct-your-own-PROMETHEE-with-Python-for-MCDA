@@ -74,13 +74,13 @@ def n_categories(alternatives_performances):
     return 2
 
 
-def test_cluster_using_prometheecluster(alternatives_performances,
-                                        preference_thresholds,
-                                        indifference_thresholds,
-                                        standard_deviations,
-                                        generalized_criteria,
-                                        criteria_directions,
-                                        criteria_weights, n_categories):
+def test_cluster_using_promethee_cluster(alternatives_performances,
+                                         preference_thresholds,
+                                         indifference_thresholds,
+                                         standard_deviations,
+                                         generalized_criteria,
+                                         criteria_directions,
+                                         criteria_weights, n_categories):
     assignment = promethee_cluster(alternatives_performances,
                                    preference_thresholds,
                                    indifference_thresholds,
@@ -88,7 +88,8 @@ def test_cluster_using_prometheecluster(alternatives_performances,
                                    criteria_directions, criteria_weights,
                                    n_categories)
     assignment_list = []
-    for c1, c2 in assignment.items(): assignment_list.append(c2[0])
+    for c1, c2 in assignment.items():
+        assignment_list.append(c2[0])
     assignment_list.sort()
     assignment_to_test = pd.Series(data=['a1', 'a2'])
     assignment_to_check = pd.Series(data=assignment_list)
@@ -96,10 +97,10 @@ def test_cluster_using_prometheecluster(alternatives_performances,
 
 
 if __name__ == '__main__':
-    test_cluster_using_prometheecluster(alternatives_performances,
-                                        preference_thresholds,
-                                        indifference_thresholds,
-                                        standard_deviations,
-                                        generalized_criteria,
-                                        criteria_directions,
-                                        criteria_weights, n_categories)
+    test_cluster_using_promethee_cluster(alternatives_performances,
+                                         preference_thresholds,
+                                         indifference_thresholds,
+                                         standard_deviations,
+                                         generalized_criteria,
+                                         criteria_directions,
+                                         criteria_weights, n_categories)
