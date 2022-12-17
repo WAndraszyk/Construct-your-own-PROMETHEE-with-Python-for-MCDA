@@ -5,23 +5,26 @@
 import math
 
 import pandas as pd
+from typing import List, Tuple
 from core.input_validation import promethee_i_ranking_validation
+from core.enums import RelationType
+# from mcda.core.sorting import RelationType -> ścieżka francuza
 
 
 __all__ = ["calculate_prometheeI_ranking"]
 
 
 def calculate_prometheeI_ranking(flows: pd.DataFrame,
-                                 weak_preference=True
-                                 ) -> pd.DataFrame:
+                                 weak_preference=False
+                                 ) -> List[Tuple[str, str, RelationType]]:
     """
     This function calculates outranking pairs - 1st alternative in pair |
-    relation between variants | 2nd alternative in pair.
+    2nd alternative in pair | relation between variants.
     Relationship types:
-        P - preferred
-        I - indifferent
-        ? - incomparable
-        S - outranking relation
+        PREFERENCE,
+        INDIFFERENCE,
+        INCOMPARABLE,
+        WEAK_PREFERENCE.
 
     :param flows: pd.DataFrame with alternatives names as index and flows
     as columns named (positive and negative)
@@ -37,34 +40,38 @@ def calculate_prometheeI_ranking(flows: pd.DataFrame,
     positive_flow = flows['positive']
     negative_flow = flows['negative']
 
-    pairs = pd.DataFrame(index=alternatives, columns=alternatives)
+    pairs = []
 
     # Outranking relation among all alternatives calculation
     for alternative_a in alternatives:
         for alternative_b in alternatives:
             if alternative_a == alternative_b:
-                pairs[alternative_b][alternative_a] = None
                 continue
             if weak_preference:
                 if positive_flow[alternative_a] >= \
                         positive_flow[alternative_b] \
                         and negative_flow[alternative_a] <= \
                         negative_flow[alternative_b]:
-                    pairs[alternative_b][alternative_a] = 'S'
+                    pairs.append((alternative_a, alternative_b,
+                                  RelationType.WEAK_PREFERENCE))
                 else:
-                    pairs[alternative_b][alternative_a] = '?'
+                    pairs.append((alternative_a, alternative_b,
+                                  RelationType.INCOMPARABLE))
             else:
                 if math.isclose(positive_flow[alternative_a],
                                 positive_flow[alternative_b]) \
                         and math.isclose(negative_flow[alternative_a],
                                          negative_flow[alternative_b]):
-                    pairs[alternative_b][alternative_a] = 'I'
+                    pairs.append((alternative_a, alternative_b,
+                                  RelationType.INDIFFERENCE))
                 elif positive_flow[alternative_a] >= \
                         positive_flow[alternative_b] \
                         and negative_flow[alternative_a] <= \
                         negative_flow[alternative_b]:
-                    pairs[alternative_b][alternative_a] = 'P'
+                    pairs.append((alternative_a, alternative_b,
+                                  RelationType.PREFERENCE))
                 else:
-                    pairs[alternative_b][alternative_a] = '?'
+                    pairs.append((alternative_a, alternative_b,
+                                  RelationType.INCOMPARABLE))
 
     return pairs
