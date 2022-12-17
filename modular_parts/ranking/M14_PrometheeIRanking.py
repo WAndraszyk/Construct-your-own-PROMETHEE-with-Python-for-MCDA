@@ -59,11 +59,12 @@ def calculate_prometheeI_ranking(flows: pd.DataFrame,
                                   RelationType.INCOMPARABLE))
             else:
                 if math.isclose(positive_flow[alternative_a],
-                                positive_flow[alternative_b]) \
+                                positive_flow[alternative_b], rel_tol=1e-6) \
                         and math.isclose(negative_flow[alternative_a],
                                          negative_flow[alternative_b]):
                     pairs.append((alternative_a, alternative_b,
                                   RelationType.INDIFFERENCE))
+
                 elif positive_flow[alternative_a] >= \
                         positive_flow[alternative_b] \
                         and negative_flow[alternative_a] <= \
