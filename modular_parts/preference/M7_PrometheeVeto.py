@@ -113,8 +113,10 @@ def compute_veto(
 
     # check whether to calculate overall preference
     if preferences is not None:
-        return veto, partial_veto, pc.overall_preference(preferences, veto, profiles,
-                                     decimal_place)
+        return veto, partial_veto, pc.overall_preference(preferences,
+                                                         veto,
+                                                         profiles,
+                                                         decimal_place)
     else:
         return veto, partial_veto
 
