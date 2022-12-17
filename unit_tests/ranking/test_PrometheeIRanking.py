@@ -1,8 +1,9 @@
 import pytest
 import sys
 import pandas as pd
-from pandas.testing import assert_frame_equal
 from modular_parts.ranking import calculate_prometheeI_ranking
+from core.enums import RelationType
+# from mcda.core.sorting import RelationType -> ścieżka francuza
 
 sys.path.append('../..')
 
@@ -17,17 +18,43 @@ def outranking_flows():
 
 
 def test_prometheeI_ranking(outranking_flows):
-    alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
-    expected = pd.DataFrame(
-        [[None, '?', '?', '?', '?', '?'], ['P', None, '?', '?', '?', 'P'],
-         ['P', 'P', None, '?', 'P', 'P'], ['P', 'P', 'P', None, 'P', 'P'],
-         ['P', 'P', '?', '?', None, 'P'], ['?', '?', '?', '?', '?', None, ]],
-        index=alternatives, columns=alternatives)
+    expected = [
+        ('a1', 'a2', RelationType.INCOMPARABLE),
+        ('a1', 'a3', RelationType.INCOMPARABLE),
+        ('a1', 'a4', RelationType.INCOMPARABLE),
+        ('a1', 'a5', RelationType.INCOMPARABLE),
+        ('a1', 'a6', RelationType.INCOMPARABLE),
+        ('a2', 'a1', RelationType.PREFERENCE),
+        ('a2', 'a3', RelationType.INCOMPARABLE),
+        ('a2', 'a4', RelationType.INCOMPARABLE),
+        ('a2', 'a5', RelationType.INCOMPARABLE),
+        ('a2', 'a6', RelationType.PREFERENCE),
+        ('a3', 'a1', RelationType.PREFERENCE),
+        ('a3', 'a2', RelationType.PREFERENCE),
+        ('a3', 'a4', RelationType.INCOMPARABLE),
+        ('a3', 'a5', RelationType.PREFERENCE),
+        ('a3', 'a6', RelationType.PREFERENCE),
+        ('a4', 'a1', RelationType.PREFERENCE),
+        ('a4', 'a2', RelationType.PREFERENCE),
+        ('a4', 'a3', RelationType.PREFERENCE),
+        ('a4', 'a5', RelationType.PREFERENCE),
+        ('a4', 'a6', RelationType.PREFERENCE),
+        ('a5', 'a1', RelationType.PREFERENCE),
+        ('a5', 'a2', RelationType.PREFERENCE),
+        ('a5', 'a3', RelationType.INCOMPARABLE),
+        ('a5', 'a4', RelationType.INCOMPARABLE),
+        ('a5', 'a6', RelationType.PREFERENCE),
+        ('a6', 'a1', RelationType.INCOMPARABLE),
+        ('a6', 'a2', RelationType.INCOMPARABLE),
+        ('a6', 'a3', RelationType.INCOMPARABLE),
+        ('a6', 'a4', RelationType.INCOMPARABLE),
+        ('a6', 'a5', RelationType.INCOMPARABLE)
+    ]
 
     actual = calculate_prometheeI_ranking(outranking_flows,
                                           weak_preference=False)
 
-    assert_frame_equal(expected, actual, atol=0.006)
+    assert actual == expected
 
 
 if __name__ == '__main__':

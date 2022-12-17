@@ -1,13 +1,13 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class SurrogateMethod(Enum):
     """Enumeration of surrogate weights methods."""
 
-    EW = 1
-    RS = 2
-    RR = 3
-    ROC = 4
+    EW = auto()
+    RS = auto()
+    RR = auto()
+    ROC = auto()
 
 
 class ScoringFunction(Enum):
@@ -19,9 +19,9 @@ class ScoringFunction(Enum):
     SUM: represent a sum function
     """
 
-    MAX = 1
-    MIN = 2
-    SUM = 3
+    MAX = auto()
+    MIN = auto()
+    SUM = auto()
 
 
 class ScoringFunctionDirection(Enum):
@@ -33,9 +33,9 @@ class ScoringFunctionDirection(Enum):
     DIFFERENCE: ScoringFunction(R(a,b) - R(b,a))
     """
 
-    IN_FAVOR = 1
-    AGAINST = 2
-    DIFFERENCE = 3
+    IN_FAVOR = auto()
+    AGAINST = auto()
+    DIFFERENCE = auto()
 
 
 class CompareProfiles(Enum):
@@ -47,20 +47,20 @@ class CompareProfiles(Enum):
     LIMITING_PROFILES: represents a limiting profiles type
     """
 
-    CENTRAL_PROFILES = 1
-    BOUNDARY_PROFILES = 2
-    LIMITING_PROFILES = 3
+    CENTRAL_PROFILES = auto()
+    BOUNDARY_PROFILES = auto()
+    LIMITING_PROFILES = auto()
 
 
 class GeneralCriterion(Enum):
     """Enumeration of the preference functions."""
 
-    USUAL = 1
-    U_SHAPE = 2
-    V_SHAPE = 3
-    LEVEL = 4
-    V_SHAPE_INDIFFERENCE = 5
-    GAUSSIAN = 6
+    USUAL = auto()
+    U_SHAPE = auto()
+    V_SHAPE = auto()
+    LEVEL = auto()
+    V_SHAPE_INDIFFERENCE = auto()
+    GAUSSIAN = auto()
 
 
 class InteractionType(Enum):
@@ -99,5 +99,32 @@ class FlowType(Enum):
     preferences to calculate positive and negative flows
     """
 
-    BASIC = 1
-    PROFILE_BASED = 2
+    BASIC = auto()
+    PROFILE_BASED = auto()
+
+
+class RelationType(Enum):
+    """Enumeration of MCDA relation types."""
+
+    PREFERENCE = auto()
+    INDIFFERENCE = auto()
+    INCOMPARABLE = auto()
+    WEAK_PREFERENCE = auto()
+
+    @classmethod
+    def has_value(cls, x: "RelationType") -> bool:
+        """Check if value is in enumeration.
+
+        :param x:
+        :return:
+        """
+        return x in cls
+
+    @classmethod
+    def content_message(cls) -> str:
+        """Return list of items and their values.
+
+        :return:
+        """
+        s = ", ".join(f"{item}: {item.value}" for item in cls)
+        return "RelationType only has following values " + s
