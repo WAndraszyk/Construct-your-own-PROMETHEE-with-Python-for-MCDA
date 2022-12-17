@@ -108,7 +108,7 @@ def dms_partial_preferences():
         keys=criteria)
 
     DM1_partial_preferences = (
-    DM1_alternatives_partial_preferences, DM1_profiles_partial_preferences)
+     DM1_alternatives_partial_preferences, DM1_profiles_partial_preferences)
 
     DM2_g1_profiles_partial_preferences = pd.DataFrame(
         [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -205,7 +205,7 @@ def dms_partial_preferences():
         keys=criteria)
 
     DM2_partial_preferences = (
-    DM2_alternatives_partial_preferences, DM2_profiles_partial_preferences)
+     DM2_alternatives_partial_preferences, DM2_profiles_partial_preferences)
 
     return [DM1_partial_preferences, DM2_partial_preferences]
 

@@ -166,10 +166,12 @@ def _calculate_profiles_general_net_flows(
             # to get preferences where profiles are preferred
             # to current alternative
             for (alternative_i, alternative_i_row), (_, profile_j_col) in \
-                    zip(alternatives_vs_profiles_partial_preferences.
-                                droplevel(0).iterrows(),
-                        profiles_vs_alternatives_partial_preferences.
-                                T.iterrows()):
+                    zip(
+                    alternatives_vs_profiles_partial_preferences.droplevel(
+                        0).iterrows(),
+                    profiles_vs_alternatives_partial_preferences.T.iterrows(
+
+                    )):
 
                 # Iterate simultaneously over above preferences to get
                 # a pair of preferences for each profile

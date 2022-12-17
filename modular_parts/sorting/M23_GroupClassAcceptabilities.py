@@ -8,7 +8,6 @@
     Implementation and naming convention are taken from the
     :cite:p:'DamartDiasMousseau2007'
 """
-import math
 import pandas as pd
 from typing import List, Tuple
 from core.input_validation import group_class_acceptabilities_validation

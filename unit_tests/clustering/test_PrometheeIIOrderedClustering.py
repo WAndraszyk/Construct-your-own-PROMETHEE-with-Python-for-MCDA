@@ -73,13 +73,13 @@ def n_categories():
     return 2
 
 
-def test_cluster_using_prometheecluster(alternatives_performances,
-                                        preference_thresholds,
-                                        indifference_thresholds,
-                                        standard_deviations,
-                                        generalized_criteria,
-                                        criteria_directions,
-                                        criteria_weights, n_categories):
+def test_cluster_using_promethee_cluster(alternatives_performances,
+                                         preference_thresholds,
+                                         indifference_thresholds,
+                                         standard_deviations,
+                                         generalized_criteria,
+                                         criteria_directions,
+                                         criteria_weights, n_categories):
     assignment = promethee_II_ordered_clustering(alternatives_performances,
                                                  preference_thresholds,
                                                  indifference_thresholds,
@@ -94,10 +94,10 @@ def test_cluster_using_prometheecluster(alternatives_performances,
 
 
 if __name__ == '__main__':
-    test_cluster_using_prometheecluster(alternatives_performances,
-                                        preference_thresholds,
-                                        indifference_thresholds,
-                                        standard_deviations,
-                                        generalized_criteria,
-                                        criteria_directions,
-                                        criteria_weights, n_categories)
+    test_cluster_using_promethee_cluster(alternatives_performances,
+                                         preference_thresholds,
+                                         indifference_thresholds,
+                                         standard_deviations,
+                                         generalized_criteria,
+                                         criteria_directions,
+                                         criteria_weights, n_categories)

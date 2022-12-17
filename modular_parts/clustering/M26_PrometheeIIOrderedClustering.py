@@ -178,7 +178,7 @@ def _sort_alternatives_to_categories(
                                                 promethee_ii_flows)
 
     # if the category is empty, the algorithm force one alternative to
-    # belonging to it
+    # belong to it
     assignments = _force_alternative_to_empty_category(assignments,
                                                        central_profiles.index)
     return assignments

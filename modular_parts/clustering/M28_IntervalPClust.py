@@ -19,7 +19,7 @@ from modular_parts.preference import compute_preference_indices
 __all__ = ['cluster_using_interval_pclust']
 
 
-def _calculate_profile_based_flows(central_profiles_performances: pd.DataFrame,
+def _calculate_profile_based_flows(profiles_performances: pd.DataFrame,
                                    alternatives_performances: pd.DataFrame,
                                    preference_thresholds: pd.Series,
                                    indifference_thresholds: pd.Series,
@@ -32,7 +32,7 @@ def _calculate_profile_based_flows(central_profiles_performances: pd.DataFrame,
     Calculate the profiles net flows using profile-based outranking flows
     method.
 
-    :param: central_profiles_performances: pd.DataFrame with the profiles as
+    :param: profiles_performances: pd.DataFrame with the profiles as
     index and criteria as columns. Contains the performances of
     the central profiles(centroids).
     :param: alternatives_performances: pd.DataFrame with the alternatives
@@ -67,12 +67,12 @@ def _calculate_profile_based_flows(central_profiles_performances: pd.DataFrame,
         generalized_criteria,
         directions,
         weights,
-        central_profiles_performances)
+        profiles_performances)
 
     # Use basic Promethee Preferences method to calculate the profiles
     # preferences
     profiles_preferences, _ = compute_preference_indices(
-        central_profiles_performances,
+        profiles_performances,
         preference_thresholds,
         indifference_thresholds,
         standard_deviations,
@@ -339,8 +339,9 @@ def _calculate_homogeneity_index(principal_categories: Dict[str, List[str]],
             # Sum up all preferences between alternatives in that cluster
             homogeneity_indices[category] = \
                 alternatives_preferences.loc[alternatives_in_category,
-                                             alternatives_in_category
-                                             ].sum().sum() / \
+                                             alternatives_in_category].sum(
+
+                ).sum() / \
                 (len(alternatives_in_category) ** 2 - len(
                     alternatives_in_category))
         else:

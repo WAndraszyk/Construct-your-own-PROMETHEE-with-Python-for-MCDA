@@ -102,9 +102,9 @@ def test_overall_preference(alternatives, alternatives_performances, weights,
                                   [0.000, 0.000, 0.000, 0.000, 0.000],
                                   [0.000, 0.000, 0.000, 0.000, 0.000]],
                             columns=alternatives, index=alternatives)
-    _, _, actual = compute_veto(alternatives_performances=alternatives_performances,
-                          weights=weights, veto_thresholds=vetoes,
-                          directions=directions, preferences=preference)
+    _, _, actual = compute_veto(
+        alternatives_performances=alternatives_performances, weights=weights,
+        veto_thresholds=vetoes, directions=directions, preferences=preference)
 
     assert_frame_equal(actual, expected, atol=0.006)
 
