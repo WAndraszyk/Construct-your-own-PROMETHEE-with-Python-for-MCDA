@@ -152,6 +152,7 @@ def _calculate_first_step_assignments(categories: List[str],
 
 
 def _calculate_final_assignments(alternatives_flows: pd.DataFrame,
+                                 category_profiles_flows: pd.DataFrame,
                                  classification: pd.DataFrame,
                                  cut_point: NumericValue,
                                  assign_to_better_class: bool = True
@@ -166,6 +167,8 @@ def _calculate_final_assignments(alternatives_flows: pd.DataFrame,
     compared with cut point parameter.
 
     :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with profiles as
     index and flows as columns named (positive and negative)
     :param classification: pd.DataFrame with alternatives names as index and
     assignments as columns named (worse and better)
@@ -197,24 +200,30 @@ def _calculate_final_assignments(alternatives_flows: pd.DataFrame,
             alternatives_flows.loc[alternative, 'positive'] - \
             alternatives_flows.loc[alternative, 'negative']
 
-        worse_category_net_outranking_flow = \
-            worse_category_alternatives.apply(
-                lambda row: row['positive'] - row['negative'], axis=1)
+        if worse_category_alternatives.empty:
+            new_classification[alternative] = alternative_row['worse']
+            continue
+        else:
+            worse_category_net_outranking_flow = \
+                worse_category_alternatives.apply(
+                    lambda row: row['positive'] - row['negative'], axis=1)
+            positive_distance = \
+                worse_category_net_outranking_flow.map(
+                    lambda x: alternative_net_outranking_flow - x).sum() / \
+                worse_category_alternatives.shape[0]
 
-        better_category_net_outranking_flow = \
-            better_category_alternatives.apply(
-                lambda row: row['positive'] - row['negative'], axis=1)
+        if better_category_alternatives.empty:
+            new_classification[alternative] = alternative_row['better']
+            continue
+        else:
+            better_category_net_outranking_flow = \
+                better_category_alternatives.apply(
+                    lambda row: row['positive'] - row['negative'], axis=1)
+            negative_distance = better_category_net_outranking_flow.map(
+                lambda x: x - alternative_net_outranking_flow).sum() / \
+                better_category_alternatives.shape[0]
 
-        # Distance calculating
-        positive_distance = \
-            worse_category_net_outranking_flow.map(
-                lambda x: alternative_net_outranking_flow - x).sum()
-        negative_distance = better_category_net_outranking_flow.map(
-            lambda x: x - alternative_net_outranking_flow).sum()
-
-        total_distance = \
-            1 / worse_category_alternatives.shape[0] * positive_distance - \
-            1 / better_category_alternatives.shape[0] * negative_distance
+        total_distance = positive_distance - negative_distance
 
         # Assignment based on distance comparison
         if total_distance > cut_point:
@@ -280,8 +289,10 @@ def calculate_promsort_sorted_alternatives(
         categories,
         alternatives_flows,
         category_profiles_flows)
+
     final_step_assignments = _calculate_final_assignments(
         alternatives_flows,
+        category_profiles_flows,
         first_step_assignments,
         cut_point,
         assign_to_better_class)
