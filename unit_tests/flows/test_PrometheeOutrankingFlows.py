@@ -135,7 +135,7 @@ def profiles_preferences():
                         columns=profiles)
 
 
-def test_prometheeI_outranking_flows(alternatives_preferences):
+def test_basic_outranking_flows(alternatives_preferences):
     alternatives = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
     expected = pd.DataFrame({'positive': [0.041512, 0.121882, 0.269248,
                                           0.609344, 0.260582, 0.03652],
@@ -144,13 +144,13 @@ def test_prometheeI_outranking_flows(alternatives_preferences):
                              }, index=alternatives)
 
     actual = calculate_promethee_outranking_flows(alternatives_preferences,
-                                                  FlowType.PROMETHEE_I)
+                                                  FlowType.BASIC)
 
     assert_frame_equal(expected, actual, atol=0.006)
 
 
-def test_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII,
-                                      profiles_preferences):
+def test_profile_based_outrank_flows(alternatives_vs_profiles_preferencesII,
+                                     profiles_preferences):
     alternatives = [f"a{i}" for i in range(1, 4)]
     profiles = [f"p{i}" for i in range(1, 5)]
     external_index = []
@@ -171,11 +171,11 @@ def test_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII,
 
     actual = calculate_promethee_outranking_flows(
         alternatives_vs_profiles_preferencesII,
-        FlowType.PROMETHEE_II, profiles_preferences)
+        FlowType.PROFILE_BASED, profiles_preferences)
     assert_frame_equal(expected, actual, atol=0.006)
 
 
-def test_prometheeI_outranking_flows_for_alternatives_vs_profiles(
+def test_basic_outranking_flows_for_alternatives_vs_profiles(
         alternatives_vs_profiles_preferences):
     alternatives = [f"a{i}" for i in range(1, 13)]
     profiles = [f"p{i}" for i in range(1, 4)]
@@ -206,7 +206,7 @@ def test_prometheeI_outranking_flows_for_alternatives_vs_profiles(
 
     actual_alternatives = calculate_promethee_outranking_flows(
         alternatives_vs_profiles_preferences,
-        FlowType.PROMETHEE_I)
+        FlowType.BASIC)
     assert_frame_equal(expected_alternatives, actual_alternatives, atol=0.006)
 
     expected_profiles = pd.DataFrame(
@@ -216,13 +216,13 @@ def test_prometheeI_outranking_flows_for_alternatives_vs_profiles(
          }, index=profiles)
     actual_profiles = calculate_promethee_outranking_flows(
         alternatives_vs_profiles_preferences[::-1],
-        flow_type=FlowType.PROMETHEE_I)
+        flow_type=FlowType.BASIC)
     assert_frame_equal(expected_profiles, actual_profiles, atol=0.006)
 
 
 if __name__ == '__main__':
-    test_prometheeI_outranking_flows(alternatives_preferences)
-    test_prometheeII_outranking_flows(alternatives_vs_profiles_preferencesII,
-                                      profiles_preferences)
-    test_prometheeI_outranking_flows_for_alternatives_vs_profiles(
+    test_basic_outranking_flows(alternatives_preferences)
+    test_profile_based_outrank_flows(alternatives_vs_profiles_preferencesII,
+                                     profiles_preferences)
+    test_basic_outranking_flows_for_alternatives_vs_profiles(
         alternatives_vs_profiles_preferences)

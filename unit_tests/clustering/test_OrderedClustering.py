@@ -16,7 +16,8 @@ def preferences():
 
 def test_ordered_clusters(preferences):
     expected = pd.Series([['a'], ['b', 'c'], ['d']],
-                         name="Alternatives in clusters", index=[1, 2, 3])
+                         name="Alternatives in clusters",
+                         index=[f"C{i}" for i in range(1, 4)])
     actual = group_into_ordered_clusters(preferences, 3)
     assert_series_equal(expected, actual)
 

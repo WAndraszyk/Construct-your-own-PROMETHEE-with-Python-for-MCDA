@@ -1,7 +1,10 @@
 """
 This module implements the Ordered Clustering method which divides
 alternatives into k ordered clusters based on the preference
-indices matrix
+indices matrix.
+
+Implementation and naming of conventions are taken from
+:cite:p:'???'.
 """
 from typing import List, Tuple
 from core.aliases import NumericValue
@@ -9,6 +12,7 @@ from core.input_validation import ordered_clustering_validation
 from core.graph import Graph
 import numpy as np
 import pandas as pd
+import copy
 
 __all__ = ["group_into_ordered_clusters"]
 
@@ -30,14 +34,14 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
 
     alternatives = preferences.index
     shape = np.shape(preferences)
-    preferences = list(preferences.values)
+    preferences_list = copy.deepcopy(list(preferences.values))
 
     graph = np.zeros(shape)
     clusters = []
     deleted_nodes = []
     while True:
         # find maximum preference value
-        max_pi, i, j = _search_max(preferences)
+        max_pi, i, j = _search_max(preferences_list)
         if max_pi == 0:
             break
         else:
@@ -47,7 +51,7 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
             if _check_graph(graph, k):
                 # delete the edge between node i and j
                 graph[i][j] = 0
-            preferences[i][j] = 0
+            preferences_list[i][j] = 0
 
     while True:
         cluster = []
@@ -68,7 +72,7 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
                 deleted_nodes.append(i)
         clusters.append(cluster)
     clusters_fin = pd.Series(clusters, name='Alternatives in clusters')
-    clusters_fin.index += 1
+    clusters_fin.index = [f"C{i}" for i in range(1, len(clusters_fin) + 1)]
     return clusters_fin
 
 

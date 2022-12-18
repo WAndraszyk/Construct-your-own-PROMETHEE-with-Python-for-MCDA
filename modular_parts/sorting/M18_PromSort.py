@@ -1,9 +1,11 @@
 """
     This module computes the assignments of given alternatives to
     categories using PromSort.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'ArazOzkarahan2007'.
 """
 import math
-
 import pandas as pd
 from core.aliases import NumericValue
 from typing import List, Tuple
@@ -24,13 +26,17 @@ def _define_outranking_relation(positive_flow_a: NumericValue,
     and profile or profile and alternative (preference - 'P', indifference -
      'I', incomparable - '?')
 
-    :param positive_flow_a: positive flow of first profile/alternative
-    :param negative_flow_a: negative flow of first profile/alternative
-    :param positive_flow_b: positive flow of second profile/alternative
-    :param negative_flow_b: negative flow of second profile/alternative
+    :param positive_flow_a: NumericValue that determines positive flow of
+    first profile/alternative
+    :param negative_flow_a: NumericValue that determines negative flow of
+    first profile/alternative
+    :param positive_flow_b: NumericValue that determines positive flow of
+    second profile/alternative
+    :param negative_flow_b: NumericValue that determines negative flow of
+    second profile/alternative
 
-    :return: one of three types of outranking relation between first
-     profile/alternative and second profile/alternative
+    :return: chr that determines one of three types of outranking relation
+    between first profile/alternative and second profile/alternative
     """
     if math.isclose(positive_flow_a, positive_flow_b) \
             and math.isclose(negative_flow_a, negative_flow_b):
@@ -52,16 +58,18 @@ def _check_if_all_profiles_are_preferred_to_alternative(
         alternative_positive_flow: NumericValue,
         alternative_negative_flow: NumericValue) -> bool:
     """
-    Checks if all profiles are preferred to alternative
+    This function checks if all profiles are preferred to alternative
     (which allow sorting method to assign alternative to the worst category)
 
-    :param category_profiles_flows: Flows table with category profiles flows
-    :param alternative_positive_flow: Numeric Value of positive flow of
-     alternative
-    :param alternative_negative_flow: Numeric Value of negative flow of
-     alternative
+    :param category_profiles_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param alternative_positive_flow: NumericValue that determines positive
+    flow of alternative
+    :param alternative_negative_flow: NumericValue that determines negative
+    flow of alternative
 
-    :return: True if all profiles are preferred to alternative, else False
+    :return: Boolean that determines if all profiles are preferred
+    to alternative
     """
     outranking_relations = category_profiles_flows.apply(
         lambda row: _define_outranking_relation(row['positive'],
@@ -77,9 +85,8 @@ def _calculate_first_step_assignments(categories: List[str],
                                       category_profiles_flows: pd.DataFrame
                                       ) -> pd.DataFrame:
     """
-    Calculates first step of assignments alternatives to categories.
     This function calculates outranking relations alternative to each boundary
-     profile, then:
+    profile, then:
     - if alternative is preferred to all boundary profiles then assign
      alternative to the best category
     - calculate outranking relations of each boundary profile to alternative,
@@ -92,15 +99,16 @@ def _calculate_first_step_assignments(categories: List[str],
      assigned first incomparable
     or indifference index category as worse class and first incomparable
     or indifference index +1 category
-     as better class.
+    as better class.
 
-    :param categories: List of categories names
-    :param alternatives_flows: Flows table with alternatives flows
-    :param category_profiles_flows: Flows table with category profiles flows
+    :param categories: List with categories names as strings
+    :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
 
-    :return: Dictionary with classifications and List of Tuples of
-     alternative, worse and better class to
-    which can be alternative assigned in final assignments step
+    :return: pd.DataFrame with alternatives names as index and
+    assignments as columns named (worse and better)
     """
 
     classification = {alternative: [] for alternative in
@@ -115,6 +123,7 @@ def _calculate_first_step_assignments(categories: List[str],
                 category_profile_row['positive'],
                 category_profile_row['negative']), axis=1)
 
+        # Checking alternatives outranking relations
         first_i_occurrence = category_profiles.get_loc(
             outranking_relations.str.contains('I').idxmax()) \
             if outranking_relations.str.contains('I').any() else float('inf')
@@ -125,6 +134,7 @@ def _calculate_first_step_assignments(categories: List[str],
             outranking_relations.str.contains('P').idxmin()) - 1 \
             if outranking_relations.str.contains('P').any() else float('inf')
 
+        # Assignment conditions
         if outranking_relations[-1] == 'P':
             classification[alternative] = [categories[-1], categories[-1]]
         elif _check_if_all_profiles_are_preferred_to_alternative(
@@ -145,33 +155,34 @@ def _calculate_first_step_assignments(categories: List[str],
 
 
 def _calculate_final_assignments(alternatives_flows: pd.DataFrame,
+                                 category_profiles_flows: pd.DataFrame,
                                  classification: pd.DataFrame,
                                  cut_point: NumericValue,
                                  assign_to_better_class: bool = True
                                  ) -> pd.Series:
     """
     Used assigned categories to assign the unassigned ones. Based on
-     positive and negative distance,
-    that is calculated for each alternative, basing on calculated in
-    first step categories (s and s+1).
+    positive and negative distance, that is calculated for each alternative,
+    basing on calculated in first step categories (s and s+1).
     After calculating positive and negative distances a total distance
-     is determining.
-    After computing the total distance for all alternatives and profiles
-    it is compared with cut point parameter.
+    is determining.
+    After computing the total distance for all alternatives and profiles it is
+    compared with cut point parameter.
 
-    :param alternatives_flows: Flows table with alternatives flows
-    :param classification: DataFrame with classifications of alternatives
-     (worse and better class)
-    :param cut_point: Numeric Value in range <-1, 1> which define DM
-     preference of classifying alternative to worse
-    or better class in final alternative assignment
-    (-1 means 'always worse category', 1 means 'always better category')
-    :param assign_to_better_class: Boolean which describe preference of the
-     DM in final alternative assignment if
-    total distance is equal cut_point value.
+    :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with profiles as
+    index and flows as columns named (positive and negative)
+    :param classification: pd.DataFrame with alternatives names as index and
+    assignments as columns named (worse and better)
+    :param cut_point: NumericValue in range <-1, 1> which define DM
+    preference of classifying alternative to worse or better class in
+    final alternative assignment
+    :param assign_to_better_class: boolean which describe preference of
+    the DM in final alternative assignment if total distance is equal
+    cut_point value.
 
-    :return: DataFrame with final classifications of
-    alternatives (only one class)
+    :return: pd.Series objects with assignments as values
     """
 
     new_classification = classification.apply(
@@ -180,6 +191,7 @@ def _calculate_final_assignments(alternatives_flows: pd.DataFrame,
     not_classified = classification[new_classification.isnull()]
     classified = classification[~new_classification.isnull()]
 
+    # Iterating over unassigned alternatives
     for alternative, alternative_row in not_classified.iterrows():
         worse_category_alternatives = alternatives_flows.loc[
             classified[classified['worse'] == alternative_row['worse']].index]
@@ -191,24 +203,32 @@ def _calculate_final_assignments(alternatives_flows: pd.DataFrame,
             alternatives_flows.loc[alternative, 'positive'] - \
             alternatives_flows.loc[alternative, 'negative']
 
-        worse_category_net_outranking_flow = \
-            worse_category_alternatives.apply(
-                lambda row: row['positive'] - row['negative'], axis=1)
+        if worse_category_alternatives.empty:
+            new_classification[alternative] = alternative_row['worse']
+            continue
+        else:
+            worse_category_net_outranking_flow = \
+                worse_category_alternatives.apply(
+                    lambda row: row['positive'] - row['negative'], axis=1)
+            positive_distance = \
+                worse_category_net_outranking_flow.map(
+                    lambda x: alternative_net_outranking_flow - x).sum() / \
+                worse_category_alternatives.shape[0]
 
-        better_category_net_outranking_flow = \
-            better_category_alternatives.apply(
-                lambda row: row['positive'] - row['negative'], axis=1)
+        if better_category_alternatives.empty:
+            new_classification[alternative] = alternative_row['better']
+            continue
+        else:
+            better_category_net_outranking_flow = \
+                better_category_alternatives.apply(
+                    lambda row: row['positive'] - row['negative'], axis=1)
+            negative_distance = better_category_net_outranking_flow.map(
+                lambda x: x - alternative_net_outranking_flow).sum() / \
+                better_category_alternatives.shape[0]
 
-        positive_distance = \
-            worse_category_net_outranking_flow.map(
-                lambda x: alternative_net_outranking_flow - x).sum()
-        negative_distance = better_category_net_outranking_flow.map(
-            lambda x: x - alternative_net_outranking_flow).sum()
+        total_distance = positive_distance - negative_distance
 
-        total_distance = \
-            1 / worse_category_alternatives.shape[0] * positive_distance - \
-            1 / better_category_alternatives.shape[0] * negative_distance
-
+        # Assignment based on distance comparison
         if total_distance > cut_point:
             new_classification[alternative] = alternative_row['better']
         elif total_distance < cut_point:
@@ -233,25 +253,29 @@ def calculate_promsort_sorted_alternatives(
         assign_to_better_class: bool = True) -> \
         Tuple[pd.DataFrame, pd.Series]:
     """
-    Sort alternatives to proper categories.
+    This function sorts alternatives to proper categories
+    (based on PromSort).
 
-    :param categories: List of categories names
-    :param alternatives_flows: Flows table with alternatives flows
-    :param category_profiles_flows: Flows table with category profiles flows
-    :param criteria_thresholds: Series with criteria thresholds
-    :param category_profiles: Performance table with category profiles
-    performances
-    :param criteria_directions: Series with criteria directions
-    :param cut_point: Numeric Value in range <-1, 1> which define DM
-    preference of classifying alternative to worse
-    or better class in final alternative assignment
-    (-1 means 'always worse category', 1 means 'always better category')
+    :param categories: List with categories names as strings
+    :param alternatives_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param category_profiles_flows: pd.DataFrame with alternatives as
+    index and flows as columns named (positive and negative)
+    :param criteria_thresholds: pd.Series with criteria as index and
+    thresholds as values
+    :param category_profiles: pd.DataFrame with profiles as index and criteria
+    as columns
+    :param criteria_directions: pd.Series with criteria as index and
+    Direction as values
+    :param cut_point: NumericValue in range <-1, 1> which define DM
+    preference of classifying alternative to worse or better class in
+    final alternative assignment
     :param assign_to_better_class: Boolean which describe preference of
-     the DM in final alternative assignment if
-    total distance is equal cut_point value.
-    :return: DataFrame with imprecise category assignments(worse and better
-     class)
-    and Series with precise assignments
+    the DM in final alternative assignment if total distance is equal
+    cut_point value.
+    :return: Tuple with pd.DataFrame with alternatives names as index and
+    assignments as columns named (worse and better) and pd.Series objects with
+    assignments as values
     """
     prom_sort_validation(categories, alternatives_flows,
                          category_profiles_flows, criteria_thresholds,
@@ -268,8 +292,10 @@ def calculate_promsort_sorted_alternatives(
         categories,
         alternatives_flows,
         category_profiles_flows)
+
     final_step_assignments = _calculate_final_assignments(
         alternatives_flows,
+        category_profiles_flows,
         first_step_assignments,
         cut_point,
         assign_to_better_class)

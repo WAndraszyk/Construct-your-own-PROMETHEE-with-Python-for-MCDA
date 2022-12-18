@@ -1,5 +1,8 @@
 """
 This module calculates preference indices with veto thresholds
+
+Implementation and naming of conventions are taken from
+:cite:p:'???'.
 """
 from core.aliases import NumericValue
 import core.preference_commons as pc
@@ -113,8 +116,10 @@ def compute_veto(
 
     # check whether to calculate overall preference
     if preferences is not None:
-        return veto, partial_veto, pc.overall_preference(preferences, veto, profiles,
-                                     decimal_place)
+        return veto, partial_veto, pc.overall_preference(preferences,
+                                                         veto,
+                                                         profiles,
+                                                         decimal_place)
     else:
         return veto, partial_veto
 

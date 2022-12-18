@@ -7,9 +7,9 @@ from core.enums import Direction
 
 def group_alternatives(assignment: pd.Series) -> pd.Series:
     """
-    Converts output from @calculate_prometheetri_sorted_alternatives into
+    Converts output from Promethee Tri module into
     pd.Series with clusters as indexes assignment by numbers of assigned
-    alternatives .
+    alternatives.
 
     :param assignment: Series with precise assignments of alternatives to
         categories
@@ -23,6 +23,26 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
         else:
             cluster[value] = [key]
     return cluster
+
+
+def change_clusters_output(clusters: pd.Series) -> pd.Series:
+    """
+    Changes clusters output from pd.Series with clusters as indexes
+    and list of assigned alternatives as values to pd.Series with
+    alternatives as indexes and assigned cluster as value.
+
+    :param clusters: pd.Series with clusters as indexes and list of
+        assigned alternatives as values
+    :return: pd.Series with alternatives as indexes and assigned
+        cluster as value
+    """
+
+    output = pd.Series([], dtype=str)
+    for cluster, alternatives in clusters.items():
+        for alternative in alternatives:
+            output[alternative] = cluster
+    output.sort_index(inplace=True)
+    return output
 
 
 def calculate_new_profiles(profiles_performances: pd.DataFrame,
@@ -41,7 +61,7 @@ def calculate_new_profiles(profiles_performances: pd.DataFrame,
 
     :return: Dataframe with redefined profiles' performances
     """
-    central_profiles_out = profiles_performances.copy()
+    central_profiles_out = profiles_performances.copy(deep=True)
     profile_alternatives = defaultdict(list)
     for index, value in assignment.items():
         profile_alternatives[value].append(index)

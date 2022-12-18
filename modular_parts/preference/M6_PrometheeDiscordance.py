@@ -2,6 +2,9 @@
 This module implements a way of calculating discordance indices which
 is a measure of the extent to which criterion j is discordant with aPjb using
 Promethee Discordance method.
+
+Implementation and naming of conventions are taken from
+:cite:p:'Discordance'.
 """
 import pandas as pd
 from typing import Tuple, List, Union

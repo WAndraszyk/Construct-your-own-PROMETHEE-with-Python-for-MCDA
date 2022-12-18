@@ -1,6 +1,9 @@
 """
     This module computes net outranking flows based on positive and negative
     outranking flows.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'BransMareschal2005'.
 """
 from typing import Union
 
@@ -12,7 +15,7 @@ from core.input_validation import calculate_net_outranking_flows_validation
 
 
 def calculate_net_outranking_flows(flows: pd.DataFrame,
-                                   promethee_II_format: bool = False) \
+                                   profile_based_format: bool = False) \
         -> Union[pd.Series, pd.DataFrame]:
     """
     Computes net outranking flow based on positive and negative flows.
@@ -21,8 +24,8 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
 
     :param flows: pd.Dataframe of both positive and negative outranking flows.
         index: alternatives, columns: positive, negative
-    :param promethee_II_format: boolean value describe whether net flow should
-        be return alone or as DataFrame together with outranking flows
+    :param profile_based_format: boolean value describe whether net flow
+        should be return alone or as DataFrame together with outranking flows
 
     :return: Series of net outranking flow - index: alternatives or DataFrame
         of outranking flows with net outranking flow, index: alternatives,
@@ -41,7 +44,7 @@ def calculate_net_outranking_flows(flows: pd.DataFrame,
 
     net = pd.Series(data=flow_data, index=alternatives,
                     name='Net outranking flow')
-    if promethee_II_format:
+    if profile_based_format:
         net_flow = flows.copy()
         net_flow['net'] = net
         return net_flow

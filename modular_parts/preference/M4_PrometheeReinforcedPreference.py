@@ -3,6 +3,9 @@ This module calculates preference indices with possibility of
 reinforcement, which means giving a bonus to an alternative which is
 significantly better on a given criterion than another alternative, using
 Promethee Reinforced Preference method.
+
+Implementation and naming of conventions are taken from
+:cite:p:'ReinforcedPreference'.
 """
 from typing import List, Tuple, Union
 from core.preference_commons import GeneralCriterion

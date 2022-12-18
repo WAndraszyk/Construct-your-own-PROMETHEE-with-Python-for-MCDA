@@ -1,6 +1,9 @@
 """
 This module implements clustering method based on FlowSort and k-mean
 algorithm.
+
+Implementation and naming of conventions are taken from
+:cite:p:'P2CLUST'.
 """
 import numpy as np
 import pandas as pd
@@ -111,7 +114,11 @@ def promethee_II_ordered_clustering(alternatives_performances: pd.DataFrame,
     # change output from Series with alternatives indices and categories as
     # values to categories indices and alternatives as values
     cluster = group_alternatives(assignments)
+    # temporary switch of the indexes for proper sorting
+    # (f.e. for strings '2' < '11')
+    cluster.index = [int(category[1:]) for category in cluster.index]
     cluster.sort_index(inplace=True)
+    cluster.index = categories
     return cluster
 
 
@@ -162,10 +169,10 @@ def _sort_alternatives_to_categories(
         s_parameters, generalized_criteria, directions, weights)
 
     # calculating Net Outranking Flow
-    promethee_ii_flows = calculate_promethee_outranking_flows(
-        alternatives_preference, FlowType.PROMETHEE_II,
+    profile_based_flows = calculate_promethee_outranking_flows(
+        alternatives_preference, FlowType.PROFILE_BASED,
         profiles_preference)
-    promethee_ii_flows = calculate_net_outranking_flows(promethee_ii_flows,
+    promethee_ii_flows = calculate_net_outranking_flows(profile_based_flows,
                                                         True)
 
     redirected_profiles = pc.directed_alternatives_performances(
@@ -174,11 +181,11 @@ def _sort_alternatives_to_categories(
     check_dominance_condition(directions, redirected_profiles)
 
     # sorting alternatives into categories
-    assignments = calculate_flowsort_assignment(categories,
-                                                promethee_ii_flows)
+    assignments = _calculate_flowsort_assignment(categories,
+                                                 promethee_ii_flows)
 
     # if the category is empty, the algorithm force one alternative to
-    # belonging to it
+    # belong to it
     assignments = _force_alternative_to_empty_category(assignments,
                                                        central_profiles.index)
     return assignments
@@ -231,7 +238,7 @@ def _force_alternative_to_empty_category(assignments: pd.Series,
         item = assignments_copy.sample()
         unique_category = assignments_copy.unique()
         # categories which are not in unique categories are empty
-        if list(set(categories.values) - set(unique_category)) == []:
+        if not list(set(categories.values) - set(unique_category)):
             break
 
         # if the alternative's category is in old_value, that is its category
@@ -245,8 +252,8 @@ def _force_alternative_to_empty_category(assignments: pd.Series,
     return assignments_copy
 
 
-def calculate_flowsort_assignment(categories: pd.Index,
-                                  promethee_ii_flows: pd.DataFrame) \
+def _calculate_flowsort_assignment(categories: pd.Index,
+                                   promethee_ii_flows: pd.DataFrame) \
         -> pd.Series:
     """
     This function assign alternatives to the category which has the closet

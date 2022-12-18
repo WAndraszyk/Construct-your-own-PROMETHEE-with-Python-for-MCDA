@@ -1,10 +1,11 @@
 """
     This class computes Net Flow Score which bases on calculating scores
-    associated with
-    each alternative.
+    associated with each alternative.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'KadzinskiMichalski2016' and :cite:p:'BouyssouPerny1992'.
 """
 import math
-
 import numpy as np
 import pandas as pd
 from core.enums import ScoringFunction, ScoringFunctionDirection
@@ -13,17 +14,23 @@ from core.input_validation import net_flow_score_validation
 __all__ = ['calculate_net_flows_score']
 
 
-def _calculate_score(preferences: pd.Series,
+def _calculate_score(preferences: pd.DataFrame,
                      function: ScoringFunction,
-                     direction: ScoringFunctionDirection) -> np.array:
+                     direction: ScoringFunctionDirection) -> np.ndarray:
     """
-    Calculates scores for passed preferences.
+    This function calculates scores for passed preferences.
 
-    :param preferences: 2D List of aggregated preferences between
-    alternatives.
-    :return: List of Net Flow Scores for passed preferences.
+    :param preferences: pd.DataFrame with alternatives names as index
+    and columns
+    :param function: ScoringFunction that determines scoring function
+    used in calculation
+    :param direction: ScoringFunctionDirection that determines scoring
+    function direction used in calculation
+
+    :return: np.ndarray with net flow scores for passed preferences
     """
 
+    # Scoring function selection
     if function is ScoringFunction.MAX:
         function = np.nanmax
     elif function is ScoringFunction.MIN:
@@ -31,17 +38,24 @@ def _calculate_score(preferences: pd.Series,
     else:
         function = np.nansum
 
+    # Scoring function direction selection
     if direction is ScoringFunctionDirection.IN_FAVOR:
         scores = function(preferences.values, axis=1)
     elif direction is ScoringFunctionDirection.AGAINST:
         scores = -function(preferences.values, axis=0)
     else:
         scores = function(preferences.values - preferences.values.T, axis=1)
-
     return scores
 
 
 def _find_duplicates_values(array: np.ndarray) -> set:
+    """
+    This function finds duplicated values.
+
+    :param array: np.ndarray with net flow scores for passed preferences
+
+    :return: set with duplicated values
+    """
     seen = set()
     duplicated_values = set()
 
@@ -59,18 +73,18 @@ def calculate_net_flows_score(preferences: pd.DataFrame,
                               direction: ScoringFunctionDirection,
                               avoid_same_scores: bool = False) -> pd.Series:
     """
-    Calculates scores for all preferences.
+    This function calculates net flow scores for all preferences.
 
+    :param preferences: pd.DataFrame with alternatives names as index
+    and columns
+    :param function: ScoringFunction that determines scoring function
+    used in calculation
+    :param direction: ScoringFunctionDirection that determines scoring
+    function direction used in calculation
+    :param avoid_same_scores: bool, that determines if equal values are
+    allowed in result
 
-    :param preferences: Preference table of aggregated preferences.
-    :param function: Enum ScoringFunction - indicate which function should be
-    used in calculating Net Flow Score.
-    :param direction: Enum ScoringFunctionDirection - indicate which function
-    direction should be used in
-    :param avoid_same_scores: If True and calculate_scores returns some equal
-    scores calculate once more scores for
-                              alternatives which get the same score.
-    :return: List of Net Flow Scores for all preferences.
+    :return: pd.Series with net flow scores for all preferences
     """
     net_flow_score_validation(preferences, function, direction,
                               avoid_same_scores)
@@ -78,6 +92,8 @@ def calculate_net_flows_score(preferences: pd.DataFrame,
 
     if avoid_same_scores:
         scores = _calculate_score(preferences, function, direction)
+
+        # Repeat calculations for duplicate values
         if len(scores) != len(set(scores)):
             duplicated_values = _find_duplicates_values(scores)
             for duplicated_value in duplicated_values:

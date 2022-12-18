@@ -1,6 +1,9 @@
 """
 This module implements clustering method based on PrometheeTri and k-mean
 algorithm.
+
+Implementation and naming of conventions are taken from
+:cite:p:'PClusterTri'.
 """
 from typing import Tuple
 import numpy as np
@@ -69,7 +72,7 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
     # initialize central profiles_performances by random choosing them from
     # alternatives
     profiles = alternatives_performances.iloc[
-        random.sample(range(0, alternatives_performances.index.__len__()),
+        random.sample(range(0, len(alternatives_performances.index)),
                       n_categories)]
     profiles.index = categories
 
@@ -82,7 +85,7 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
 
     # algorithm ends when assignment doesn't change anymore
     while not old_assignment.equals(assignment):
-        old_assignment = assignment.copy()
+        old_assignment = assignment.copy(deep=True)
         assignment, profiles = _calculate_sorted_alternatives(
             alternatives_performances, preference_thresholds,
             indifference_thresholds, s_parameters,
@@ -91,7 +94,11 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
     # change output from Series with alternatives indices and categories as
     # values to categories indices and alternatives as values
     cluster = group_alternatives(assignment)
-    cluster.sort_values(key=lambda x: x.str.len(), inplace=True)
+    # temporary switch of the indexes for proper sorting
+    # (f.e. for strings '2' < '11')
+    cluster.index = [int(category[1:]) for category in cluster.index]
+    cluster.sort_index(inplace=True)
+    cluster.index = categories
     return cluster
 
 
@@ -131,13 +138,13 @@ def _calculate_sorted_alternatives(alternatives_performances: pd.DataFrame,
     """
 
     # calculating partial preference alternatives over profiles
-    _, partial_prefe = compute_preference_indices(alternatives_performances,
-                                                  preference_thresholds,
-                                                  indifference_thresholds,
-                                                  s_parameters,
-                                                  generalized_criteria,
-                                                  directions, weights,
-                                                  profiles_performances)
+    _, partial_pref = compute_preference_indices(alternatives_performances,
+                                                 preference_thresholds,
+                                                 indifference_thresholds,
+                                                 s_parameters,
+                                                 generalized_criteria,
+                                                 directions, weights,
+                                                 profiles_performances)
 
     # calculating partial preference profiles over profiles
     _, profile_partial_pref = compute_preference_indices(
@@ -146,7 +153,7 @@ def _calculate_sorted_alternatives(alternatives_performances: pd.DataFrame,
 
     # sorting alternatives into categories
     assignment = calculate_prometheetri_sorted_alternatives(
-        profiles_performances.index.tolist(), weights, partial_prefe,
+        profiles_performances.index.tolist(), weights, partial_pref,
         profile_partial_pref, True)
 
     # update central profiles_performances

@@ -9,7 +9,7 @@ def usual_criterion(d: NumericValue) -> NumericValue:
     :param d: difference between two alternatives on a specified criterion
     :return: preference value
     """
-    return 1 if d > 0 else 0
+    return 1.0 if d > 0 else 0.0
 
 
 def u_shape_criterion(d: NumericValue, q: NumericValue) -> NumericValue:
@@ -21,9 +21,9 @@ def u_shape_criterion(d: NumericValue, q: NumericValue) -> NumericValue:
     :return: preference value
     """
     if d <= q:
-        return 0
+        return 0.0
     else:
-        return 1
+        return 1.0
 
 
 def v_shape_criterion(d: NumericValue, p: NumericValue) -> NumericValue:
@@ -36,11 +36,11 @@ def v_shape_criterion(d: NumericValue, p: NumericValue) -> NumericValue:
     :return: preference value
     """
     if d <= 0:
-        return 0
+        return 0.0
     elif d <= p:
         return d / p
     else:
-        return 1
+        return 1.0
 
 
 def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue
@@ -57,11 +57,11 @@ def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue
     :return: preference value
     """
     if d <= q:
-        return 0
+        return 0.0
     elif d <= p:
         return 0.5
     else:
-        return 1
+        return 1.0
 
 
 def v_shape_indifference_criterion(d: NumericValue, p: NumericValue,
@@ -76,11 +76,11 @@ def v_shape_indifference_criterion(d: NumericValue, p: NumericValue,
     :return: preference value
     """
     if d <= q:
-        return 0
+        return 0.0
     elif d <= p:
         return (d - q) / (p - q)
     else:
-        return 1
+        return 1.0
 
 
 def gaussian_criterion(d: NumericValue, s: NumericValue) -> NumericValue:
@@ -95,6 +95,6 @@ def gaussian_criterion(d: NumericValue, s: NumericValue) -> NumericValue:
     """
     e = math.e
     if d <= 0:
-        return 0
+        return 0.0
     else:
-        return 1 - e ** (-((d ** 2) / (2 * s ** 2)))
+        return 1.0 - e ** (-((d ** 2) / (2 * s ** 2)))

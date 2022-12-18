@@ -30,29 +30,109 @@ def _check_alternatives_performances(alternatives_performances: pd.DataFrame):
                          "with int or float values")
 
 
-def _check_thresholds(thresholds: pd.Series, thresholds_name: str):
+def _check_if_criteria_are_the_same(criteria_1: pd.Index,
+                                    criteria_2: pd.Index):
     """
-    Check if thresholds are valid.
+    Check if two criteria are the same.
 
-    :param thresholds: pd.Series with criteria as index and
-    thresholds as values
-    :param thresholds_name: Name of thresholds type
-    :raise ValueError: if thresholds are not valid
+    :param criteria_1: pd.Index with criteria names
+    :param criteria_2: pd.Index with criteria names
+    :raises ValueError: if criteria are not the same
     """
 
-    # Check if thresholds are a Series
-    if not isinstance(thresholds, pd.Series):
-        raise ValueError(f"{thresholds_name} should be passed as a Series")
+    # Check if criteria are the same
+    if not criteria_1.equals(criteria_2):
+        raise ValueError("Criteria are not the same in different objects")
 
-    # Check if thresholds are numeric
-    if thresholds.dtypes not in ['int32', 'int64', 'float32', 'float64']:
-        raise ValueError(f"{thresholds_name} should be passed with float "
-                         f"values")
 
-    # Check if thresholds are positive
-    if not thresholds.all() >= 0:
-        raise ValueError(f"{thresholds_name} should be passed with values "
-                         f"greater or equal to 0")
+def _check_preference_thresholds(preference_thresholds: pd.Series,
+                                 criteria: pd.Index):
+    """
+    Check if preference thresholds are valid.
+
+    :param preference_thresholds: pd.Series with criteria as index and
+    preference thresholds as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if preference thresholds are not valid
+    """
+
+    # Check if preference thresholds are a Series
+    if not isinstance(preference_thresholds, pd.Series):
+        raise TypeError("Preference thresholds should be passed as "
+                        "a Series object")
+
+    _check_if_criteria_are_the_same(preference_thresholds.index, criteria)
+
+    # Check if preference thresholds are numeric
+    for threshold in preference_thresholds:
+        if not (isinstance(threshold, int) or isinstance(threshold, float)
+                or threshold is None):
+            raise TypeError("Preference thresholds should be numeric values"
+                            " or None")
+
+    # Check if preference thresholds are not negative
+    if (preference_thresholds < 0).any():
+        raise ValueError("Preference thresholds can not be lower than 0")
+
+
+def _check_indifference_thresholds(indifference_thresholds: pd.Series,
+                                   criteria: pd.Index):
+    """
+    Check if indifference thresholds are valid.
+
+    :param indifference_thresholds: pd.Series with criteria as index and
+    indifference thresholds as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if indifference thresholds are not valid
+    """
+
+    # Check if indifference thresholds are a Series
+    if not isinstance(indifference_thresholds, pd.Series):
+        raise TypeError("Indifference thresholds should be passed as a "
+                        "Series object")
+
+    _check_if_criteria_are_the_same(indifference_thresholds.index, criteria)
+
+    # Check if indifference thresholds are numeric or None
+    for threshold in indifference_thresholds:
+        if not (isinstance(threshold, int) or isinstance(threshold, float)
+                or threshold is None):
+            raise TypeError("Indifference thresholds should be numeric values"
+                            " or None")
+
+    # Check if indifference thresholds are not negative
+    if (indifference_thresholds < 0).any():
+        raise ValueError("Indifference thresholds can not be lower than 0")
+
+
+def _check_standard_deviations(standard_deviations: pd.Series,
+                               criteria: pd.Index):
+    """
+    Check if standard deviations are valid.
+
+    :param standard_deviations: pd.Series with criteria as index and
+    standard deviations as values
+    :param criteria: pd.Index with criteria names
+    :raise ValueError: if standard deviations are not valid
+    """
+
+    # Check if standard deviations are a Series
+    if not isinstance(standard_deviations, pd.Series):
+        raise TypeError("Standard deviations should be passed as a "
+                        "Series object")
+
+    _check_if_criteria_are_the_same(standard_deviations.index, criteria)
+
+    # Check if standard deviations thresholds are numeric
+    for deviation in standard_deviations:
+        if not (isinstance(deviation, int) or isinstance(deviation, float)
+                or deviation is None):
+            raise TypeError("Standard deviations should be numeric values"
+                            " or None")
+
+    # Check if standard deviations are not negative
+    if (standard_deviations < 0).any():
+        raise ValueError("Standard deviations can not be lower than 0")
 
 
 def _check_generalized_criteria(generalized_criteria: pd.Series):
@@ -97,7 +177,7 @@ def _check_weights(weights: pd.Series):
     """
     Check if weights are valid.
 
-    :param weights: pd.Series with criteria as index an weights as values
+    :param weights: pd.Series with criteria as index a weights as values
     :raises ValueError: if weights are not valid
     """
 
@@ -327,9 +407,12 @@ def intervalp2clust_validation(alternatives_performances: pd.DataFrame,
     """
 
     _check_alternatives_performances(alternatives_performances)
-    _check_thresholds(preference_thresholds, "Preference thresholds")
-    _check_thresholds(indifference_thresholds, "Indifference thresholds")
-    _check_thresholds(standard_deviations, "Standard deviations")
+    _check_preference_thresholds(preference_thresholds,
+                                 criteria_weights.index)
+    _check_indifference_thresholds(indifference_thresholds,
+                                   criteria_weights.index)
+    _check_standard_deviations(standard_deviations,
+                               criteria_weights.index)
     _check_generalized_criteria(generalized_criteria)
     _check_criteria_directions(criteria_directions)
     _check_weights(criteria_weights)
