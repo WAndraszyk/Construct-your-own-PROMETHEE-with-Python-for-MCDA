@@ -425,10 +425,11 @@ def cluster_using_interval_pclust(alternatives_performances: pd.DataFrame,
     weights as values
     :param n_categories: integer, indicates number of clusters to create
     :param max_iterations: integer, sets maximum number of iterations.
-    :return: Tuple with pd.Series with alternatives as index and cluster
-    tag as values, pd.DataFrame with centroids tags as index and criteria
-    as columns and global quality index as float. The pd.Series shows
-    to which cluster the alternative belongs. The pd.DataFrame shows
+    :return: Tuple with pd.Series with principal and not empty interval
+    categories as index and list with alternatives names assigned to
+    particular cluster as values, pd.DataFrame with centroids tags as index
+    and criteria as columns and global quality index as float. The pd.Series
+    shows to which cluster the alternative belongs. The pd.DataFrame shows
     performances of central profiles(centroids).
     """
 
@@ -556,14 +557,13 @@ def cluster_using_interval_pclust(alternatives_performances: pd.DataFrame,
 
     # Prepare output
     # Insert principal categories assignments
-    assignments = pd.Series(index=alternatives_performances.index, dtype=str)
+    clusters = pd.Series(index=categories, dtype='object')
     for category, alternatives in principal_categories.items():
-        for alternative in alternatives:
-            assignments.loc[alternative] = category
+        clusters.loc[category] = alternatives
     # Insert interval categories assignments
     for category, subcategories in interval_categories.items():
         for subcategory, alternatives in subcategories.items():
-            for alternative in alternatives:
-                assignments.loc[alternative] = category + subcategory
+            if len(alternatives) > 0:
+                clusters.loc[category+subcategory] = alternatives
 
-    return assignments, central_profiles, global_quality_index
+    return clusters, central_profiles, global_quality_index

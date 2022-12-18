@@ -68,7 +68,7 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
                 deleted_nodes.append(i)
         clusters.append(cluster)
     clusters_fin = pd.Series(clusters, name='Alternatives in clusters')
-    clusters_fin.index += 1
+    clusters_fin.index = [f"C{i}" for i in range(1, len(clusters_fin) + 1)]
     return clusters_fin
 
 

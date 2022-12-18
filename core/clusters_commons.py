@@ -25,6 +25,26 @@ def group_alternatives(assignment: pd.Series) -> pd.Series:
     return cluster
 
 
+def change_clusters_output(clusters: pd.Series) -> pd.Series:
+    """
+    Changes clusters output from pd.Series with clusters as indexes
+    and list of assigned alternatives as values to pd.Series with
+    alternatives as indexes and assigned cluster as value.
+
+    :param clusters: pd.Series with clusters as indexes and list of
+        assigned alternatives as values
+    :return: pd.Series with alternatives as indexes and assigned
+        cluster as value
+    """
+
+    output = pd.Series([], dtype=str)
+    for cluster, alternatives in clusters.items():
+        for alternative in alternatives:
+            output[alternative] = cluster
+    output.sort_index(inplace=True)
+    return output
+
+
 def calculate_new_profiles(profiles_performances: pd.DataFrame,
                            alternatives_performances: pd.DataFrame,
                            assignment: Union[pd.DataFrame, pd.Series],

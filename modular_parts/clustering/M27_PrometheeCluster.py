@@ -69,7 +69,7 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
     # initialize central profiles_performances by random choosing them from
     # alternatives
     profiles = alternatives_performances.iloc[
-        random.sample(range(0, alternatives_performances.index.__len__()),
+        random.sample(range(0, len(alternatives_performances.index)),
                       n_categories)]
     profiles.index = categories
 
@@ -91,7 +91,11 @@ def promethee_cluster(alternatives_performances: pd.DataFrame,
     # change output from Series with alternatives indices and categories as
     # values to categories indices and alternatives as values
     cluster = group_alternatives(assignment)
-    cluster.sort_values(key=lambda x: x.str.len(), inplace=True)
+    # temporary switch of the indexes for proper sorting
+    # (f.e. for strings '2' < '11')
+    cluster.index = [int(category[1:]) for category in cluster.index]
+    cluster.sort_index(inplace=True)
+    cluster.index = categories
     return cluster
 
 
