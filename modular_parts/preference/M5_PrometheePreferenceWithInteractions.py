@@ -77,6 +77,9 @@ def compute_preference_indices_with_interactions(
     alternatives = alternatives_performances.index
     criteria = weights.index
 
+    # weights normalization
+    weights = weights/sum(weights)
+
     # changing values of alternatives' performances according to direction
     # of criterion for further calculations
     alternatives_performances = pc.directed_alternatives_performances(
