@@ -12,6 +12,7 @@ from core.input_validation import ordered_clustering_validation
 from core.graph import Graph
 import numpy as np
 import pandas as pd
+import copy
 
 __all__ = ["group_into_ordered_clusters"]
 
@@ -33,14 +34,14 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
 
     alternatives = preferences.index
     shape = np.shape(preferences)
-    preferences = list(preferences.values)
+    preferences_list = copy.deepcopy(list(preferences.values))
 
     graph = np.zeros(shape)
     clusters = []
     deleted_nodes = []
     while True:
         # find maximum preference value
-        max_pi, i, j = _search_max(preferences)
+        max_pi, i, j = _search_max(preferences_list)
         if max_pi == 0:
             break
         else:
@@ -50,7 +51,7 @@ def group_into_ordered_clusters(preferences: pd.DataFrame, k: int
             if _check_graph(graph, k):
                 # delete the edge between node i and j
                 graph[i][j] = 0
-            preferences[i][j] = 0
+            preferences_list[i][j] = 0
 
     while True:
         cluster = []
