@@ -1,6 +1,9 @@
 """
 This module implements the basic way of calculating preference indices with
 Promethee Preference method.
+
+Implementation and naming of conventions are taken from
+:cite:p:'BransMareschal2005'.
 """
 from typing import Tuple, Union
 

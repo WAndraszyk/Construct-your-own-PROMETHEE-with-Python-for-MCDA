@@ -2,6 +2,9 @@
     This class calculates aggregated flows which are weighted sum of flows
     for every alternative.
     Allows many Decision Makers to get influence on final flows.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'MacharisBransMareschal1998'.
 """
 import pandas as pd
 from core.input_validation import promethee_group_ranking_validation

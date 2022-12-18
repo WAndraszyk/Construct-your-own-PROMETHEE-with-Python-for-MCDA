@@ -1,6 +1,9 @@
 """
 This class computes Promethee III intervals and ranking based on positive
 and negative flows and preferences.
+
+Implementation and naming of conventions are taken from
+:cite:p:'PrometheeIII'.
 """
 from typing import List, Tuple
 

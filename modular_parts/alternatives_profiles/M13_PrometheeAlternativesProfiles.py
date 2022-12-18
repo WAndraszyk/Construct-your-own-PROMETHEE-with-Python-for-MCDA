@@ -1,5 +1,8 @@
 """
     This module profile the alternatives using the single criterion net flows.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'BransMareschal2005'.
 """
 
 import pandas as pd

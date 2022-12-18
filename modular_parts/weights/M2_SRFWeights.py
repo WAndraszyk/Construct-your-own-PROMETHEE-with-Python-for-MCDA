@@ -3,7 +3,7 @@
     (or Simos-Roy-Figueira; SRF) method.
 
     Implementation and naming of conventions are taken from
-    :cite:p:'FigueiraRoy2001'
+    :cite:p:'FigueiraRoy2001'.
 """
 import math
 import pandas as pd

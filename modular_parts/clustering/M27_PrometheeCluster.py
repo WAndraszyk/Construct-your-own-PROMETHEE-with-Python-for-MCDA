@@ -1,6 +1,9 @@
 """
 This module implements clustering method based on PrometheeTri and k-mean
 algorithm.
+
+Implementation and naming of conventions are taken from
+:cite:p:'PClusterTri'.
 """
 from typing import Tuple
 import numpy as np

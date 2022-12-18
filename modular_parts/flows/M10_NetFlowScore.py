@@ -1,6 +1,9 @@
 """
     This class computes Net Flow Score which bases on calculating scores
     associated with each alternative.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'KadzinskiMichalski2016' and :cite:p:'BouyssouPerny1992'.
 """
 import math
 import numpy as np

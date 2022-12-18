@@ -1,6 +1,9 @@
 """
     This module computes the assignments of given alternatives to categories
     using FlowSort procedure based on PrometheeI flows.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'NemeryLamboray2007'.
 """
 
 import pandas as pd

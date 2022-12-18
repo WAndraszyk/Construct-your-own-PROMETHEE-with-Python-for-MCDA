@@ -2,6 +2,9 @@
 This module implements Promethee V method, which
 maximises the result of {0,1} linear programming problem
 by choosing appropriate set of alternatives.
+
+Implementation and naming of conventions are taken from
+:cite:p:'BransMareschal2005'.
 """
 from core.constraint import Constraint
 from core.linear_solver import solve_linear_problem

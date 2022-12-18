@@ -1,5 +1,8 @@
 """
 This module calculates preference indices with interactions between criteria.
+
+Implementation and naming of conventions are taken from
+:cite:p:'ElectreInteractions'.
 """
 from typing import Tuple, Union
 from core.aliases import NumericValue

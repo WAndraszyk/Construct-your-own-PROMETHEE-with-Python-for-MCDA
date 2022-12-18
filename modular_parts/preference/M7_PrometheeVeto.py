@@ -1,5 +1,8 @@
 """
 This module calculates preference indices with veto thresholds
+
+Implementation and naming of conventions are taken from
+:cite:p:'???'.
 """
 from core.aliases import NumericValue
 import core.preference_commons as pc

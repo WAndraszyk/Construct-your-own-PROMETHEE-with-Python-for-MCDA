@@ -1,7 +1,10 @@
 """
 This module implements the Ordered Clustering method which divides
 alternatives into k ordered clusters based on the preference
-indices matrix
+indices matrix.
+
+Implementation and naming of conventions are taken from
+:cite:p:'???'.
 """
 from typing import List, Tuple
 from core.aliases import NumericValue

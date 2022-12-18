@@ -1,6 +1,9 @@
 """
     This class compute PrometheeIRanking based on positive and negative flows.
     Implemented method is generalized to relation of the weak preference.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'BransMareschal2005'.
 """
 import math
 

@@ -1,6 +1,9 @@
 """
     This module computes net outranking flows based on positive and negative
     outranking flows.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'BransMareschal2005'.
 """
 from typing import Union
 

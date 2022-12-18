@@ -1,6 +1,9 @@
 """
     This module computes the assignments of given alternatives to categories
     using Promethee Tri method.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'FigueiraDeSmetBrans2004' and :cite:p:'ArazOzkarahan2007'.
 """
 
 import pandas as pd

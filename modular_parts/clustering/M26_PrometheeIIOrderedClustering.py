@@ -1,6 +1,9 @@
 """
 This module implements clustering method based on FlowSort and k-mean
 algorithm.
+
+Implementation and naming of conventions are taken from
+:cite:p:'P2CLUST'.
 """
 import numpy as np
 import pandas as pd

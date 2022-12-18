@@ -1,6 +1,9 @@
 """
     This module computes the assignments of given alternatives to
     categories using PromSort.
+
+    Implementation and naming of conventions are taken from
+    :cite:p:'ArazOzkarahan2007'.
 """
 import math
 import pandas as pd
