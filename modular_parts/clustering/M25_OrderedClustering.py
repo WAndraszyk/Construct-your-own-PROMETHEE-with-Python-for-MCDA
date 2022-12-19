@@ -4,7 +4,7 @@ alternatives into k ordered clusters based on the preference
 indices matrix.
 
 Implementation and naming of conventions are taken from
-:cite:p:'???'.
+:cite:p:'Clustering'.
 """
 from typing import List, Tuple
 from core.aliases import NumericValue

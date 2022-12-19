@@ -3,7 +3,7 @@ This module creates a Promethee II ranking based on flows calculated with
 Promethee II method.
 
 Implementation and naming of conventions are taken from
-:cite:p:'???'.
+:cite:p:'BransMareschal2005'.
 """
 import pandas as pd
 from core.input_validation import promethee_ii_ranking_validation
