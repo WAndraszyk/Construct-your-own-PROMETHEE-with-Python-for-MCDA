@@ -68,8 +68,8 @@ def compute_veto(
     alternatives = alternatives_performances.index
     criteria = weights.keys()
 
-    # weights normalization
-    weights = weights/sum(weights)
+    # # weights normalization
+    # weights = weights/sum(weights)
 
     # changing values of alternatives' performances according to direction
     # of criterion for further calculations
@@ -149,8 +149,15 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
     :return: DataFrame of veto indices as value and
         alternatives/profiles as index and columns
     """
+
+    # calculating sum of weights
+    weight_sum = sum(weights.values)
+
+    # checking if second set of alternatives/profiles is given
     if j_iter is None:
+        # if there is not, use the first one for both
         j_iter = i_iter
+
     vetoes = []
     index = partial_veto.loc[criteria[0]].index
     columns = partial_veto.loc[criteria[0]].columns
@@ -168,7 +175,8 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
                         break
                 else:
                     pi_a_b += partial_veto.loc[k, j][i] * weights[k]
-
+            if (pi_a_b != 0 or pi_a_b != 1) and not strong_veto:
+                pi_a_b /= weight_sum
             aggregated_v.append(round(pi_a_b, decimal_place))
         vetoes.append(aggregated_v)
 

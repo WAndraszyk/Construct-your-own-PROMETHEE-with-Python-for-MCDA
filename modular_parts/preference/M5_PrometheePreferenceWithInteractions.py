@@ -77,9 +77,6 @@ def compute_preference_indices_with_interactions(
     alternatives = alternatives_performances.index
     criteria = weights.index
 
-    # weights normalization
-    weights = weights/sum(weights)
-
     # changing values of alternatives' performances according to direction
     # of criterion for further calculations
     alternatives_performances = pc.directed_alternatives_performances(
@@ -154,6 +151,10 @@ def _preferences(minimum_interaction_effect: bool,
     :return: DataFrame of aggregated preference indices as values,
         alternatives/profiles as index and columns.
     """
+
+    # calculating sum of weights
+    weight_sum = sum(weights.values)
+
     # checking if second set of alternatives/profiles is given
     if j_iter is None:
         # if there is not, use the first one for both
@@ -167,7 +168,7 @@ def _preferences(minimum_interaction_effect: bool,
             interaction_ab = 0
             for k in criteria:
                 pi_a_b += partial_pref.loc[k, i][j] * weights[k]
-
+            pi_a_b /= weight_sum
             # calculating interaction effect for every interaction
             for key in interactions.index.values:
                 k1 = interactions['criterion_1'].loc[key]
@@ -189,7 +190,7 @@ def _preferences(minimum_interaction_effect: bool,
             # aggregate partial preference indices and interation effect
             # from each criterion
             aggregated = round((pi_a_b + interaction_ab) / (
-                    sum(weights.values) + interaction_ab), decimal_place)
+                    1 + interaction_ab), decimal_place)
             aggregated_pi.append(aggregated if aggregated >= 0 else 0)
         preferences.append(aggregated_pi)
     preferences = pd.DataFrame(data=preferences, columns=j_iter, index=i_iter)
