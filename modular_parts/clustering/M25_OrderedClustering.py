@@ -84,7 +84,7 @@ def _search_max(preferences: List[List[NumericValue]]
     :param preferences: matrix of preference indices
     :return: Tuple of maximum preference value and its position in matrix
     """
-    max_pi = 0
+    max_pi = 0.0
     pi_i = 0
     pi_j = 0
     # iterate through preference indices and find the maximum
