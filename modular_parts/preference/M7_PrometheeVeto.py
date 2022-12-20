@@ -4,9 +4,10 @@ This module calculates preference indices with veto thresholds
 Implementation and naming of conventions are taken from
 :cite:p:'???'.
 """
+
+import pandas as pd
 from core.aliases import NumericValue
 import core.preference_commons as pc
-import pandas as pd
 from typing import Tuple, List, Union
 
 __all__ = ["compute_veto"]
@@ -134,7 +135,7 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
             i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
     """
     Calculates aggregated veto indices.
-    
+
     :param criteria: pd.Index with criteria indices
     :param weights: Series with weights as values and criteria as index
     :param strong_veto: boolean value representing strong veto or discordance
@@ -145,12 +146,18 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
     :param decimal_place: the decimal place of the output numbers
     :param i_iter: alternatives or categories profiles
     :param j_iter: alternatives or categories profiles or None
-
     :return: DataFrame of veto indices as value and
         alternatives/profiles as index and columns
     """
+
+    # calculating sum of weights
+    weight_sum = sum(weights.values)
+
+    # checking if second set of alternatives/profiles is given
     if j_iter is None:
+        # if there is not, use the first one for both
         j_iter = i_iter
+
     vetoes = []
     index = partial_veto.loc[criteria[0]].index
     columns = partial_veto.loc[criteria[0]].columns
@@ -168,7 +175,8 @@ def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
                         break
                 else:
                     pi_a_b += partial_veto.loc[k, j][i] * weights[k]
-
+            if (pi_a_b != 0 or pi_a_b != 1) and not strong_veto:
+                pi_a_b /= weight_sum
             aggregated_v.append(round(pi_a_b, decimal_place))
         vetoes.append(aggregated_v)
 
