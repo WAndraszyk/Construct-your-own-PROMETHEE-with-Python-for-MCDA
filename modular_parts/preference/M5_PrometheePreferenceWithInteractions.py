@@ -4,6 +4,7 @@ This module calculates preference indices with interactions between criteria.
 Implementation and naming of conventions are taken from
 :cite:p:'ElectreInteractions'.
 """
+
 import pandas as pd
 from typing import Tuple, Union
 from core.aliases import NumericValue
@@ -169,6 +170,8 @@ def _preferences(minimum_interaction_effect: bool,
             interaction_ab = 0
             for k in criteria:
                 pi_a_b += partial_pref.loc[k, i][j] * weights[k]
+
+            # weights normalization
             pi_a_b /= weight_sum
             # calculating interaction effect for every interaction
             for key in interactions.index.values:
@@ -190,6 +193,9 @@ def _preferences(minimum_interaction_effect: bool,
                         partial_pref.loc[k2, i][j]) * coefficient
             # aggregate partial preference indices and interation effect
             # from each criterion
+
+            # weights normalization, because for normal aggrageted preference
+            # we made normalization earlier, instead of weight_sum we use 1
             aggregated = round((pi_a_b + interaction_ab) / (
                     1 + interaction_ab), decimal_place)
             aggregated_pi.append(aggregated if aggregated >= 0 else 0)
