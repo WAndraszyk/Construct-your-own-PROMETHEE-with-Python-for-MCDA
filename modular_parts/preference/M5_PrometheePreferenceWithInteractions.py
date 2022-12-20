@@ -29,7 +29,8 @@ def compute_preference_indices_with_interactions(
         decimal_place: NumericValue = 3,
         minimum_interaction_effect: bool = False) -> Union[
     Tuple[pd.DataFrame, pd.DataFrame], Tuple[
-        Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]]:
+        Tuple[pd.DataFrame, pd.DataFrame], Tuple[
+        Tuple[pd.DataFrame, pd.DataFrame]]]]:
     """
     Calculates preference of every alternative over other alternatives
     or profiles based on partial preferences. Includes

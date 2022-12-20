@@ -24,12 +24,12 @@ def compute_veto(
         decimal_place: NumericValue = 3,
         preferences=None) -> Union[
     Tuple[
-        Union[pd.DataFrame, List[pd.DataFrame]],
-        Union[pd.DataFrame, List[pd.DataFrame]]],
+        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
+        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]],
     Tuple[
-        Union[pd.DataFrame, List[pd.DataFrame]],
-        Union[pd.DataFrame, List[pd.DataFrame]],
-        Union[pd.DataFrame, Tuple[pd.DataFrame]]]]:
+        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
+        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
+        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]]]:
     """
     Calculates veto of every alternative over other alternatives
     or profiles_performances based on partial veto
@@ -96,32 +96,31 @@ def compute_veto(
     # checking if categories_profiles exist
     if categories_profiles is None:
         # calculating veto indices for alternatives over alternatives
+
         veto = _vetoes(criteria, weights, strong_veto, partial_vet,
                        decimal_place, alternatives)
-        partial_veto = partial_vet
     else:
         profiles = True
         # calculating veto indices for alternatives over profiles
         # and profiles over alternatives
-        partial_veto = partial_vet[1], partial_vet[0]
         veto = (
-            _vetoes(criteria, weights, strong_veto, partial_vet[1],
+            _vetoes(criteria, weights, strong_veto, partial_vet[0],
                     decimal_place,
                     categories_profiles,
                     alternatives),
-            _vetoes(criteria, weights, strong_veto, partial_vet[0],
+            _vetoes(criteria, weights, strong_veto, partial_vet[1],
                     decimal_place,
                     alternatives,
                     categories_profiles))
 
     # check whether to calculate overall preference
     if preferences is not None:
-        return veto, partial_veto, pc.overall_preference(preferences,
-                                                         veto,
-                                                         profiles,
-                                                         decimal_place)
+        return veto, partial_vet, pc.overall_preference(preferences,
+                                                        veto,
+                                                        profiles,
+                                                        decimal_place)
     else:
-        return veto, partial_veto
+        return veto, partial_vet
 
 
 def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
@@ -218,11 +217,11 @@ def _partial_veto(veto_thresholds: pd.Series, criteria: pd.Index,
         # and profiles over alternatives at every criterion
         pvetos = (
             _veto_deep(veto_thresholds=veto_thresholds, criteria=criteria,
-                       deviations=deviations[0],
+                       deviations=deviations[1],
                        i_iter=alternatives_performances,
                        j_iter=profile_performances),
             _veto_deep(veto_thresholds=veto_thresholds, criteria=criteria,
-                       deviations=deviations[1],
+                       deviations=deviations[0],
                        i_iter=profile_performances,
                        j_iter=alternatives_performances))
     return pvetos
@@ -253,12 +252,12 @@ def _veto_deep(veto_thresholds: pd.Series, criteria: pd.Index,
     for k in range(criteria.size):
         v = veto_thresholds[k]
         criterion_indices = []
-        for j in range(i_iter.shape[0]):
+        for i in range(i_iter.shape[0]):
             alternative_vetoes = []
-            for i in range(j_iter.shape[0]):
+            for j in range(j_iter.shape[0]):
                 if v is None:
                     alternative_vetoes.append(0)
-                elif deviations[k][i][j] >= v:
+                elif deviations[k][j][i] >= v:
                     alternative_vetoes.append(1)
                 else:
                     alternative_vetoes.append(0)
