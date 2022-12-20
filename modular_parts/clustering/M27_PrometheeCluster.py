@@ -5,14 +5,16 @@ algorithm.
 Implementation and naming of conventions are taken from
 :cite:p:'PClusterTri'.
 """
+
+
+import random
+import pandas as pd
 from typing import Tuple
 import numpy as np
 import core.preference_commons as pc
 from core.clusters_commons import group_alternatives, calculate_new_profiles
 from core.input_validation import promethee_cluster_validation
 from modular_parts.sorting import calculate_prometheetri_sorted_alternatives
-import pandas as pd
-import random
 from modular_parts.preference.M3_PrometheePreference import \
     compute_preference_indices
 

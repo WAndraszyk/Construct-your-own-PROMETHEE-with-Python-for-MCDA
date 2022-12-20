@@ -4,10 +4,11 @@ This module calculates preference indices with interactions between criteria.
 Implementation and naming of conventions are taken from
 :cite:p:'ElectreInteractions'.
 """
+import pandas as pd
 from typing import Tuple, Union
 from core.aliases import NumericValue
 import core.preference_commons as pc
-import pandas as pd
+
 
 __all__ = ["compute_preference_indices_with_interactions"]
 
@@ -154,7 +155,7 @@ def _preferences(minimum_interaction_effect: bool,
 
     # calculating sum of weights
     weight_sum = sum(weights.values)
-
+    print()
     # checking if second set of alternatives/profiles is given
     if j_iter is None:
         # if there is not, use the first one for both

@@ -5,6 +5,7 @@ Promethee II method.
 Implementation and naming of conventions are taken from
 :cite:p:'BransMareschal2005'.
 """
+
 import pandas as pd
 from core.input_validation import promethee_ii_ranking_validation
 __all__ = ["calculate_promethee_ii_ranking"]

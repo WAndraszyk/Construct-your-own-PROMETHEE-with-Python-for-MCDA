@@ -4,10 +4,10 @@ This module calculates preference indices with veto thresholds
 Implementation and naming of conventions are taken from
 :cite:p:'Veto'.
 """
-from core.aliases import NumericValue
-import core.preference_commons as pc
 import pandas as pd
 from typing import Tuple, List, Union
+from core.aliases import NumericValue
+import core.preference_commons as pc
 
 __all__ = ["compute_veto"]
 

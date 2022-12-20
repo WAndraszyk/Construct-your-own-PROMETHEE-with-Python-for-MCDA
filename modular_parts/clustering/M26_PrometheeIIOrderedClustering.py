@@ -5,6 +5,7 @@ algorithm.
 Implementation and naming of conventions are taken from
 :cite:p:'P2CLUST'.
 """
+
 import numpy as np
 import pandas as pd
 import core.preference_commons as pc
