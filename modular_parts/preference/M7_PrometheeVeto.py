@@ -68,8 +68,8 @@ def compute_veto(
     alternatives = alternatives_performances.index
     criteria = weights.keys()
 
-    # weights normalization
-    weights = weights/sum(weights)
+    # # weights normalization
+    # weights = weights/sum(weights)
 
     # changing values of alternatives' performances according to direction
     # of criterion for further calculations
