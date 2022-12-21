@@ -124,8 +124,7 @@ def compute_veto(
 
 
 def _vetoes(criteria: pd.Index, weights: pd.Series, strong_veto: bool,
-            partial_veto: Union[
-                pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
+            partial_veto:pd.DataFrame,
             decimal_place: NumericValue,
             i_iter: pd.Index, j_iter: pd.Index = None) -> pd.DataFrame:
     """
