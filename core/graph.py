@@ -70,17 +70,17 @@ class Graph:
         :return: the length of the longest path in the graph
         """
         n = self.V
-        dp = [0] * (n + 1)
+        dp = [0] * n
 
-        vis = [False] * (n + 1)
+        vis = [False] * n
 
-        for i in range(1, n + 1):
+        for i in range(n):
             if not vis[i]:
                 self.__dfs__(i, self.graph, dp, vis)
 
         ans = 0
 
-        for i in range(1, n + 1):
+        for i in range(n):
             ans = max(ans, dp[i])
 
         return ans

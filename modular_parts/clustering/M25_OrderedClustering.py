@@ -124,7 +124,7 @@ def _check_graph(graph: np.ndarray, k: int) -> bool:
     is_cyclic = g.is_cyclic()
     if not is_cyclic:
         # check the maximum path length
-        return g.find_longest_path() >= k - 1
+        return g.find_longest_path() > k - 1
     else:
         return True
 
