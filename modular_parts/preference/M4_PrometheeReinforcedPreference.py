@@ -8,6 +8,9 @@ Implementation and naming of conventions are taken from
 :cite:p:'ReinforcedPreference'.
 """
 from typing import List, Tuple, Union
+
+import numpy as np
+
 from core.preference_commons import GeneralCriterion
 from core.aliases import NumericValue
 from core.input_validation import reinforced_preference_validation
@@ -258,7 +261,7 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
                 # check if there is a rp threshold
                 if reinforced_preference_thresholds[criteria[k]].dtype \
                         in ["int", "int32", "int64", "float", "float32",
-                            "float64"]:
+                            "float64"] and not np.isnan(reinforced_preference_thresholds[criteria[k]]):
                     is_rp_none = False
                     # check if deviation exceeds the rp threshold
                     exceeds = deviations[k][i][j] > \
@@ -311,6 +314,7 @@ def _pp_deep(criteria: pd.Index, generalized_criteria: pd.Series,
                         alternativeIndex = \
                             gc.gaussian_criterion(deviations[k][i][j], s)
                     else:
+                        print(is_rp_none)
                         raise ValueError(
                             "pref_func "
                             + str(method)

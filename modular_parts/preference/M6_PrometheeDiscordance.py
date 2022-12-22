@@ -16,11 +16,12 @@ __all__ = ["compute_discordance"]
 
 
 def compute_discordance(criteria: List[str],
-                        partial_preferences: Union[pd.DataFrame,
-                                                   Tuple[pd.DataFrame]],
+                        partial_preferences: Union[
+                            pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
                         tau: NumericValue, decimal_place: NumericValue = 3,
-                        preferences: Union[pd.DataFrame,
-                                           Tuple[pd.DataFrame]] = None,
+                        preferences: Union[
+                            pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]
+                        = None,
                         were_categories_profiles: bool = False
                         ) -> Union[
     Tuple[
@@ -29,7 +30,7 @@ def compute_discordance(criteria: List[str],
     Tuple[
         Union[pd.DataFrame, List[pd.DataFrame]],
         Union[pd.DataFrame, List[pd.DataFrame]],
-        Union[pd.DataFrame, Tuple[pd.DataFrame]]]]:
+        Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]]]:
     """
     Calculates overall discordance by aggregating partial discordance indices.
 

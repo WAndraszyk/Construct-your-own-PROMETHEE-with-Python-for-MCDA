@@ -81,7 +81,6 @@ def test_veto_preference(alternatives, alternatives_performances, weights,
         alternatives_performances=alternatives_performances, weights=weights,
         veto_thresholds=vetoes,
         directions=directions)
-
     assert_frame_equal(actual, expected, atol=0.006)
 
 

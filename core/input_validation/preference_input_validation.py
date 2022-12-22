@@ -418,13 +418,13 @@ def _check_criteria(criteria: List[str]):
     """
 
     # Check if criteria are list
-    if not isinstance(criteria, list):
+    if not (isinstance(criteria, list) or isinstance(criteria, pd.Index)):
         raise TypeError("Criteria should be passed as a list object")
 
     # Check if all criteria are strings
-    for k in criteria:
-        if not isinstance(k, str):
-            raise TypeError("Criterion should be a string")
+    # for k in criteria:
+    #     if not isinstance(k, str):
+    #         raise TypeError("Criterion should be a string")
 
 
 def _check_partial_preferences(

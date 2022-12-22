@@ -5,10 +5,9 @@
     Implementation and naming of conventions are taken from
     :cite:p:'BransMareschal2005'.
 """
+
 from typing import Union
-
 import pandas as pd
-
 __all__ = ['calculate_net_outranking_flows']
 
 from core.input_validation import calculate_net_outranking_flows_validation

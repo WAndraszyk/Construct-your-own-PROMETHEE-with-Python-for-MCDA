@@ -4,7 +4,7 @@ alternatives into k ordered clusters based on the preference
 indices matrix.
 
 Implementation and naming of conventions are taken from
-:cite:p:'???'.
+:cite:p:'Clustering'.
 """
 from typing import List, Tuple
 from core.aliases import NumericValue
@@ -84,7 +84,7 @@ def _search_max(preferences: List[List[NumericValue]]
     :param preferences: matrix of preference indices
     :return: Tuple of maximum preference value and its position in matrix
     """
-    max_pi = 0
+    max_pi = 0.0
     pi_i = 0
     pi_j = 0
     # iterate through preference indices and find the maximum
@@ -124,7 +124,7 @@ def _check_graph(graph: np.ndarray, k: int) -> bool:
     is_cyclic = g.is_cyclic()
     if not is_cyclic:
         # check the maximum path length
-        return g.find_longest_path() >= k - 1
+        return g.find_longest_path() > k - 1
     else:
         return True
 
