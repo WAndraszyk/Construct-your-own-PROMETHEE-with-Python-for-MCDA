@@ -1,18 +1,17 @@
 import math
-from core.aliases import NumericValue
+from typing import Union
 
 
-def usual_criterion(d: NumericValue) -> NumericValue:
-    """
-    Returns 0 if difference is less or equal to 0, if not it returns 1.
-
+def usual_criterion(d: Union[int, float]) -> Union[int, float]:
+    """Returns 0 if difference is less or equal to 0, if not it returns 1.
     :param d: difference between two alternatives on a specified criterion
-    :return: preference value
+
+    :returns: preference value
     """
     return 1.0 if d > 0 else 0.0
 
 
-def u_shape_criterion(d: NumericValue, q: NumericValue) -> NumericValue:
+def u_shape_criterion(d: Union[int, float], q: Union[int, float]) -> Union[int, float]:
     """
     Returns 0 if difference is less or equal to q, if not it returns 1.
 
@@ -26,7 +25,7 @@ def u_shape_criterion(d: NumericValue, q: NumericValue) -> NumericValue:
         return 1.0
 
 
-def v_shape_criterion(d: NumericValue, p: NumericValue) -> NumericValue:
+def v_shape_criterion(d: Union[int, float], p: Union[int, float]) -> Union[int, float]:
     """
     Returns 0 if difference is less or equal to p, 1 if it is greater than p.
     Else it calculates the number between 0 and 1 based on the difference.
@@ -43,8 +42,9 @@ def v_shape_criterion(d: NumericValue, p: NumericValue) -> NumericValue:
         return 1.0
 
 
-def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue
-                    ) -> NumericValue:
+def level_criterion(
+    d: Union[int, float], p: Union[int, float], q: Union[int, float]
+) -> Union[int, float]:
     """
     Returns: 0 for d<=q,
              0.5 for q<d<=p,
@@ -64,8 +64,9 @@ def level_criterion(d: NumericValue, p: NumericValue, q: NumericValue
         return 1.0
 
 
-def v_shape_indifference_criterion(d: NumericValue, p: NumericValue,
-                                   q: NumericValue) -> NumericValue:
+def v_shape_indifference_criterion(
+    d: Union[int, float], p: Union[int, float], q: Union[int, float]
+) -> Union[int, float]:
     """
     Returns 0 if difference is less or equal to q, 1 if it is greater than p.
     Else it calculates the number between 0 and 1 based on the difference.
@@ -83,18 +84,18 @@ def v_shape_indifference_criterion(d: NumericValue, p: NumericValue,
         return 1.0
 
 
-def gaussian_criterion(d: NumericValue, s: NumericValue) -> NumericValue:
+def gaussian_criterion(d: Union[int, float], s: Union[int, float]) -> Union[int, float]:
     """
     Calculates preference based on nonlinear gaussian function.
 
     :param s: intermediate value between q and p. Defines the inflection
-    point of the preference function.
+              point of the preference function.
     :param d: difference between two
-    alternatives on a specified criterion
+              alternatives on a specified criterion
     :return: preference value
     """
     e = math.e
     if d <= 0:
         return 0.0
     else:
-        return 1.0 - e ** (-((d ** 2) / (2 * s ** 2)))
+        return 1.0 - e ** (-((d**2) / (2 * s**2)))

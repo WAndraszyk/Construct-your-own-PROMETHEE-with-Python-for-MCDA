@@ -2,7 +2,13 @@ from enum import Enum, auto
 
 
 class SurrogateMethod(Enum):
-    """Enumeration of surrogate weights methods."""
+    """Enumeration of surrogate weights methods.
+
+    EW: represents 'equal weights' variant
+    RS: represents 'rank sum' variant
+    RR: represents 'reciprocal of ranks' variant
+    ROC: represents 'rank order centroid' variant
+    """
 
     EW = auto()
     RS = auto()
@@ -71,6 +77,7 @@ class InteractionType(Enum):
     WKN: represents a weakening interaction,
     ANT: represents an antagonistic interaction.
     """
+
     STN = 2
     WKN = 1
     ANT = -1
@@ -110,11 +117,11 @@ class RelationType(Enum):
     INDIFFERENCE = auto()
     INCOMPARABLE = auto()
     WEAK_PREFERENCE = auto()
+    REVERSE_PREFERENCE = auto()
 
     @classmethod
     def has_value(cls, x: "RelationType") -> bool:
         """Check if value is in enumeration.
-
         :param x:
         :return:
         """
@@ -123,7 +130,6 @@ class RelationType(Enum):
     @classmethod
     def content_message(cls) -> str:
         """Return list of items and their values.
-
         :return:
         """
         s = ", ".join(f"{item}: {item.value}" for item in cls)

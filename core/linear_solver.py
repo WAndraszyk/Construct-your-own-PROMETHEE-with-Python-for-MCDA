@@ -1,12 +1,14 @@
 import itertools
+from typing import List, Tuple, Union
+
 import numpy as np
-from typing import List, Tuple
-from core.constraint import Constraint, Relation
-from core.aliases import NumericValue
+
+from .constraint import Constraint, Relation
 
 
-def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue],
-                         n: int) -> Tuple[int]:
+def solve_linear_problem(
+    constraints: List[Constraint], C: List[Union[int, float]], n: int
+) -> Tuple[int, ...]:
     """
     Solves given linear problem. Component value can be either 1 or 0.
 
@@ -19,7 +21,7 @@ def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue],
     combinations = list(itertools.product([0, 1], repeat=n))
 
     max_Z = 0
-    decision = ()
+    decision: Tuple[int, ...] = ()
     for combination in combinations:
         # calculate value for a given solution
         Z = np.dot(C, combination)
@@ -40,19 +42,19 @@ def solve_linear_problem(constraints: List[Constraint], C: List[NumericValue],
     return decision
 
 
-def check_constraint(constraint: Constraint, combination: Tuple[int]) -> bool:
+def check_constraint(constraint: Constraint, combination: Tuple[int, ...]) -> bool:
     """
     This function checks whether a given combination of values satisfies
     a given constraint.
 
     :param constraint: Constraint type, which represents a mathematical
-     constraint.
+                      constraint.
     :param combination: Tuple of integer values. It represents a
-        combination of values that needs to be checked against
-         the constraint.
+                        combination of values that needs to be checked against
+                        the constraint.
 
     :return: The function returns a Boolean value indicating whether the
-        given combination satisfies the given constraint.
+             given combination satisfies the given constraint.
     """
     if constraint.relation == Relation.EQ:
         return np.dot(combination, constraint.A) == constraint.b
